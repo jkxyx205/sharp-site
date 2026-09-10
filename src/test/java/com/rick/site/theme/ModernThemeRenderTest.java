@@ -79,7 +79,7 @@ class ModernThemeRenderTest {
         assertThat(html).contains("Acme Corp");
         assertThat(html).contains("Widget A");
         assertThat(html).contains("We exhibited at Canton Fair");
-        assertThat(html).contains("/themes/modern/css/style.css");
+        assertThat(html).contains("<style");
         assertThat(html).contains("info@acme.com");
         assertThat(html).contains("沪ICP备0000号");
     }
@@ -106,7 +106,7 @@ class ModernThemeRenderTest {
                 ctx.setVariable("article", new SampleArticle("n1", "Canton Fair", "We exhibited", "<p>News body</p>", null));
             }
             String html = templateEngine.process("themes/modern/" + page, ctx);
-            assertThat(html).as(page).contains("Acme Corp").contains("/themes/modern/css/style.css");
+            assertThat(html).as(page).contains("Acme Corp").contains("<style");
         }
     }
 }

@@ -80,6 +80,6 @@ class SiteHomeControllerTest {
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("We build great things")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Founded in 2010")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Ready to work with us?")))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("/themes/modern/css/style.css")));
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("<style")));
     }
 }

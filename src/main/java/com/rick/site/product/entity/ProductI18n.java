@@ -52,7 +52,7 @@ public class ProductI18n extends BaseEntity<Long> {
     @Column(comment = "富文本正文(清洗后)")
     String content;
 
-    @Column(value = "specification_json", comment = "规格 JSON 字符串")
+    @Column(value = "specification_json", comment = "规格 JSON 字符串", columnDefinition = "jsonb")
     String specificationJson;
 
     @Length(max = 500)

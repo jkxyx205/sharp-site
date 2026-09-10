@@ -73,7 +73,7 @@ class SitePageControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("About Us")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("We are great")))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("/themes/modern/css/style.css")));
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("<style")));
     }
 
     @Test

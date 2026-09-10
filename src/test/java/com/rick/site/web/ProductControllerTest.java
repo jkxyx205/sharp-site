@@ -73,7 +73,7 @@ class ProductControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Widget A")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("/products/widget-a")))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("/themes/modern/css/style.css")));
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("<style")));
     }
 
     @Test

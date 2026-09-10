@@ -28,7 +28,13 @@ public class AdminUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        TenantContext.requireTenantId();
+        // 登录按租户域名:无租户上下文(如通过 localhost/IP 访问后台)时,
+        // requireTenantId() 会抛 BizException → 被 DaoAuthenticationProvider 包装成
+        // InternalAuthenticationServiceException(500)。改为抛 UsernameNotFoundException,
+        // 使表单登录失败优雅重定向到 /admin/login?error(与密码错误一致)。
+        if (TenantContext.get().isEmpty()) {
+            throw new UsernameNotFoundException("当前请求未解析到租户，请通过租户域名访问后台");
+        }
         AdminUser user = adminUserService.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("管理员不存在: " + username));
         return new AdminPrincipal(user.getId(), user.getTenantId(),

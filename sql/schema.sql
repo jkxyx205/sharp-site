@@ -309,3 +309,9 @@ CREATE TABLE IF NOT EXISTS publish_record (
     is_deleted BOOLEAN NOT NULL DEFAULT FALSE
 );
 CREATE UNIQUE INDEX IF NOT EXISTS uk_tenant_version ON publish_record (tenant_id, version) WHERE is_deleted = false;
+
+-- sharp-database 对 jsonb 列 UPDATE 未做 ::jsonb 转换(INSERT 内联字面量已 OK),
+-- 导致 UPDATE ... SET specification_json = ?(varchar 绑定)报类型不匹配。
+-- 补一个 varchar→jsonb 赋值转换,使 setString 绑定可写入 jsonb 列。可重复执行。
+DROP CAST IF EXISTS (varchar AS jsonb);
+CREATE CAST (varchar AS jsonb) WITH INOUT AS ASSIGNMENT;

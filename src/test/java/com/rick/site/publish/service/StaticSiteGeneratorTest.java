@@ -117,6 +117,10 @@ class StaticSiteGeneratorTest {
         assertTrue(html.contains("/products"), "root-relative product link");
         // 发布站点默认 index,follow(非预览 noindex)
         assertTrue(html.contains("index, follow"));
+        // 主题样式内联进模板,发布产物自带 <style>;不再外部引用 static/themes/modern/css
+        // (静态站点由 Nginx 提供文件,不经 Spring app,外部 CSS 路径会 404 → 样式丢失)
+        assertTrue(html.contains("<style"), "inline theme style");
+        assertTrue(!html.contains("/themes/modern/css/style.css"), "no external css link");
     }
 
     @Test

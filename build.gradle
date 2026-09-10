@@ -58,4 +58,10 @@ tasks.named('test') {
     // 默认 maxSize=10 易超限。统一压到 3,使上下文数 × 3 远低于 50,避免连接耗尽。
     systemProperty 'spring.datasource.hikari.maximum-pool-size', '3'
     systemProperty 'spring.datasource.hikari.minimum-idle', '1'
+
+    // 测试数据种子开关:仅 `-PsharpSeed` 时向测试 JVM 注入 sharp.seed=true,
+    // 激活 @EnabledIfSystemProperty 的 SeedDataTest(默认构建跳过,不污染共享库)。
+    if (project.hasProperty('sharpSeed')) {
+        systemProperty 'sharp.seed', 'true'
+    }
 }

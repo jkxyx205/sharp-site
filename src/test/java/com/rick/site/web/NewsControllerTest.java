@@ -76,7 +76,7 @@ class NewsControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Canton Fair")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("/news/canton-fair")))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("/themes/modern/css/style.css")));
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("<style")));
     }
 
     @Test
