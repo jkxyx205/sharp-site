@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- 顶部导航。active 标记当前页高亮。 -->
+<header th:fragment="header(siteName, active)" class="site-header">
+    <div class="container header-inner">
+        <a class="brand" th:href="@{/}" th:text="${siteName}">Site Name</a>
+        <button class="nav-toggle" aria-label="Toggle menu" onclick="this.parentElement.classList.toggle('open')">&#9776;</button>
+        <nav class="site-nav">
+            <a th:href="@{/}" th:classappend="${active == 'index'} ? 'active' : ''">Home</a>
+            <a th:href="@{/about}" th:classappend="${active == 'about'} ? 'active' : ''">About</a>
+            <a th:href="@{/products}" th:classappend="${active == 'products'} ? 'active' : ''">Products</a>
+            <a th:href="@{/news}" th:classappend="${active == 'news'} ? 'active' : ''">News</a>
+            <a th:href="@{/contact}" th:classappend="${active == 'contact'} ? 'active' : ''">Contact</a>
+        </nav>
+    </div>
+</header>
+</html>

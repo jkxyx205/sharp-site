@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- SEO meta 片段(ARCHITECTURE §5/§6, REQUIREMENTS §15):title/description/keywords/
+     canonical/robots/OG,数据全部来自模型(SeoConfigService.resolveView 写入),不硬编码企业内容。 -->
+<th:block th:fragment="seo(title, description, keywords, canonical, robots, siteName)">
+    <title th:text="${title + ' | ' + siteName}">Page Title | Site Name</title>
+    <meta name="description" th:content="${description}" content="" />
+    <meta name="keywords" th:content="${keywords}" content="" />
+    <link rel="canonical" th:href="${canonical}" href="/" />
+    <meta name="robots" th:content="${robots}" content="index, follow" />
+    <meta property="og:title" th:content="${ogTitle != null ? ogTitle : title}" content="" />
+    <meta property="og:description" th:content="${ogDescription != null ? ogDescription : description}" content="" />
+    <meta property="og:image" th:if="${ogImage != null and !ogImage.isEmpty()}" th:content="${ogImage}" />
+    <meta property="og:site_name" th:content="${siteName}" content="" />
+    <meta property="og:type" content="website" />
+</th:block>
+</html>

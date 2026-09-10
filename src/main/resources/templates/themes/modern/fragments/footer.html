@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- 页脚:企业信息来自模型(TenantConfig),不硬编码。 -->
+<footer th:fragment="footer(siteName, config)" class="site-footer">
+    <div class="container footer-grid">
+        <div>
+            <h4 th:text="${siteName}">Site Name</h4>
+            <p th:if="${config != null and config.address != null}" th:text="${config.address}">Address</p>
+            <p th:if="${config != null and config.email != null}">
+                <a th:href="'mailto:' + ${config.email}" th:text="${config.email}">email@example.com</a>
+            </p>
+        </div>
+        <div>
+            <p th:if="${config != null and config.phone != null}" th:text="'Tel: ' + ${config.phone}">Tel</p>
+            <p th:if="${config != null and config.whatsapp != null}" th:text="'WhatsApp: ' + ${config.whatsapp}">WhatsApp</p>
+        </div>
+        <div>
+            <p th:if="${config != null and config.copyright != null}" th:text="${config.copyright}">© Year Site</p>
+            <p th:if="${config != null and config.icp != null}" th:text="${config.icp}">ICP</p>
+        </div>
+    </div>
+</footer>
+</html>

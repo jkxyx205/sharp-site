@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{themes/modern/fragments/head :: head(pageTitle=${pageTitle}, pageDescription=${pageDescription}, pageKeywords=${pageKeywords}, canonical=${canonical}, robots=${robots}, siteName=${siteName})}"></head>
+<body>
+<header th:replace="~{themes/modern/fragments/header :: header(siteName=${siteName}, active='about')}"></header>
+
+<article class="container section">
+    <h1 th:text="${pageTitle}">About</h1>
+    <div class="rich-text" th:utext="${content} ?: ''">
+        About content goes here.
+    </div>
+</article>
+
+<footer th:replace="~{themes/modern/fragments/footer :: footer(siteName=${siteName}, config=${config})}"></footer>
+</body>
+</html>

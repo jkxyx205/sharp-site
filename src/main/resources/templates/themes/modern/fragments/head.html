@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- 公共 <head>:charset/viewport + SEO + 主题样式。 -->
+<head th:fragment="head(pageTitle, pageDescription, pageKeywords, canonical, robots, siteName)">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <th:block th:replace="~{themes/modern/fragments/seo :: seo(title=${pageTitle}, description=${pageDescription}, keywords=${pageKeywords}, canonical=${canonical}, robots=${robots}, siteName=${siteName})}"></th:block>
+    <link rel="stylesheet" th:href="@{/themes/modern/css/style.css}" href="/themes/modern/css/style.css" />
+</head>
+</html>

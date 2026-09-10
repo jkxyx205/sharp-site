@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>发布</title>
+    <style>
+        body { font-family: system-ui, sans-serif; background:#f5f5f5; margin:0; padding:40px; }
+        .card { max-width:840px; margin:20px auto; background:#fff; padding:24px; border-radius:8px; box-shadow:0 1px 4px rgba(0,0,0,.12); }
+        h1 { font-size:20px; margin:0 0 16px; }
+        nav a { margin-right:16px; color:#2563eb; }
+        .publish-bar { display:flex; align-items:center; gap:16px; margin-bottom:20px; }
+        button { background:#2563eb; color:#fff; border:0; padding:8px 18px; border-radius:4px; cursor:pointer; font-size:14px; }
+        .latest { color:#555; font-size:14px; }
+        .status-SUCCESS { color:#16a34a; font-weight:600; }
+        .status-FAILED { color:#dc2626; font-weight:600; }
+        .status-PENDING { color:#d97706; font-weight:600; }
+        table { width:100%; border-collapse:collapse; font-size:14px; }
+        th, td { text-align:left; padding:8px 10px; border-bottom:1px solid #eee; }
+        th { color:#666; font-weight:600; }
+        .err { color:#dc2626; }
+        .empty { color:#888; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>网站发布</h1>
+    <nav>
+        <a th:href="@{/admin/}">后台首页</a>
+        <a th:href="@{/admin/products}">产品管理</a>
+        <a th:href="@{/preview/}" target="_blank">预览站点</a>
+    </nav>
+    <div class="publish-bar">
+        <form method="post" th:action="@{/admin/publish}">
+            <button type="submit">发布新版本</button>
+        </form>
+        <span class="latest" th:if="${latest != null}">
+            当前状态:<span th:class="'status-' + ${latest.status}" th:text="${latest.status}">—</span>
+            · 版本 <strong th:text="${latest.version}">—</strong>
+            <span th:if="${latest.finishedAt != null}">· <span th:text="${#temporals.format(latest.finishedAt, 'yyyy-MM-dd HH:mm:ss')}">—</span></span>
+        </span>
+        <span class="latest" th:if="${latest == null}">暂无发布记录</span>
+    </div>
+
+    <table>
+        <thead>
+        <tr><th>版本</th><th>状态</th><th>开始时间</th><th>完成时间</th><th>错误信息</th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="r : ${records}">
+            <td th:text="${r.version}">v001</td>
+            <td><span th:class="'status-' + ${r.status}" th:text="${r.status}">—</span></td>
+            <td><span th:if="${r.startedAt != null}" th:text="${#temporals.format(r.startedAt, 'yyyy-MM-dd HH:mm:ss')}">—</span></td>
+            <td><span th:if="${r.finishedAt != null}" th:text="${#temporals.format(r.finishedAt, 'yyyy-MM-dd HH:mm:ss')}">—</span></td>
+            <td class="err" th:text="${r.errorMessage ?: ''}">—</td>
+        </tr>
+        <tr th:if="${records.isEmpty()}"><td colspan="5" class="empty">暂无发布记录</td></tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

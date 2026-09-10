@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{themes/modern/fragments/head :: head(pageTitle=${pageTitle}, pageDescription=${pageDescription}, pageKeywords=${pageKeywords}, canonical=${canonical}, robots=${robots}, siteName=${siteName})}"></head>
+<body>
+<header th:replace="~{themes/modern/fragments/header :: header(siteName=${siteName}, active='news')}"></header>
+
+<section class="container section">
+    <h1 th:text="${pageTitle} ?: 'News'">News</h1>
+    <ul class="news-list" th:if="${news != null and !news.isEmpty()}">
+        <li th:each="a : ${news}">
+            <a th:href="@{'/news/' + ${a.slug}}" th:text="${a.title}">News title</a>
+            <span th:if="${a.publishTime != null}" th:text="${#temporals.format(a.publishTime, 'yyyy-MM-dd')}"></span>
+        </li>
+    </ul>
+    <p th:if="${news == null or news.isEmpty()}" class="empty">No news yet.</p>
+</section>
+
+<footer th:replace="~{themes/modern/fragments/footer :: footer(siteName=${siteName}, config=${config})}"></footer>
+</body>
+</html>

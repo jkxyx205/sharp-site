@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Products · Admin</title>
+    <style>
+        body { font-family: system-ui, sans-serif; background:#f5f5f5; margin:0; padding:40px; }
+        .card { max-width:800px; margin:20px auto; background:#fff; padding:24px; border-radius:8px; box-shadow:0 1px 4px rgba(0,0,0,.12); }
+        h1 { font-size:20px; margin:0 0 16px; }
+        table { width:100%; border-collapse:collapse; font-size:14px; }
+        th, td { text-align:left; padding:8px; border-bottom:1px solid #eee; }
+        nav a { color:#2563eb; }
+        .empty { color:#888; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>产品管理</h1>
+    <nav><a th:href="@{/admin/}">← 返回</a></nav>
+    <table>
+        <thead>
+            <tr><th>Slug</th><th>状态</th><th>排序</th></tr>
+        </thead>
+        <tbody>
+            <tr th:each="p : ${products}">
+                <td th:text="${p.slug}">slug</td>
+                <td th:text="${p.status == 1 ? '上架' : '下架'}">—</td>
+                <td th:text="${p.sort}">0</td>
+            </tr>
+        </tbody>
+    </table>
+    <p class="empty" th:if="${products == null or products.isEmpty()}">暂无产品。</p>
+</div>
+</body>
+</html>

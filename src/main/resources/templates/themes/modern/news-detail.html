@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{themes/modern/fragments/head :: head(pageTitle=${pageTitle}, pageDescription=${pageDescription}, pageKeywords=${pageKeywords}, canonical=${canonical}, robots=${robots}, siteName=${siteName})}"></head>
+<body>
+<header th:replace="~{themes/modern/fragments/header :: header(siteName=${siteName}, active='news')}"></header>
+
+<article class="container section" th:if="${article != null}">
+    <h1 th:text="${article.title}">Article Title</h1>
+    <p class="meta" th:if="${article.publishTime != null}"
+       th:text="${#temporals.format(article.publishTime, 'yyyy-MM-dd')}"></p>
+    <div class="rich-text" th:utext="${article.content} ?: ''">Article content.</div>
+    <p class="back"><a th:href="@{/news}">← Back to news</a></p>
+</article>
+
+<footer th:replace="~{themes/modern/fragments/footer :: footer(siteName=${siteName}, config=${config})}"></footer>
+</body>
+</html>

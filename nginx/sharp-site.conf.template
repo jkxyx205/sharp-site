@@ -1,0 +1,82 @@
+# =============================================================================
+# sharp-site Nginx 配置模板(TASK-1402)
+#
+# 部署模型:静态站点按租户隔离落盘到 {www-root}/{tenantId}/current,
+# 由发布服务原子切换符号链接(TASK-1303)。Nginx 按 Host(域名)解析租户,
+# 将 root 指向对应租户的 current 目录,实现:
+#
+#   domain ──► /data/www/{tenantId}/current
+#
+# 租户域名 → tenantId 的映射来源:应用库 tenant_domain 表(domain 全局唯一,
+# 关联 tenant_id)。部署时按既有域名生成对应 server 块(见下方脚本说明),
+# 或通过开源动态映射方案(map / lua)按 Host 实时查表。
+#
+# 域名隔离(TASK-1403):每个 server 块 root 硬绑定到单一租户目录,
+# Nginx 不会跨租户目录穿越;current 为符号链接,nginx 默认跟随符号链接
+# (disable_symlinks off),但被 root 限定在自身租户目录内。
+# =============================================================================
+
+# ---------------------------------------------------------------------------
+# 方式 A(推荐,简单可靠):按域名生成独立 server 块
+# 部署脚本读取 tenant_domain 表,为每个主域名生成如下 server 块。
+# 适合域名数量可控的场景。模板中以占位符 {domain} / {tenant_id} 标记,
+# 由部署脚本(如 envsubst / sed)填充后写入 conf.d/。
+# ---------------------------------------------------------------------------
+server {
+    listen 80;
+    # 如启用 HTTPS,改 listen 443 ssl; 并配 ssl_certificate 等
+    server_name {domain};
+
+    # 静态根:该租户的当前发布版本(release 符号链接)
+    root /data/www/{tenant_id}/current;
+    index index.html;
+
+    # 路径首页:优先 index.html
+    location = / {
+        try_files /index.html =404;
+    }
+
+    # 静态文件:找不到则 404,不回退到 root(避免意外暴露目录)
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    # 站点地图 / robots 显式放行
+    location = /sitemap.xml { try_files /sitemap.xml =404; }
+    location = /robots.txt  { try_files /robots.txt =404; }
+
+    # 上传媒体如由后端服务,可反代到应用(可选)
+    # location /media/ {
+    #     proxy_pass http://127.0.0.1:8080;
+    #     proxy_set_header Host $host;
+    # }
+
+    # 安全:禁止点号目录穿越
+    location ~ /\. { deny all; }
+}
+
+# ---------------------------------------------------------------------------
+# 方式 B(动态映射,域名多时省 conf 维护):
+# 用 map 按 Host 查 tenantId,统一一个 server 块按变量拼 root。
+# 域名表可通过 include 进来的 /etc/nginx/tenant_map.conf 维护,
+# 该文件由应用发布脚本定期从 tenant_domain 表刷新生成。
+# ---------------------------------------------------------------------------
+# map $host $tenant_id {
+#     default "";
+#     www.tenant-a.com  100;
+#     www.tenant-b.com  200;
+#     # include /etc/nginx/tenant_map.conf;
+# }
+#
+# server {
+#     listen 80;
+#     server_name _;
+#     # 仅当 Host 命中 map 才提供静态内容,否则返回 404(未绑定域名)
+#     if ($tenant_id = "") { return 404; }
+#     root /data/www/$tenant_id/current;
+#     index index.html;
+#     location / { try_files $uri $uri/ =404; }
+#     location = /sitemap.xml { try_files /sitemap.xml =404; }
+#     location = /robots.txt  { try_files /robots.txt =404; }
+#     location ~ /\. { deny all; }
+# }

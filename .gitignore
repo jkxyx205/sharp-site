@@ -1,0 +1,18 @@
+# Gradle
+.gradle/
+build/
+out/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# 本地环境配置（数据库凭据，禁止提交）
+.env.postgres.properties
+
+# 本地数据目录（文件上传 / 静态化输出）
+data/
+
+# macOS
+.DS_Store

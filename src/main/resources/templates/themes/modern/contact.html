@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{themes/modern/fragments/head :: head(pageTitle=${pageTitle}, pageDescription=${pageDescription}, pageKeywords=${pageKeywords}, canonical=${canonical}, robots=${robots}, siteName=${siteName})}"></head>
+<body>
+<header th:replace="~{themes/modern/fragments/header :: header(siteName=${siteName}, active='contact')}"></header>
+
+<section class="container section contact">
+    <h1 th:text="${pageTitle} ?: 'Contact'">Contact</h1>
+    <div class="contact-grid">
+        <div th:if="${config != null}">
+            <p th:if="${config.address != null}" th:text="${config.address}">Address</p>
+            <p th:if="${config.phone != null}" th:text="'Tel: ' + ${config.phone}">Tel</p>
+            <p th:if="${config.mobile != null}" th:text="'Mobile: ' + ${config.mobile}">Mobile</p>
+            <p th:if="${config.email != null}">
+                <a th:href="'mailto:' + ${config.email}" th:text="${config.email}">email</a>
+            </p>
+            <p th:if="${config.whatsapp != null}" th:text="'WhatsApp: ' + ${config.whatsapp}">WhatsApp</p>
+        </div>
+        <form class="contact-form" th:action="@{/contact}" method="post">
+            <label>Name <input type="text" name="name" required /></label>
+            <label>Email <input type="email" name="email" required /></label>
+            <label>Message <textarea name="message" rows="5" required></textarea></label>
+            <button type="submit" class="btn btn-primary">Send</button>
+        </form>
+    </div>
+</section>
+
+<footer th:replace="~{themes/modern/fragments/footer :: footer(siteName=${siteName}, config=${config})}"></footer>
+</body>
+</html>

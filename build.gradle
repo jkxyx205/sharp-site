@@ -1,0 +1,61 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.5.7'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.rick.site'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+repositories {
+    mavenLocal()
+    maven { url 'https://maven.aliyun.com/repository/public/' }
+    maven { url 'https://maven.aliyun.com/repository/spring/' }
+    mavenCentral()
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    // HTML 富文本清洗(CLAUDE.md §9 要求;jsoup 无传递依赖,不引入 guava 冲突)
+    implementation 'org.jsoup:jsoup:1.18.1'
+
+    // Sharp 内部组件（文档要求，禁止另起 ORM / 字典 / 上传实现）
+    implementation 'com.rick.db:sharp-database:0.0.1-SNAPSHOT'
+    implementation 'com.rick.meta:sharp-meta:0.0.1-SNAPSHOT'
+    implementation 'com.rick.fileupload:sharp-fileupload:0.0.1-SNAPSHOT'
+
+    runtimeOnly 'org.postgresql:postgresql'
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+    // 远程库 max_connections=50;测试 JVM 内多个缓存的 Spring 上下文各持一个 HikariPool,
+    // 默认 maxSize=10 易超限。统一压到 3,使上下文数 × 3 远低于 50,避免连接耗尽。
+    systemProperty 'spring.datasource.hikari.maximum-pool-size', '3'
+    systemProperty 'spring.datasource.hikari.minimum-idle', '1'
+}

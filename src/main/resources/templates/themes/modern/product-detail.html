@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{themes/modern/fragments/head :: head(pageTitle=${product.name}, pageDescription=${product.subtitle}, pageKeywords=${pageKeywords}, canonical=${canonical}, robots=${robots}, siteName=${siteName})}"></head>
+<body>
+<header th:replace="~{themes/modern/fragments/header :: header(siteName=${siteName}, active='products')}"></header>
+
+<section class="container section product-detail" th:if="${product != null}">
+    <h1 th:text="${product.name}">Product Name</h1>
+    <p class="subtitle" th:if="${product.subtitle != null}" th:text="${product.subtitle}"></p>
+    <img th:if="${product.cover != null}" th:src="${product.cover}" th:alt="${product.name}" src="" class="cover" />
+    <div class="rich-text" th:utext="${product.content} ?: ''">Product detail content.</div>
+    <p class="back"><a th:href="@{/products}">← Back to products</a></p>
+</section>
+
+<footer th:replace="~{themes/modern/fragments/footer :: footer(siteName=${siteName}, config=${config})}"></footer>
+</body>
+</html>
