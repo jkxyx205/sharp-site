@@ -77,16 +77,13 @@ CREATE INDEX idx_domain_tenant ON tenant_domain (tenant_id);
 - 一个 Tenant 可以多个 domain
 - 一个 Tenant 最多一个 primary domain
 
-## 3. tenant_config
+## 3. tenant_config / tenant_config_i18n
 
 ```sql
 CREATE TABLE tenant_config (
     id BIGINT PRIMARY KEY,
     tenant_id BIGINT NOT NULL,
     logo VARCHAR(1000),
-    company_name VARCHAR(500),
-    company_name_short VARCHAR(200),
-    address VARCHAR(1000),
     phone VARCHAR(100),
     mobile VARCHAR(100),
     email VARCHAR(200),
@@ -94,7 +91,6 @@ CREATE TABLE tenant_config (
     facebook VARCHAR(500),
     linkedin VARCHAR(500),
     youtube VARCHAR(500),
-    copyright VARCHAR(500),
     icp VARCHAR(200),
     create_by BIGINT,
     create_time TIMESTAMP NOT NULL,
@@ -105,6 +101,32 @@ CREATE TABLE tenant_config (
 
 CREATE UNIQUE INDEX uk_tenant_config ON tenant_config (tenant_id) WHERE is_deleted = false;
 ```
+
+联系方式 / 备案(logo/phone/mobile/email/whatsapp/facebook/linkedin/youtube/icp)跨语种共享,
+留在 base 行(每租户一行)。公司名称 / 公司简称 / 地址 / 版权信息随语种变化,改由
+`tenant_config_i18n` 按语种维护:
+
+```sql
+CREATE TABLE tenant_config_i18n (
+    id BIGINT PRIMARY KEY,
+    tenant_config_id BIGINT NOT NULL,
+    language VARCHAR(20) NOT NULL,
+    company_name VARCHAR(500) NOT NULL,
+    company_name_short VARCHAR(200),
+    address VARCHAR(1000),
+    copyright VARCHAR(500),
+    create_by BIGINT,
+    create_time TIMESTAMP NOT NULL,
+    update_by BIGINT,
+    update_time TIMESTAMP NOT NULL,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE
+);
+
+CREATE UNIQUE INDEX uk_tenant_config_i18n ON tenant_config_i18n (tenant_config_id, language) WHERE is_deleted = false;
+```
+
+i18n 在 (tenant_config_id, language) 范围内唯一;展示按当前语种取,缺失回退租户默认语种
+(经 `I18nService.resolve`,与 product / article 一致)。
 
 ## 4. 页面与首页区块(前端模板维护)
 
