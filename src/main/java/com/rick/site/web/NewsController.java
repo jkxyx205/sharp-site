@@ -18,6 +18,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -50,9 +52,11 @@ public class NewsController {
         String dl = manifestResolver.defaultLocale(tenant);
         LocaleResolution loc = LocaleContext.get()
                 .orElseGet(() -> new LocaleResolution(dl, "/news"));
-        List<ArticleView> news = articleService.listForDisplay(
+        List<ArticleView> news = new ArrayList<>(articleService.listForDisplay(
                         loc.language(), dl).stream()
-                .map(ArticleView::from).toList();
+                .map(ArticleView::from).toList());
+        // 新闻列表倒序:最新在前(页面端;后端排序保持不变)。
+        Collections.reverse(news);
         model.addAttribute("news", news);
         seoService.resolveView("/news", null, loc.language(), dl,
                 new SeoFallback("News", "", "", request.getRequestURL().toString())).applyTo(model);
