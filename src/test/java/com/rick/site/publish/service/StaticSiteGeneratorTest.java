@@ -69,7 +69,7 @@ class StaticSiteGeneratorTest {
     @BeforeEach
     void setup() throws Exception {
         tenant = tenantService.save(Tenant.builder()
-                .code("stg").name("Static Co").themeId("modern").defaultLanguage("en-US").build());
+                .code("stg").name("Static Co").themeId("modern").build());
         TenantContext.set(tenant);
         domainService.add("www.example.com", true);
 
@@ -121,6 +121,12 @@ class StaticSiteGeneratorTest {
         // (静态站点由 Nginx 提供文件,不经 Spring app,外部 CSS 路径会 404 → 样式丢失)
         assertTrue(html.contains("<style"), "inline theme style");
         assertTrue(!html.contains("/themes/modern/css/style.css"), "no external css link");
+        // ThemeMessageSource 按 themeId+locale 解析 #{key}(en-US 默认语种),
+        // 缺键会渲染 ??key??,故断言无未解析标记且含预期文案。
+        assertTrue(!html.contains("??"), "no unresolved message markers");
+        assertTrue(html.contains("Featured Products"), "home.featured.title message");
+        assertTrue(html.contains("Latest News"), "home.news.title message");
+        assertTrue(html.contains("View Products"), "home.products.btn message");
     }
 
     @Test

@@ -79,6 +79,13 @@ public class SitePageService extends BaseServiceImpl<SitePageDAO, SitePage, Long
         return i18nDAO.insertOrUpdate(i18n);
     }
 
+    /** 逻辑删除:校验归属(跨租户查不到)后置 is_deleted。 */
+    @Transactional(rollbackFor = Exception.class)
+    public void delete(Long pageId) {
+        requireOwned(pageId);
+        baseDAO.deleteById(pageId);
+    }
+
     /**
      * 展示用:按路径加载页面,取当前语言 i18n(缺失回退租户默认语言)。
      *

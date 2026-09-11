@@ -2,38 +2,68 @@ package com.rick.site.i18n.service;
 
 import com.rick.site.i18n.model.LocaleResolution;
 import com.rick.site.tenant.context.TenantContext;
-import com.rick.site.tenant.entity.Tenant;
+import com.rick.site.theme.model.ThemeManifest;
+import com.rick.site.theme.service.ThemeManifestResolver;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 /**
- * 默认 LocaleResolver 实现(TASK-0301)。
+ * 默认 LocaleResolver 实现(TASK-0301,Phase 18 修订)。
  *
  * <p>规则:路径首段若匹配支持的语言(大小写不敏感,如 {@code /zh-cn/...}),取该语言并剥去前缀;
- * 否则取 {@link Tenant#getDefaultLanguage()}(无租户回退 {@link #PLATFORM_DEFAULT})。
+ * 否则取主题默认语种(来自 {@code themes/{themeId}/meta/theme.json},无租户回退 {@link #PLATFORM_DEFAULT})。
  *
- * <p>Phase 2 支持语言(架构允许后续在 {@link #SUPPORTED_LANGUAGES} 扩展):
- * zh-CN、en-US。未来可加 de-DE、fr-FR 等(REQUIREMENTS.md §13)。
+ * <p>语种与多语言判定的唯一来源是 Theme(§26.1):{@link #supportedLanguages()} 返回当前租户主题
+ * 的 {@code theme.json.locales}(不再返回平台固定列表),后台编辑/语言切换据此遍历。
+ *
+ * <p>平台支持语种仍为 {@link #SUPPORTED_LANGUAGES}(zh-CN / en-US),作为 URL 段识别白名单,
+ * 架构允许后续扩展(§13)。{@code theme.json.locales} 必须是其子集。
  *
  * @author Rick.Xu
  */
 @Component
 public class DefaultLocaleResolver implements LocaleResolver {
 
-    /** Phase 2 支持语言;新增语言在此追加即可。 */
+    /** Phase 2 平台支持语言;URL 段识别白名单。新增语言在此追加即可。 */
     static final List<String> SUPPORTED_LANGUAGES = List.of("zh-CN", "en-US");
 
     /** 无租户时的平台默认语言。 */
     static final String PLATFORM_DEFAULT = "en-US";
 
+    private final ThemeManifestResolver manifestResolver;
+
+    public DefaultLocaleResolver(ThemeManifestResolver manifestResolver) {
+        this.manifestResolver = manifestResolver;
+    }
+
+    /**
+     * 当前租户主题启用的语种(供后台多语言编辑遍历与语言切换);无租户回退平台列表。
+     */
+    public List<String> supportedLanguages() {
+        return currentManifest()
+                .map(ThemeManifest::locales)
+                .filter(locs -> locs != null && !locs.isEmpty())
+                .orElse(SUPPORTED_LANGUAGES);
+    }
+
+    /** 当前租户主题的默认语种(取代 {@code tenant.defaultLanguage});无租户回退平台默认。 */
+    public String defaultLanguage() {
+        return currentManifest()
+                .map(ThemeManifest::defaultLocale)
+                .filter(lang -> SUPPORTED_LANGUAGES.contains(normalize(lang)))
+                .map(DefaultLocaleResolver::normalize)
+                .orElse(PLATFORM_DEFAULT);
+    }
+
     @Override
     public LocaleResolution resolve(HttpServletRequest request) {
         String path = request.getRequestURI();
-        String defaultLanguage = TenantContext.get()
-                .map(Tenant::getDefaultLanguage)
+        String defaultLanguage = currentManifest()
+                .map(ThemeManifest::defaultLocale)
                 .filter(lang -> SUPPORTED_LANGUAGES.contains(normalize(lang)))
                 .map(DefaultLocaleResolver::normalize)
                 .orElse(PLATFORM_DEFAULT);
@@ -53,6 +83,17 @@ public class DefaultLocaleResolver implements LocaleResolver {
             }
         }
         return new LocaleResolution(defaultLanguage, remaining);
+    }
+
+    /** 当前租户的主题清单(无租户/解析失败回退 empty)。 */
+    private Optional<ThemeManifest> currentManifest() {
+        return TenantContext.get().flatMap(t -> {
+            try {
+                return Optional.of(manifestResolver.resolve(t));
+            } catch (Exception e) {
+                return Optional.empty();
+            }
+        });
     }
 
     /**

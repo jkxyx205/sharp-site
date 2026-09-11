@@ -8,6 +8,7 @@ import com.rick.site.seo.dto.SeoFallback;
 import com.rick.site.seo.service.SeoConfigService;
 import com.rick.site.tenant.context.TenantContext;
 import com.rick.site.tenant.entity.Tenant;
+import com.rick.site.theme.service.ThemeManifestResolver;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,19 +32,23 @@ public class SiteHomeController {
 
     private final HomeSectionService homeSectionService;
     private final SeoConfigService seoService;
+    private final ThemeManifestResolver manifestResolver;
 
-    public SiteHomeController(HomeSectionService homeSectionService, SeoConfigService seoService) {
+    public SiteHomeController(HomeSectionService homeSectionService, SeoConfigService seoService,
+                             ThemeManifestResolver manifestResolver) {
         this.homeSectionService = homeSectionService;
         this.seoService = seoService;
+        this.manifestResolver = manifestResolver;
     }
 
     @GetMapping(value = {"/", "/{locale:[a-z]{2}-[a-z]{2}}", "/{locale:[a-z]{2}-[a-z]{2}}/"})
     public String index(HttpServletRequest request, Model model) {
         Tenant tenant = TenantContext.require();
+        String defaultLanguage = manifestResolver.defaultLocale(tenant);
         LocaleResolution loc = LocaleContext.get()
-                .orElseGet(() -> new LocaleResolution(tenant.getDefaultLanguage(), "/"));
+                .orElseGet(() -> new LocaleResolution(defaultLanguage, "/"));
         Map<String, ResolvedSection> sections = homeSectionService.resolveForDisplay(
-                loc.language(), tenant.getDefaultLanguage());
+                loc.language(), defaultLanguage);
 
         ResolvedSection hero = sections.get("hero");
         ResolvedSection company = sections.get("company");
@@ -59,7 +64,7 @@ public class SiteHomeController {
 
         String fbTitle = text(hero, SiteHomeController::i18nTitle);
         String fbDesc = text(company, SiteHomeController::i18nSubtitle);
-        seoService.resolveView(SeoConfigService.HOME, null, loc.language(), tenant.getDefaultLanguage(),
+        seoService.resolveView(SeoConfigService.HOME, null, loc.language(), defaultLanguage,
                 new SeoFallback(fbTitle, fbDesc, "", request.getRequestURL().toString())).applyTo(model);
         return "themes/modern/index";
     }

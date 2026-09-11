@@ -68,7 +68,7 @@ class PublishServiceTest {
     @BeforeEach
     void setup() {
         tenant = tenantService.save(Tenant.builder()
-                .code("pub").name("Publish Co").themeId("modern").defaultLanguage("en-US").build());
+                .code("pub").name("Publish Co").themeId("modern").build());
         TenantContext.set(tenant);
         seedContent();
     }

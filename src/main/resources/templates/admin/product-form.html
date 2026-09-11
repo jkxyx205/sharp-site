@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/fragments/head :: head(title='产品编辑')}"></head>
+<body>
+<div class="card">
+    <h1><span th:text="${product.id == null ? '新建产品' : '编辑产品'}">产品</span></h1>
+    <nav><a th:href="@{/admin/products}">← 返回列表</a></nav>
+    <p class="error" th:if="${error}" th:text="${error}">错误</p>
+    <form th:action="@{/admin/products/save}" method="post">
+        <input type="hidden" name="id" th:value="${product.id}" />
+        <label>Slug <span class="hint">租户内唯一 URL 标识</span>
+            <input type="text" name="slug" th:value="${product.slug}" required placeholder="smart-widget" /></label>
+        <label>分类
+            <select name="categoryId">
+                <option value="">— 无 —</option>
+                <option th:each="c : ${categories}" th:value="${c.id}"
+                        th:selected="${product.categoryId != null && product.categoryId == c.id}"
+                        th:text="${c.slug}">category</option>
+            </select></label>
+        <label>Cover URL
+            <input type="url" name="cover" th:value="${product.cover}" placeholder="/img/widget.jpg" /></label>
+        <label>排序 <span class="hint">升序</span>
+            <input type="number" name="sort" th:value="${product.sort}" /></label>
+        <label>Status
+            <select name="status">
+                <option value="1" th:selected="${product.status == 1}">上架</option>
+                <option value="0" th:selected="${product.status != 1}">下架</option>
+            </select></label>
+
+        <th:block th:each="lang : ${languages}">
+            <fieldset th:classappend="${lang == defaultLanguage ? 'default-lang' : ''}">
+                <legend><span th:text="${lang}">语言</span>
+                    <span class="lang-tag" th:if="${lang == defaultLanguage}">· 默认语言</span></legend>
+                <label>Name <span class="hint">必填,空则不保存该语言</span>
+                    <input type="text" th:name="'name_' + ${lang}"
+                           th:value="${i18nMap[lang] != null ? i18nMap[lang].name : ''}" /></label>
+                <label>Subtitle
+                    <input type="text" th:name="'subtitle_' + ${lang}"
+                           th:value="${i18nMap[lang] != null ? i18nMap[lang].subtitle : ''}" /></label>
+                <label>Description
+                    <textarea th:name="'description_' + ${lang}" style="min-height:60px"
+                              th:text="${i18nMap[lang] != null ? i18nMap[lang].description : ''}"></textarea></label>
+                <label>Content <span class="hint">富文本 HTML</span>
+                    <textarea th:name="'content_' + ${lang}"
+                              th:text="${i18nMap[lang] != null ? i18nMap[lang].content : ''}"></textarea></label>
+                <label>Specification JSON
+                    <textarea th:name="'specificationJson_' + ${lang}" style="min-height:80px"
+                              th:text="${i18nMap[lang] != null ? i18nMap[lang].specificationJson : ''}"
+                              placeholder='{"weight":"0.5kg","color":"black"}'></textarea></label>
+                <label>SEO Title
+                    <input type="text" th:name="'seoTitle_' + ${lang}"
+                           th:value="${i18nMap[lang] != null ? i18nMap[lang].seoTitle : ''}" /></label>
+                <label>SEO Description
+                    <input type="text" th:name="'seoDescription_' + ${lang}"
+                           th:value="${i18nMap[lang] != null ? i18nMap[lang].seoDescription : ''}" /></label>
+            </fieldset>
+        </th:block>
+
+        <div class="actions">
+            <button type="submit" class="btn">保存</button>
+            <a th:href="@{/admin/products}" class="btn btn-secondary">取消</a>
+        </div>
+    </form>
+</div>
+</body>
+</html>

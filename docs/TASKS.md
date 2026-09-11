@@ -669,6 +669,55 @@ Chinese
 
 ---
 
+# Phase 18：按租户多语言 + 模板 i18n + 多语种静态发布 + 逻辑分页
+
+> 需求依据：REQUIREMENTS.md §26。逐任务实现 → 编译 → 测试 → 验证。
+
+## TASK-1801 按租户语种
+
+- `tenant.languages` 列（VARCHAR，逗号分隔）+ 实体字段 + 迁移（存量 = default_language）。
+- `Tenant.enabledLanguages()` 返回 List<String>；`isMultiLanguage()` = size > 1。
+- `DefaultLocaleResolver`：默认语言仍来自 tenant；非默认语种段是否启用取决于 `languages`。
+- 测试：多语言 vs 单语言租户的语言集合解析。
+
+## TASK-1802 后台按租户语种编辑
+
+- admin 5 个表单 `addLanguages`：由 `localeResolver.supportedLanguages()` 改为 `tenant.enabledLanguages()`。
+- 单语言租户：表单不渲染语种选择/fieldset（单栏直接编辑）。
+- 保存：仅按启用语种写 i18n 行。
+- 测试：单语言租户编辑产品 → 仅该语种 i18n 行。
+
+## TASK-1803 模板 i18n（messages.json）
+
+- `MessageSource` bean（`classpath:i18n/messages`）+ Thymeleaf `#{}` 集成。
+- `messages.properties` / `messages_zh_CN.properties` / `messages_en_US.properties`。
+- modern 主题界面文案改 `#{key}`：nav / hero / 按钮 / footer。
+- `LocaleFilter` 设置 `LocaleContextHolder`；`OfflineWebContext(locale)`。
+- 测试：`#{}` 在 zh-cn / en-us 下分别解析为对应文案。
+
+## TASK-1804 多语种静态发布
+
+- `StaticSiteGenerator.generate`：按 `tenant.enabledLanguages()` 遍历；每语种生成 `/{L}/` 镜像。
+- 多语言：根 `index.html` 重定向到默认语种；`sitemap.xml` 含各语种 URL。
+- 单语言：保持根 `/` 发布。
+- 测试：多语言发布产出 `{L}/index.html` 等；单语言发布产出根 `index.html`。
+
+## TASK-1805 逻辑分页
+
+- `StaticSiteGenerator` 产品/新闻列表分页生成 `products/page/{n}/index.html`、`news/page/{n}/index.html`。
+- 列表模板加分页导航；仅渲染当前页条目。
+- 动态 `/products?page=N`、`/news?page=N` 同样逻辑分页。
+- 测试：N+1 条产品 → 产出 2 页静态文件；分页链接正确。
+
+## TASK-1806 验收
+
+- 多语言租户发布 → `/zh-cn/` 与 `/en-us/` 镜像齐全；`/` 重定向。
+- 单语言租户发布 → 根 `index.html`，无 locale 目录。
+- 列表多页 + 详情静态跳转。
+- `./gradlew clean build` 全绿。
+
+---
+
 # Definition of Done
 
 一个 Task 只有满足以下条件才算完成：

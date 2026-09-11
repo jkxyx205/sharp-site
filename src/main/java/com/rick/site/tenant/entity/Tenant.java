@@ -36,9 +36,6 @@ public class Tenant extends BaseCodeEntity<Long> {
     @Column(nullable = false, comment = "主题ID,如 modern / industrial")
     String themeId;
 
-    @Column(nullable = false, comment = "默认语言,如 en-US / zh-CN")
-    String defaultLanguage;
-
     @Column(nullable = false, comment = "状态:1启用,0停用")
     Short status;
 }

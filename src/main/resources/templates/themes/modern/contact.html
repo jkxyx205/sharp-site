@@ -5,22 +5,22 @@
 <header th:replace="~{themes/modern/fragments/header :: header(siteName=${siteName}, active='contact')}"></header>
 
 <section class="container section contact">
-    <h1 th:text="${pageTitle} ?: 'Contact'">Contact</h1>
+    <h1 th:text="#{contact.title}">Contact</h1>
     <div class="contact-grid">
         <div th:if="${config != null}">
             <p th:if="${config.address != null}" th:text="${config.address}">Address</p>
-            <p th:if="${config.phone != null}" th:text="'Tel: ' + ${config.phone}">Tel</p>
-            <p th:if="${config.mobile != null}" th:text="'Mobile: ' + ${config.mobile}">Mobile</p>
+            <p th:if="${config.phone != null}" th:text="|#{common.tel}: ${config.phone}|">Tel</p>
+            <p th:if="${config.mobile != null}" th:text="|#{common.mobile}: ${config.mobile}|">Mobile</p>
             <p th:if="${config.email != null}">
                 <a th:href="'mailto:' + ${config.email}" th:text="${config.email}">email</a>
             </p>
-            <p th:if="${config.whatsapp != null}" th:text="'WhatsApp: ' + ${config.whatsapp}">WhatsApp</p>
+            <p th:if="${config.whatsapp != null}" th:text="|#{common.whatsapp}: ${config.whatsapp}|">WhatsApp</p>
         </div>
-        <form class="contact-form" th:action="@{/contact}" method="post">
-            <label>Name <input type="text" name="name" required /></label>
-            <label>Email <input type="email" name="email" required /></label>
-            <label>Message <textarea name="message" rows="5" required></textarea></label>
-            <button type="submit" class="btn btn-primary">Send</button>
+        <form class="contact-form" th:action="@{${localePrefix + '/contact'}}" method="post">
+            <label><span th:text="#{contact.name}">Name</span> <input type="text" name="name" required /></label>
+            <label><span th:text="#{contact.email}">Email</span> <input type="email" name="email" required /></label>
+            <label><span th:text="#{contact.message}">Message</span> <textarea name="message" rows="5" required></textarea></label>
+            <button type="submit" class="btn btn-primary" th:text="#{contact.send}">Send</button>
         </form>
     </div>
 </section>

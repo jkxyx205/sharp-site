@@ -32,7 +32,6 @@ class TenantServiceTest {
                 .build());
 
         assertThat(saved.getId()).isNotNull();
-        assertThat(saved.getDefaultLanguage()).isEqualTo("en-US");
         assertThat(saved.getStatus()).isEqualTo((short) 1);
         assertThat(saved.getBaseEntityInfo().getCreateTime()).isNotNull();
         assertThat(saved.getBaseEntityInfo().getUpdateTime()).isNotNull();

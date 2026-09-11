@@ -10,6 +10,7 @@ import com.rick.site.seo.dto.SeoFallback;
 import com.rick.site.seo.service.SeoConfigService;
 import com.rick.site.tenant.context.TenantContext;
 import com.rick.site.tenant.entity.Tenant;
+import com.rick.site.theme.service.ThemeManifestResolver;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -33,24 +34,27 @@ public class NewsController {
 
     private final ArticleService articleService;
     private final SeoConfigService seoService;
+    private final ThemeManifestResolver manifestResolver;
 
-    public NewsController(ArticleService articleService, SeoConfigService seoService) {
+    public NewsController(ArticleService articleService, SeoConfigService seoService,
+                         ThemeManifestResolver manifestResolver) {
         this.articleService = articleService;
         this.seoService = seoService;
+        this.manifestResolver = manifestResolver;
     }
 
     @GetMapping(value = {"/news", "/{locale:[a-z]{2}-[a-z]{2}}/news",
             "/news/", "/{locale:[a-z]{2}-[a-z]{2}}/news/"})
     public String list(HttpServletRequest request, Model model) {
         Tenant tenant = TenantContext.require();
+        String dl = manifestResolver.defaultLocale(tenant);
         LocaleResolution loc = LocaleContext.get()
-                .orElseGet(() -> new LocaleResolution(tenant.getDefaultLanguage(), "/news"));
+                .orElseGet(() -> new LocaleResolution(dl, "/news"));
         List<ArticleView> news = articleService.listForDisplay(
-                        loc.language(), tenant.getDefaultLanguage()).stream()
+                        loc.language(), dl).stream()
                 .map(ArticleView::from).toList();
         model.addAttribute("news", news);
-        seoService.resolveView(SeoConfigService.NEWS_LIST, null, loc.language(),
-                tenant.getDefaultLanguage(),
+        seoService.resolveView(SeoConfigService.NEWS_LIST, null, loc.language(), dl,
                 new SeoFallback("News", "", "", request.getRequestURL().toString())).applyTo(model);
         return "themes/modern/news";
     }
@@ -59,12 +63,13 @@ public class NewsController {
     public String detail(@org.springframework.web.bind.annotation.PathVariable String slug,
                           HttpServletRequest request, Model model) {
         Tenant tenant = TenantContext.require();
+        String dl = manifestResolver.defaultLocale(tenant);
         LocaleResolution loc = LocaleContext.get()
-                .orElseGet(() -> new LocaleResolution(tenant.getDefaultLanguage(), "/news/" + slug));
+                .orElseGet(() -> new LocaleResolution(dl, "/news/" + slug));
         ResolvedArticle resolved;
         try {
             resolved = articleService.resolveForDisplay(
-                    slug, loc.language(), tenant.getDefaultLanguage());
+                    slug, loc.language(), dl);
         } catch (BizException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
@@ -74,7 +79,7 @@ public class NewsController {
         String fbDesc = article.seoDescription() != null ? article.seoDescription()
                 : (article.summary() != null ? article.summary() : "");
         seoService.resolveView(SeoConfigService.ARTICLE, resolved.article().getId(),
-                loc.language(), tenant.getDefaultLanguage(),
+                loc.language(), dl,
                 new SeoFallback(fbTitle, fbDesc, article.cover(), request.getRequestURL().toString())).applyTo(model);
         return "themes/modern/news-detail";
     }

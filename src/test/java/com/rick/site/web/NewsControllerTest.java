@@ -47,7 +47,7 @@ class NewsControllerTest {
     @BeforeEach
     void setup() {
         tenant = tenantService.save(Tenant.builder()
-                .code("news-ctrl").name("News Co").themeId("modern").defaultLanguage("en-US").build());
+                .code("news-ctrl").name("News Co").themeId("modern").build());
         TenantContext.set(tenant);
         domainService.add("localhost", true);
 

@@ -5,14 +5,19 @@
 <header th:replace="~{themes/modern/fragments/header :: header(siteName=${siteName}, active='news')}"></header>
 
 <section class="container section">
-    <h1 th:text="${pageTitle} ?: 'News'">News</h1>
+    <h1 th:text="#{news.title}">News</h1>
     <ul class="news-list" th:if="${news != null and !news.isEmpty()}">
         <li th:each="a : ${news}">
-            <a th:href="@{'/news/' + ${a.slug}}" th:text="${a.title}">News title</a>
+            <a th:href="@{${localePrefix + '/news/' + a.slug}}" th:text="${a.title}">News title</a>
             <span th:if="${a.publishTime != null}" th:text="${#temporals.format(a.publishTime, 'yyyy-MM-dd')}"></span>
         </li>
     </ul>
-    <p th:if="${news == null or news.isEmpty()}" class="empty">No news yet.</p>
+    <p th:if="${news == null or news.isEmpty()}" class="empty" th:text="#{news.empty}">No news yet.</p>
+    <nav class="pagination" th:if="${totalPages != null and totalPages > 1}">
+        <a th:if="${prevLink != null}" th:href="${prevLink}" th:text="#{page.prev}">‹ Previous</a>
+        <span th:text="${page + ' / ' + totalPages}">1 / 1</span>
+        <a th:if="${nextLink != null}" th:href="${nextLink}" th:text="#{page.next}">Next ›</a>
+    </nav>
 </section>
 
 <footer th:replace="~{themes/modern/fragments/footer :: footer(siteName=${siteName}, config=${config})}"></footer>

@@ -17,7 +17,11 @@
     <h1>后台首页</h1>
     <p class="meta">已登录:<strong th:text="${username}">admin</strong> · 租户:<strong th:text="${tenantName}">—</strong>(ID <span th:text="${tenantId}">—</span>)</p>
     <nav>
+        <a th:href="@{/admin/pages}">页面管理</a>
         <a th:href="@{/admin/products}">产品管理</a>
+        <a th:href="@{/admin/news}">新闻管理</a>
+        <a th:href="@{/admin/categories}">分类管理</a>
+        <a th:href="@{/admin/home-sections}">首页区块</a>
         <a th:href="@{/admin/publish}">网站发布</a>
         <a th:href="@{/admin/domains}">域名管理</a>
         <a th:href="@{/preview/}" target="_blank">预览站点</a>

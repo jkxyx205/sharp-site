@@ -68,6 +68,13 @@ public class CategoryService extends BaseServiceImpl<CategoryDAO, Category, Long
         return i18nDAO.insertOrUpdate(i18n);
     }
 
+    /** 逻辑删除:校验归属(跨租户查不到)后置 is_deleted。 */
+    @Transactional(rollbackFor = Exception.class)
+    public void delete(Long categoryId) {
+        requireOwned(categoryId);
+        baseDAO.deleteById(categoryId);
+    }
+
     /** 展示:按 type 取启用分类(排序),每条取当前语言 i18n(缺失回退默认),按 slug 索引。 */
     public Map<String, ResolvedCategory> resolveForDisplay(String type,
                                                             String language, String defaultLanguage) {
@@ -81,7 +88,7 @@ public class CategoryService extends BaseServiceImpl<CategoryDAO, Category, Long
         return map;
     }
 
-    Map<String, CategoryI18n> loadI18nMap(Long categoryId) {
+    public Map<String, CategoryI18n> loadI18nMap(Long categoryId) {
         Map<String, CategoryI18n> map = new LinkedHashMap<>();
         for (CategoryI18n row : i18nDAO.select("category_id = :categoryId", Map.of("categoryId", categoryId))) {
             map.put(row.getLanguage(), row);

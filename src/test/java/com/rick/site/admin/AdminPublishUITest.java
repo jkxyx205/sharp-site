@@ -66,7 +66,7 @@ class AdminPublishUITest {
     @BeforeEach
     void setup() throws Exception {
         Tenant tenant = tenantService.save(Tenant.builder()
-                .code("pubui").name("PubUI Co").themeId("modern").defaultLanguage("en-US").build());
+                .code("pubui").name("PubUI Co").themeId("modern").build());
         TenantContext.set(tenant);
         domainService.add("localhost", true);
 

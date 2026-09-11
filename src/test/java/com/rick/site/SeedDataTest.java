@@ -85,7 +85,7 @@ class SeedDataTest {
         tenant = tenantService.findByCode(TENANT_CODE).orElseGet(() ->
                 tenantService.save(Tenant.builder()
                         .code(TENANT_CODE).name(TENANT_NAME).themeId(THEME_ID)
-                        .defaultLanguage("en-US").build()));
+                        .build()));
         TenantContext.set(tenant);
 
         ensureDomain();

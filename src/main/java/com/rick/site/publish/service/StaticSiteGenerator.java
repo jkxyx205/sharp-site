@@ -3,6 +3,7 @@ package com.rick.site.publish.service;
 import com.rick.site.home.service.HomeSectionService;
 import com.rick.site.home.service.HomeSectionService.ResolvedSection;
 import com.rick.site.i18n.context.LocaleContext;
+import com.rick.site.i18n.model.LanguageOption;
 import com.rick.site.i18n.model.LocaleResolution;
 import com.rick.site.news.dto.ArticleView;
 import com.rick.site.news.service.ArticleService;
@@ -19,6 +20,8 @@ import com.rick.site.tenant.entity.TenantConfig;
 import com.rick.site.tenant.entity.TenantDomain;
 import com.rick.site.tenant.service.TenantConfigService;
 import com.rick.site.tenant.service.TenantDomainService;
+import com.rick.site.theme.model.ThemeManifest;
+import com.rick.site.theme.service.ThemeManifestResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,7 +32,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -41,8 +46,21 @@ import java.util.function.Function;
  * 与前台 Controller 共用同一套 themes/modern 模板与视图装配逻辑,确保预览/线上一致。
  *
  * <p>租户隔离:调用方(Publish)已设置 {@link TenantContext};所有查询经 SiteDatabaseConfig
- * 自动按上下文租户过滤,生成器不另行传 tenantId(§4)。多语言:Phase 12 生成默认语言静态站点;
- * {@code /{locale}/} 镜像留待后续阶段(§7 路由约定)。
+ * 自动按上下文租户过滤,生成器不另行传 tenantId(§4)。
+ *
+ * <p><b>多语言(Phase 18 修订)</b>:语种来自主题清单 {@link ThemeManifest}(theme.json)。
+ * <ul>
+ *   <li>多语言:默认语种渲染在根目录({@code /products}),其余语种镜像在
+ *       {@code /{locale-lowercase}/} 下(如 {@code /zh-cn/products});与前台路由
+ *       (DefaultLocaleResolver)约定一致——默认语种无前缀,其余带小写前缀。</li>
+ *   <li>单语言:仅默认语种,全部渲染在根目录。</li>
+ * </ul>
+ * 模板链接经模型变量 {@code localePrefix}(""/默认 或 "/{locale}")前缀化,
+ * 使镜像页内链接指向同一语种子树。
+ *
+ * <p><b>逻辑分页</b>:产品/新闻列表按 {@code pageSize} 切片,产物为
+ * {@code {prefix}/{list}/page/{n}/index.html}(n=1..N);{@code {list}/index.html}
+ * 为重定向到 {@code page/1/} 的 meta-refresh 跳板页。
  *
  * <p>sitemap/robots 的 base URL 取租户主域名(静态生成无请求上下文),默认 https。
  *
@@ -56,6 +74,10 @@ public class StaticSiteGenerator {
     @Value("${sharp.site.www-root:data/www}")
     private String wwwRoot;
 
+    /** 列表逻辑分页大小;产品/新闻共用。 */
+    @Value("${sharp.site.page-size:12}")
+    private int pageSize;
+
     private final TemplateEngine templateEngine;
     private final HomeSectionService homeSectionService;
     private final SitePageService pageService;
@@ -64,6 +86,7 @@ public class StaticSiteGenerator {
     private final SeoConfigService seoService;
     private final TenantConfigService tenantConfigService;
     private final TenantDomainService domainService;
+    private final ThemeManifestResolver manifestResolver;
 
     public StaticSiteGenerator(TemplateEngine templateEngine,
                               HomeSectionService homeSectionService,
@@ -72,7 +95,8 @@ public class StaticSiteGenerator {
                               ArticleService articleService,
                               SeoConfigService seoService,
                               TenantConfigService tenantConfigService,
-                              TenantDomainService domainService) {
+                              TenantDomainService domainService,
+                              ThemeManifestResolver manifestResolver) {
         this.templateEngine = templateEngine;
         this.homeSectionService = homeSectionService;
         this.pageService = pageService;
@@ -81,6 +105,7 @@ public class StaticSiteGenerator {
         this.seoService = seoService;
         this.tenantConfigService = tenantConfigService;
         this.domainService = domainService;
+        this.manifestResolver = manifestResolver;
     }
 
     /**
@@ -93,24 +118,50 @@ public class StaticSiteGenerator {
         Tenant tenant = TenantContext.require();
         Path releaseDir = releaseDir(tenant.getId(), version);
         Files.createDirectories(releaseDir);
-        String language = tenant.getDefaultLanguage();
+        ThemeManifest manifest = manifestResolver.resolve(tenant);
+        String defaultLocale = manifest.defaultLocale();
         String baseUrl = baseUrl(tenant);
 
-        generateHome(tenant, language, baseUrl, releaseDir);
-        generatePages(tenant, language, baseUrl, releaseDir);
-        generateProducts(tenant, language, baseUrl, releaseDir);
-        generateNews(tenant, language, baseUrl, releaseDir);
-        generateSitemap(tenant, baseUrl, releaseDir);
+        // 默认语种渲染在根目录(prefix="");多语言时其余语种镜像在 /{locale}/ 下。
+        generateForLocale(tenant, defaultLocale, defaultLocale, "", baseUrl, releaseDir, releaseDir);
+        if (manifest.isMultiLanguage()) {
+            for (String locale : manifest.locales()) {
+                if (locale.equals(defaultLocale)) {
+                    continue;
+                }
+                String dir = locale.toLowerCase(Locale.ROOT);
+                generateForLocale(tenant, locale, defaultLocale, "/" + dir,
+                        baseUrl, releaseDir.resolve(dir), releaseDir);
+            }
+        }
+        generateSitemap(tenant, manifest, baseUrl, releaseDir);
         generateRobots(tenant, baseUrl, releaseDir);
         return releaseDir;
     }
 
+    /**
+     * 渲染单个语种的整站镜像到 {@code outputDir}。
+     *
+     * @param locale        渲染语种(如 zh-CN),同时驱动 Thymeleaf {@code #{}} 解析
+     * @param defaultLocale 租户默认语种,用于 i18n 内容回退
+     * @param localePrefix  链接前缀(""/默认 或 "/{locale}");写入 outputDir 对应
+     * @param outputDir     该语种产物根目录(releaseDir 或 releaseDir/{locale})
+     */
+    private void generateForLocale(Tenant tenant, String locale, String defaultLocale,
+                                   String localePrefix, String baseUrl,
+                                   Path outputDir, Path releaseDir) throws IOException {
+        generateHome(tenant, locale, defaultLocale, localePrefix, baseUrl, outputDir);
+        generatePages(tenant, locale, defaultLocale, localePrefix, baseUrl, outputDir);
+        generateProducts(tenant, locale, defaultLocale, localePrefix, baseUrl, outputDir, releaseDir);
+        generateNews(tenant, locale, defaultLocale, localePrefix, baseUrl, outputDir, releaseDir);
+    }
+
     /** TASK-1202:首页 → {@code index.html}。 */
-    public void generateHome(Tenant tenant, String language, String baseUrl, Path releaseDir) throws IOException {
-        LocaleContext.set(new LocaleResolution(language, "/"));
-        OfflineWebContext ctx = newContext();
-        Map<String, ResolvedSection> sections = homeSectionService.resolveForDisplay(
-                language, tenant.getDefaultLanguage());
+    public void generateHome(Tenant tenant, String locale, String defaultLocale, String localePrefix,
+                             String baseUrl, Path outputDir) throws IOException {
+        LocaleContext.set(new LocaleResolution(locale, "/"));
+        OfflineWebContext ctx = newContext(locale);
+        Map<String, ResolvedSection> sections = homeSectionService.resolveForDisplay(locale, defaultLocale);
         ResolvedSection hero = sections.get("hero");
         ResolvedSection company = sections.get("company");
         ResolvedSection cta = sections.get("cta");
@@ -121,117 +172,161 @@ public class StaticSiteGenerator {
         ctx.setVariable("ctaTitle", text(cta, StaticSiteGenerator::i18nTitle));
         ctx.setVariable("products", List.of());
         ctx.setVariable("news", List.of());
-        seoService.resolveView(SeoConfigService.HOME, null, language, tenant.getDefaultLanguage(),
+        seoService.resolveView(SeoConfigService.HOME, null, locale, defaultLocale,
                 new SeoFallback(text(hero, StaticSiteGenerator::i18nTitle),
                         text(company, StaticSiteGenerator::i18nSubtitle),
-                        "", baseUrl + "/")).applyTo(ctxToModel(ctx));
-        applyCommon(ctx, tenant, language);
-        write(releaseDir, "index.html", templateEngine.process("themes/modern/index", ctx));
+                        "", baseUrl + localePrefix + "/")).applyTo(ctxToModel(ctx));
+        applyCommon(ctx, tenant, locale, localePrefix);
+        write(outputDir, "index.html", templateEngine.process("themes/modern/index", ctx));
     }
 
     /** TASK-1203:普通页面 → {@code {path}/index.html}(仅 status=1 的页面)。 */
-    public void generatePages(Tenant tenant, String language, String baseUrl, Path releaseDir) throws IOException {
+    public void generatePages(Tenant tenant, String locale, String defaultLocale, String localePrefix,
+                               String baseUrl, Path outputDir) throws IOException {
         for (SitePageService.ResolvedPage resolved : pageService.listByTenant().stream()
                 .filter(p -> p.getStatus() != null && p.getStatus() == 1)
-                .map(p -> pageService.resolveForDisplay(p.getPath(), language, tenant.getDefaultLanguage()))
+                .map(p -> pageService.resolveForDisplay(p.getPath(), locale, defaultLocale))
                 .toList()) {
             String path = resolved.page().getPath(); // 如 /about
-            LocaleContext.set(new LocaleResolution(language, path));
-            OfflineWebContext ctx = newContext();
+            LocaleContext.set(new LocaleResolution(locale, path));
+            OfflineWebContext ctx = newContext(locale);
             ctx.setVariable("page", resolved.page());
             ctx.setVariable("content", resolved.i18n() != null ? resolved.i18n().getContent() : "");
             String fbTitle = resolved.i18n() != null && resolved.i18n().getTitle() != null
                     ? resolved.i18n().getTitle() : resolved.page().getPageKey();
             String fbImage = resolved.i18n() != null ? resolved.i18n().getCover() : "";
-            seoService.resolveView(SeoConfigService.PAGE, resolved.page().getId(), language,
-                    tenant.getDefaultLanguage(),
-                    new SeoFallback(fbTitle, "", fbImage, baseUrl + path)).applyTo(ctxToModel(ctx));
-            applyCommon(ctx, tenant, language);
+            seoService.resolveView(SeoConfigService.PAGE, resolved.page().getId(), locale,
+                    defaultLocale,
+                    new SeoFallback(fbTitle, "", fbImage, baseUrl + localePrefix + path)).applyTo(ctxToModel(ctx));
+            applyCommon(ctx, tenant, locale, localePrefix);
             String rel = path.startsWith("/") ? path.substring(1) : path;
-            write(releaseDir, rel + "/index.html",
+            write(outputDir, rel + "/index.html",
                     templateEngine.process(resolved.page().getTemplate(), ctx));
         }
     }
 
-    /** TASK-1204:产品列表 + 详情。 */
-    public void generateProducts(Tenant tenant, String language, String baseUrl, Path releaseDir) throws IOException {
-        List<ResolvedProduct> resolved = productService.listForDisplay(language, tenant.getDefaultLanguage());
-        // 列表
-        LocaleContext.set(new LocaleResolution(language, "/products"));
-        OfflineWebContext listCtx = newContext();
-        listCtx.setVariable("products", resolved.stream().map(ProductView::from).toList());
-        seoService.resolveView(SeoConfigService.PRODUCTS_LIST, null, language,
-                tenant.getDefaultLanguage(),
-                new SeoFallback("Products", "", "", baseUrl + "/products")).applyTo(ctxToModel(listCtx));
-        applyCommon(listCtx, tenant, language);
-        write(releaseDir, "products/index.html",
-                templateEngine.process("themes/modern/products", listCtx));
+    /** TASK-1204:产品列表(分页)+ 详情。 */
+    public void generateProducts(Tenant tenant, String locale, String defaultLocale, String localePrefix,
+                                 String baseUrl, Path outputDir, Path releaseDir) throws IOException {
+        List<ResolvedProduct> resolved = productService.listForDisplay(locale, defaultLocale);
+        List<ProductView> views = resolved.stream().map(ProductView::from).toList();
+        int pages = pageCount(views.size());
 
-        // 详情
+        // products/index.html → 重定向到 page/1/
+        writeRedirect(outputDir, "products/index.html",
+                localePrefix + "/products/page/1/", baseUrl);
+
+        // 列表分页:products/page/{n}/index.html
+        for (int n = 1; n <= pages; n++) {
+            List<ProductView> slice = views.subList((n - 1) * pageSize,
+                    Math.min(n * pageSize, views.size()));
+            String pagePath = "/products/page/" + n + "/";
+            LocaleContext.set(new LocaleResolution(locale, pagePath));
+            OfflineWebContext ctx = newContext(locale);
+            ctx.setVariable("products", slice);
+            applyPagination(ctx, n, pages, localePrefix, "/products/page/");
+            seoService.resolveView(SeoConfigService.PRODUCTS_LIST, null, locale, defaultLocale,
+                    new SeoFallback("Products", "", "", baseUrl + localePrefix + pagePath))
+                    .applyTo(ctxToModel(ctx));
+            applyCommon(ctx, tenant, locale, localePrefix);
+            write(outputDir, "products/page/" + n + "/index.html",
+                    templateEngine.process("themes/modern/products", ctx));
+        }
+
+        // 详情:products/{slug}/index.html
         for (ResolvedProduct rp : resolved) {
             String slug = rp.product().getSlug();
-            LocaleContext.set(new LocaleResolution(language, "/products/" + slug));
-            OfflineWebContext ctx = newContext();
+            String detailPath = "/products/" + slug + "/";
+            LocaleContext.set(new LocaleResolution(locale, detailPath));
+            OfflineWebContext ctx = newContext(locale);
             ProductView product = ProductView.from(rp);
             ctx.setVariable("product", product);
             String fbTitle = product.seoTitle() != null ? product.seoTitle() : product.name();
             String fbDesc = product.seoDescription() != null ? product.seoDescription()
                     : (product.subtitle() != null ? product.subtitle() : "");
-            seoService.resolveView(SeoConfigService.PRODUCT, rp.product().getId(), language,
-                    tenant.getDefaultLanguage(),
+            seoService.resolveView(SeoConfigService.PRODUCT, rp.product().getId(), locale,
+                    defaultLocale,
                     new SeoFallback(fbTitle, fbDesc, product.cover(),
-                            baseUrl + "/products/" + slug)).applyTo(ctxToModel(ctx));
-            applyCommon(ctx, tenant, language);
-            write(releaseDir, "products/" + slug + "/index.html",
+                            baseUrl + localePrefix + detailPath)).applyTo(ctxToModel(ctx));
+            applyCommon(ctx, tenant, locale, localePrefix);
+            write(outputDir, "products/" + slug + "/index.html",
                     templateEngine.process("themes/modern/product-detail", ctx));
         }
     }
 
-    /** TASK-1205:新闻列表 + 详情。 */
-    public void generateNews(Tenant tenant, String language, String baseUrl, Path releaseDir) throws IOException {
-        List<ResolvedArticle> resolved = articleService.listForDisplay(language, tenant.getDefaultLanguage());
-        LocaleContext.set(new LocaleResolution(language, "/news"));
-        OfflineWebContext listCtx = newContext();
-        listCtx.setVariable("news", resolved.stream().map(ArticleView::from).toList());
-        seoService.resolveView(SeoConfigService.NEWS_LIST, null, language,
-                tenant.getDefaultLanguage(),
-                new SeoFallback("News", "", "", baseUrl + "/news")).applyTo(ctxToModel(listCtx));
-        applyCommon(listCtx, tenant, language);
-        write(releaseDir, "news/index.html",
-                templateEngine.process("themes/modern/news", listCtx));
+    /** TASK-1205:新闻列表(分页)+ 详情。 */
+    public void generateNews(Tenant tenant, String locale, String defaultLocale, String localePrefix,
+                             String baseUrl, Path outputDir, Path releaseDir) throws IOException {
+        List<ResolvedArticle> resolved = articleService.listForDisplay(locale, defaultLocale);
+        List<ArticleView> views = resolved.stream().map(ArticleView::from).toList();
+        int pages = pageCount(views.size());
+
+        writeRedirect(outputDir, "news/index.html",
+                localePrefix + "/news/page/1/", baseUrl);
+
+        for (int n = 1; n <= pages; n++) {
+            List<ArticleView> slice = views.subList((n - 1) * pageSize,
+                    Math.min(n * pageSize, views.size()));
+            String pagePath = "/news/page/" + n + "/";
+            LocaleContext.set(new LocaleResolution(locale, pagePath));
+            OfflineWebContext ctx = newContext(locale);
+            ctx.setVariable("news", slice);
+            applyPagination(ctx, n, pages, localePrefix, "/news/page/");
+            seoService.resolveView(SeoConfigService.NEWS_LIST, null, locale, defaultLocale,
+                    new SeoFallback("News", "", "", baseUrl + localePrefix + pagePath))
+                    .applyTo(ctxToModel(ctx));
+            applyCommon(ctx, tenant, locale, localePrefix);
+            write(outputDir, "news/page/" + n + "/index.html",
+                    templateEngine.process("themes/modern/news", ctx));
+        }
 
         for (ResolvedArticle ra : resolved) {
             String slug = ra.article().getSlug();
-            LocaleContext.set(new LocaleResolution(language, "/news/" + slug));
-            OfflineWebContext ctx = newContext();
+            String detailPath = "/news/" + slug + "/";
+            LocaleContext.set(new LocaleResolution(locale, detailPath));
+            OfflineWebContext ctx = newContext(locale);
             ArticleView article = ArticleView.from(ra);
             ctx.setVariable("article", article);
             String fbTitle = article.seoTitle() != null ? article.seoTitle() : article.title();
             String fbDesc = article.seoDescription() != null ? article.seoDescription()
                     : (article.summary() != null ? article.summary() : "");
-            seoService.resolveView(SeoConfigService.ARTICLE, ra.article().getId(), language,
-                    tenant.getDefaultLanguage(),
+            seoService.resolveView(SeoConfigService.ARTICLE, ra.article().getId(), locale,
+                    defaultLocale,
                     new SeoFallback(fbTitle, fbDesc, article.cover(),
-                            baseUrl + "/news/" + slug)).applyTo(ctxToModel(ctx));
-            applyCommon(ctx, tenant, language);
-            write(releaseDir, "news/" + slug + "/index.html",
+                            baseUrl + localePrefix + detailPath)).applyTo(ctxToModel(ctx));
+            applyCommon(ctx, tenant, locale, localePrefix);
+            write(outputDir, "news/" + slug + "/index.html",
                     templateEngine.process("themes/modern/news-detail", ctx));
         }
     }
 
-    /** TASK-1206:sitemap.xml。 */
-    public void generateSitemap(Tenant tenant, String baseUrl, Path releaseDir) throws IOException {
-        StringBuilder sb = new StringBuilder(512);
+    /** TASK-1206:sitemap.xml——含各语种镜像 URL(默认语种无前缀,其余带 /{locale}/ 前缀)。 */
+    public void generateSitemap(Tenant tenant, ThemeManifest manifest, String baseUrl, Path releaseDir) throws IOException {
+        String defaultLocale = manifest.defaultLocale();
+        StringBuilder sb = new StringBuilder(1024);
         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
         sb.append("<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n");
-        appendUrl(sb, baseUrl + "/");
-        pageService.listByTenant().stream()
-                .filter(p -> p.getStatus() != null && p.getStatus() == 1)
-                .forEach(p -> appendUrl(sb, baseUrl + p.getPath()));
-        productService.listEnabled().forEach(p ->
-                appendUrl(sb, baseUrl + "/products/" + esc(p.getSlug())));
-        articleService.listPublished().forEach(a ->
-                appendUrl(sb, baseUrl + "/news/" + esc(a.getSlug())));
+        for (String locale : manifest.locales()) {
+            String prefix = locale.equals(defaultLocale) ? "" : "/" + locale.toLowerCase(Locale.ROOT);
+            appendUrl(sb, baseUrl + prefix + "/");
+            pageService.listByTenant().stream()
+                    .filter(p -> p.getStatus() != null && p.getStatus() == 1)
+                    .forEach(p -> appendUrl(sb, baseUrl + prefix + p.getPath() + "/"));
+            List<ResolvedProduct> products = productService.listForDisplay(locale, defaultLocale);
+            int productPages = pageCount(products.size());
+            for (int n = 1; n <= productPages; n++) {
+                appendUrl(sb, baseUrl + prefix + "/products/page/" + n + "/");
+            }
+            products.forEach(p -> appendUrl(sb,
+                    baseUrl + prefix + "/products/" + esc(p.product().getSlug()) + "/"));
+            List<ResolvedArticle> articles = articleService.listForDisplay(locale, defaultLocale);
+            int newsPages = pageCount(articles.size());
+            for (int n = 1; n <= newsPages; n++) {
+                appendUrl(sb, baseUrl + prefix + "/news/page/" + n + "/");
+            }
+            articles.forEach(a -> appendUrl(sb,
+                    baseUrl + prefix + "/news/" + esc(a.article().getSlug()) + "/"));
+        }
         sb.append("</urlset>");
         write(releaseDir, "sitemap.xml", sb.toString());
     }
@@ -246,6 +341,19 @@ public class StaticSiteGenerator {
     }
 
     // ---- helpers ----
+
+    private int pageCount(int total) {
+        return Math.max(1, (int) Math.ceil(total / (double) pageSize));
+    }
+
+    /** 装填分页变量:page/totalPages/prevLink/nextLink(链接含 localePrefix)。 */
+    private void applyPagination(OfflineWebContext ctx, int page, int totalPages,
+                                 String localePrefix, String basePath) {
+        ctx.setVariable("page", page);
+        ctx.setVariable("totalPages", totalPages);
+        ctx.setVariable("prevLink", page > 1 ? localePrefix + basePath + (page - 1) + "/" : null);
+        ctx.setVariable("nextLink", page < totalPages ? localePrefix + basePath + (page + 1) + "/" : null);
+    }
 
     private Path releaseDir(Long tenantId, String version) {
         return Paths.get(wwwRoot).resolve(tenantId.toString()).resolve("releases").resolve(version);
@@ -263,18 +371,56 @@ public class StaticSiteGenerator {
         return "https://" + host;
     }
 
-    private OfflineWebContext newContext() {
-        return new OfflineWebContext();
+    private OfflineWebContext newContext(String locale) {
+        return new OfflineWebContext(Locale.forLanguageTag(locale));
     }
 
-    /** 注入 siteName / config / currentLanguage(等同 SiteCommonAttributes,离线渲染无 ControllerAdvice)。 */
-    private void applyCommon(OfflineWebContext ctx, Tenant tenant, String language) {
+    /** 注入 siteName / config / currentLanguage / localePrefix / languages(等同 SiteCommonAttributes)。 */
+    private void applyCommon(OfflineWebContext ctx, Tenant tenant, String locale, String localePrefix) {
         TenantConfig config = tenantConfigService.findByTenant().orElse(null);
         String siteName = (config != null && config.getCompanyName() != null)
                 ? config.getCompanyName() : tenant.getName();
         ctx.setVariable("siteName", siteName);
         ctx.setVariable("config", config);
-        ctx.setVariable("currentLanguage", language);
+        ctx.setVariable("currentLanguage", locale);
+        ctx.setVariable("localePrefix", localePrefix);
+        ctx.setVariable("languages", buildLanguageOptions(tenant, locale, localePrefix));
+    }
+
+    /**
+     * 静态页语言切换链接。默认语种无前缀(如 {@code /products/page/1/}),
+     * 其余语种带小写前缀(如 {@code /zh-cn/products/page/1/}),与前台 SiteCommonAttributes 一致。
+     * 单语言主题返回空列表(language 片段整体不渲染)。
+     */
+    private List<LanguageOption> buildLanguageOptions(Tenant tenant, String locale, String localePrefix) {
+        ThemeManifest manifest;
+        try {
+            manifest = manifestResolver.resolve(tenant);
+        } catch (Exception e) {
+            return List.of();
+        }
+        if (!manifest.isMultiLanguage()) {
+            return List.of();
+        }
+        String effective = LocaleContext.get().map(LocaleResolution::effectivePath).orElse("/");
+        String defaultLocale = manifest.defaultLocale();
+        List<LanguageOption> options = new ArrayList<>();
+        for (String lang : manifest.locales()) {
+            String path = lang.equals(defaultLocale)
+                    ? effective
+                    : "/" + lang.toLowerCase(Locale.ROOT) + effective;
+            options.add(new LanguageOption(lang, label(lang), path));
+        }
+        return options;
+    }
+
+    /** 语言展示文案;新增语言在此追加。 */
+    private static String label(String lang) {
+        return switch (lang) {
+            case "zh-CN" -> "中文";
+            case "en-US" -> "EN";
+            default -> lang;
+        };
     }
 
     /**
@@ -301,11 +447,21 @@ public class StaticSiteGenerator {
         }
     }
 
-    private void write(Path releaseDir, String relativePath, String content) throws IOException {
-        Path target = releaseDir.resolve(relativePath);
+    private void write(Path outputDir, String relativePath, String content) throws IOException {
+        Path target = outputDir.resolve(relativePath);
         Files.createDirectories(target.getParent());
         Files.writeString(target, content);
         log.debug("static write: {}", target);
+    }
+
+    /** meta-refresh 跳板页,把 {@code {list}/} 转向 {@code {list}/page/1/}(静态站无服务端 30x)。 */
+    private void writeRedirect(Path outputDir, String relativePath, String target, String baseUrl) throws IOException {
+        String html = "<!DOCTYPE html>\n<html><head>" +
+                "<meta charset=\"UTF-8\">" +
+                "<meta http-equiv=\"refresh\" content=\"0; url=" + esc(target) + "\">" +
+                "<link rel=\"canonical\" href=\"" + esc(baseUrl + target) + "\">" +
+                "<title>Redirect</title></head><body></body></html>\n";
+        write(outputDir, relativePath, html);
     }
 
     private void appendUrl(StringBuilder sb, String loc) {

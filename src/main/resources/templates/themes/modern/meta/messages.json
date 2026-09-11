@@ -1,0 +1,37 @@
+{
+  "nav.home":     { "zh-CN": "首页",        "en-US": "Home" },
+  "nav.about":    { "zh-CN": "关于我们",     "en-US": "About" },
+  "nav.products": { "zh-CN": "产品",        "en-US": "Products" },
+  "nav.news":     { "zh-CN": "新闻",        "en-US": "News" },
+  "nav.contact":  { "zh-CN": "联系我们",     "en-US": "Contact" },
+
+  "home.about.title":    { "zh-CN": "关于我们",           "en-US": "About Us" },
+  "home.about.readmore": { "zh-CN": "了解更多 →",         "en-US": "Read more →" },
+  "home.featured.title": { "zh-CN": "精选产品",           "en-US": "Featured Products" },
+  "home.news.title":     { "zh-CN": "最新动态",           "en-US": "Latest News" },
+  "home.products.btn":   { "zh-CN": "查看产品",           "en-US": "View Products" },
+  "home.cta.title":      { "zh-CN": "准备好与我们合作了吗？", "en-US": "Ready to work with us?" },
+  "home.cta.btn":        { "zh-CN": "联系我们",          "en-US": "Contact Us" },
+
+  "product.title":  { "zh-CN": "产品",      "en-US": "Products" },
+  "product.empty":   { "zh-CN": "暂无产品",   "en-US": "No products yet." },
+  "product.back":    { "zh-CN": "← 返回产品", "en-US": "← Back to products" },
+
+  "news.title":      { "zh-CN": "新闻",      "en-US": "News" },
+  "news.empty":      { "zh-CN": "暂无新闻",   "en-US": "No news yet." },
+  "news.back":       { "zh-CN": "← 返回新闻", "en-US": "← Back to news" },
+
+  "page.back":       { "zh-CN": "返回",      "en-US": "Back" },
+  "page.prev":       { "zh-CN": "‹ 上一页",  "en-US": "‹ Previous" },
+  "page.next":       { "zh-CN": "下一页 ›",  "en-US": "Next ›" },
+
+  "contact.title":   { "zh-CN": "联系我们",   "en-US": "Contact" },
+  "contact.name":    { "zh-CN": "姓名",      "en-US": "Name" },
+  "contact.email":   { "zh-CN": "邮箱",      "en-US": "Email" },
+  "contact.message": { "zh-CN": "留言",      "en-US": "Message" },
+  "contact.send":    { "zh-CN": "发送",      "en-US": "Send" },
+
+  "common.tel":      { "zh-CN": "电话",      "en-US": "Tel" },
+  "common.mobile":   { "zh-CN": "手机",      "en-US": "Mobile" },
+  "common.whatsapp": { "zh-CN": "WhatsApp",  "en-US": "WhatsApp" }
+}

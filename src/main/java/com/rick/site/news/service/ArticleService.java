@@ -69,6 +69,13 @@ public class ArticleService extends BaseServiceImpl<ArticleDAO, Article, Long> {
         return i18nDAO.insertOrUpdate(i18n);
     }
 
+    /** 逻辑删除:校验归属(跨租户查不到)后置 is_deleted。 */
+    @Transactional(rollbackFor = Exception.class)
+    public void delete(Long articleId) {
+        requireOwned(articleId);
+        baseDAO.deleteById(articleId);
+    }
+
     public ResolvedArticle resolveForDisplay(String slug, String language, String defaultLanguage) {
         Article article = findBySlug(slug)
                 .orElseThrow(() -> new BizException("新闻不存在: " + slug));
@@ -90,7 +97,7 @@ public class ArticleService extends BaseServiceImpl<ArticleDAO, Article, Long> {
         return new ResolvedArticle(article, resolved.orElse(null), effectiveLanguage);
     }
 
-    Map<String, ArticleI18n> loadI18nMap(Long articleId) {
+    public Map<String, ArticleI18n> loadI18nMap(Long articleId) {
         Map<String, ArticleI18n> map = new LinkedHashMap<>();
         for (ArticleI18n row : i18nDAO.select("article_id = :articleId", Map.of("articleId", articleId))) {
             map.put(row.getLanguage(), row);

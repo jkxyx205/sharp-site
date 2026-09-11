@@ -48,7 +48,7 @@ class SitePageControllerTest {
     @BeforeEach
     void setup() {
         tenant = tenantService.save(Tenant.builder()
-                .code("web-ctrl").name("Web Ctrl").themeId("modern").defaultLanguage("en-US").build());
+                .code("web-ctrl").name("Web Ctrl").themeId("modern").build());
         TenantContext.set(tenant);
         domainService.add("localhost", true);
 

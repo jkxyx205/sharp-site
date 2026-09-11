@@ -45,7 +45,7 @@ class SiteHomeControllerTest {
     @BeforeEach
     void setup() {
         tenant = tenantService.save(Tenant.builder()
-                .code("home-ctrl").name("Home Co").themeId("modern").defaultLanguage("en-US").build());
+                .code("home-ctrl").name("Home Co").themeId("modern").build());
         TenantContext.set(tenant);
         domainService.add("localhost", true);
 

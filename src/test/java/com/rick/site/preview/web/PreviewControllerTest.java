@@ -68,7 +68,7 @@ class PreviewControllerTest {
     @BeforeEach
     void setup() throws Exception {
         Tenant tenant = tenantService.save(Tenant.builder()
-                .code("pvw").name("Preview Co").themeId("modern").defaultLanguage("en-US").build());
+                .code("pvw").name("Preview Co").themeId("modern").build());
         TenantContext.set(tenant);
         domainService.add("localhost", true);
 

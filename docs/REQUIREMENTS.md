@@ -727,3 +727,82 @@ Nginx 主要负责：
 - Static Asset
 
 任何会破坏上述架构的实现方案，必须先说明原因，不得直接改变架构。
+
+---
+
+# 26. Phase 18 增补需求：按租户多语言 + 模板 i18n + 多语种静态发布 + 逻辑分页
+
+> 本节为 Phase 18 增补，补充 §13 多语言、§18 静态化、§7 页面 URL 的细化。如与上文冲突，以本节为准。
+
+## 26.1 按租户选择语种
+
+- 每个租户在 `tenant.languages` 选择启用的语种（逗号分隔规范代码，如 `en-US,zh-CN`）。
+- `tenant.default_language` 必须属于 `languages`。
+- 平台支持语种仍为 `zh-CN` / `en-US`（`DefaultLocaleResolver.SUPPORTED_LANGUAGES`），架构允许后续扩展（§13）。
+- 语言模式由 `languages` 数量推导：含 >1 语种为**多语言模式**；仅 1 个为**单语言模式**。
+
+> 拟新增 schema（待确认，见 §26.6）：
+> ```sql
+> ALTER TABLE tenant ADD COLUMN languages VARCHAR(100) NOT NULL DEFAULT 'en-US';
+> ```
+
+## 26.2 两种语言模式
+
+### 多语言模式（languages > 1）
+
+- **页面设计内容**（导航、标题、按钮、页脚等界面文案）：Theme 模板用 `#{message.key}` 引用，译文放 `src/main/resources/i18n/messages*.properties`（按 locale）；发布/渲染按 locale 取。
+- **后台管理内容**（文章、产品、页面、首页区块）：编辑时按语种分栏（per-language fieldset），仅遍历该租户启用的语种（不再遍历平台全部 `SUPPORTED_LANGUAGES`）。
+- **发布**：按语种镜像发布到 `/{locale}/`（见 §26.4）。
+
+### 单语言模式（languages == 1）
+
+- **页面设计内容**：界面文案可直写在模板中（无需 `messages.json`）；若 Theme 用 `#{}`，仅依赖默认 bundle 解析为该单一语言。
+- **后台管理内容**：编辑时不出现语种选择，直接编辑（单 fieldset；i18n 仅存该语种一行）。
+- **发布**：直接在 `/` 发布（无 locale 前缀，保持 Phase 12 行为）。
+
+> 设计取舍：为避免为单/多语言各维护一套模板（违反 §13 "不要复制整个模板目录"），modern 主题统一采用 `#{}` i18n 模式；单语言租户仅有一份默认 bundle，`#{}` 解析为该语言。如需真正"文字直写"的单语言主题，可另行编写不使用 `#{}` 的 Theme，二者渲染均正常。
+
+## 26.3 模板 i18n（messages.json）
+
+- 新增 Spring `MessageSource`（`classpath:i18n/messages`）+ Thymeleaf `#{}` 集成（Spring Boot 自动让 `SpringTemplateEngine` 使用该 MessageSource）。
+- 资源：`src/main/resources/i18n/messages.properties`（默认/fallback）、`messages_zh_CN.properties`、`messages_en_US.properties`。
+- 界面文案 key 规范：`nav.home` / `nav.about` / `nav.products` / `nav.news` / `nav.contact` / `home.cta` / `product.featured` / `news.latest` / `common.readmore` / `common.contact` / `footer.copyright` 等。
+- 动态请求：`LocaleFilter`/`LocaleContext` 解析语言后，设置 Spring `LocaleContextHolder`，使 Thymeleaf `#{}` 按当前 locale 解析。
+- 离线渲染（StaticSiteGenerator）：`OfflineWebContext(locale)` 传入对应 `java.util.Locale`。
+
+## 26.4 多语种静态发布
+
+- **多语言租户**：对每个启用语种 L 生成 `/{L}/` 镜像：
+  - `/{L}/index.html`、`/{L}/about/index.html`、`/{L}/products/...`、`/{L}/news/...`、`/{L}/contact/index.html`
+  - 根 `index.html` 重定向到默认语种 `/{defaultLocale}/`（meta refresh + `<link rel=canonical>`）。
+  - `sitemap.xml` 列出所有语种 URL；`robots.txt` 在根。
+- **单语言租户**：在根 `/` 发布（保持 Phase 12）：`index.html`、`about/index.html`、`products/...`、`news/...`。
+- URL 语种段统一**小写** `zh-cn` / `en-us`（SEO 习惯 + 与既有路由 `[a-z]{2}-[a-z]{2}` / 语言切换链接一致）。
+
+> 待确认：URL 语种段大小写。当前路由与语言切换已用小写 `zh-cn`；用户示例写作 `zh-CN` 指语种代号，实际 URL 段默认小写。如需大写，需同步改路由正则与切换链接。
+
+## 26.5 逻辑分页（产品 / 新闻列表）
+
+- 静态发布将产品列表、新闻列表分页生成：
+  - `products/index.html`（第 1 页）、`products/page/2/index.html`、…
+  - `news/index.html`（第 1 页）、`news/page/2/index.html`、…
+- 每页 N 条（默认 products 12 / news 10，可配置）。
+- 列表页仅渲染当前页条目 + 分页导航（上一页/下一页/页码）；详情链接指向静态详情 `products/{slug}/index.html`、`news/{slug}/index.html`。
+- 动态预览：`/products?page=2`、`/news?page=2` 同样分页（逻辑分页，内存切片），模板分页控件复用。
+- "逻辑分页"：全量读取后内存分页，不引入 DB 分页参数。
+
+## 26.6 schema 变更（待确认）
+
+新增 `tenant.languages` 列前需确认（既往约定不动 DATABASE.md；本需求必需此列，故提请确认）：
+
+- `tenant.languages VARCHAR(100) NOT NULL DEFAULT 'en-US'`（逗号分隔，如 `en-US,zh-CN`）。
+- 现有 `tenant.default_language` 保留不变（须属于 `languages`）。
+- 迁移：存量租户 `languages = default_language`。
+
+## 26.7 验收
+
+- 多语言租户发布后：`/zh-cn/index.html` 与 `/en-us/index.html` 均存在且内容分语言；`/` 重定向到默认语种。
+- 单语言租户发布后：`/index.html` 直接存在，无 locale 目录。
+- 产品/新闻列表存在多页静态文件；详情跳转至静态详情页。
+- 后台多语言租户编辑产品：仅出现启用语种的 fieldset；单语言租户不出现语种选择。
+- 界面文案经 `#{}` 按 locale 渲染（多语言租户切换语言时导航等文案随之变化）。

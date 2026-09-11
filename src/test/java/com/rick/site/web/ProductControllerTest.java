@@ -45,7 +45,7 @@ class ProductControllerTest {
     @BeforeEach
     void setup() {
         tenant = tenantService.save(Tenant.builder()
-                .code("prod-ctrl").name("Prod Co").themeId("modern").defaultLanguage("en-US").build());
+                .code("prod-ctrl").name("Prod Co").themeId("modern").build());
         TenantContext.set(tenant);
         domainService.add("localhost", true);
 

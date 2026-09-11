@@ -226,6 +226,15 @@ Service 查询 i18n 数据时必须明确 language。
 
 Phase 2 默认允许回退。
 
+### 7.1 按租户语种（Phase 18）
+
+每个租户在 `tenant.languages` 选定启用语种（逗号分隔）。语言模式由数量推导：
+
+- `languages` > 1：多语言模式，发布按 `/{locale}/` 镜像。
+- `languages` == 1：单语言模式，发布在根 `/`。
+
+后台编辑遍历 `tenant.enabledLanguages()` 而非平台 `SUPPORTED_LANGUAGES`。界面文案经 `#{message.key}` + `i18n/messages*.properties` 按 locale 渲染（`LocaleFilter` 同步设 `LocaleContextHolder`；离线渲染经 `OfflineWebContext(locale)`）。详见 REQUIREMENTS §26。
+
 ## 8. Controller
 
 建议网站前台：
@@ -280,6 +289,11 @@ Thymeleaf TemplateEngine
 ```text
 /data/www/{tenantId}/releases/{version}/
 ```
+
+### 9.1 多语种镜像与分页（Phase 18）
+
+- 多语言租户：每启用语种生成 `/{locale}/` 镜像（home/pages/products/news/contact）；根 `index.html` 重定向到默认语种；`sitemap.xml` 含各语种 URL。单语言租户：保持根 `/` 发布。
+- 产品/新闻列表逻辑分页：`products/page/{n}/index.html`、`news/page/{n}/index.html`（内存切片，不引入 DB 分页）。详情静态化保持 `products/{slug}/index.html`。
 
 ## 10. 发布
 

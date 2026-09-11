@@ -11,6 +11,7 @@ import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.validator.constraints.Length;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
@@ -47,6 +48,7 @@ public class Article extends TenantBaseEntity<Long> {
     String author;
 
     @Column(comment = "发布时间")
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     LocalDateTime publishTime;
 
     @Column(nullable = false, comment = "状态:1发布,0草稿/下架")

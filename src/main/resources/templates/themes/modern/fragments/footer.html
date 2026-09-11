@@ -11,8 +11,8 @@
             </p>
         </div>
         <div>
-            <p th:if="${config != null and config.phone != null}" th:text="'Tel: ' + ${config.phone}">Tel</p>
-            <p th:if="${config != null and config.whatsapp != null}" th:text="'WhatsApp: ' + ${config.whatsapp}">WhatsApp</p>
+            <p th:if="${config != null and config.phone != null}" th:text="|#{common.tel}: ${config.phone}|">Tel</p>
+            <p th:if="${config != null and config.whatsapp != null}" th:text="|#{common.whatsapp}: ${config.whatsapp}|">WhatsApp</p>
         </div>
         <div>
             <p th:if="${config != null and config.copyright != null}" th:text="${config.copyright}">© Year Site</p>

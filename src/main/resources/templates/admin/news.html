@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/fragments/head :: head(title='新闻管理')}"></head>
+<body>
+<div class="card">
+    <h1>新闻管理</h1>
+    <nav><a th:href="@{/admin/}">← 返回</a> <a th:href="@{/admin/news/new}">+ 新建文章</a></nav>
+    <p class="error" th:if="${error}" th:text="${error}">错误</p>
+    <table>
+        <thead>
+        <tr><th>Slug</th><th>作者</th><th>状态</th><th>排序</th><th>操作</th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="a : ${articles}">
+            <td th:text="${a.slug}">slug</td>
+            <td th:text="${a.author}">author</td>
+            <td th:text="${a.status == 1 ? '发布' : '草稿'}">—</td>
+            <td th:text="${a.sort}">0</td>
+            <td>
+                <a th:href="@{/admin/news/{id}/edit(id=${a.id})}">编辑</a>
+                <form th:action="@{/admin/news/{id}/delete(id=${a.id})}" method="post" style="display:inline"
+                      onsubmit="return confirm('删除该文章?');">
+                    <button type="submit" class="btn-link">删除</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <p class="empty" th:if="${articles == null or articles.isEmpty()}">暂无文章。</p>
+</div>
+</body>
+</html>

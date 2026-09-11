@@ -10,6 +10,7 @@ import com.rick.site.seo.dto.SeoFallback;
 import com.rick.site.seo.service.SeoConfigService;
 import com.rick.site.tenant.context.TenantContext;
 import com.rick.site.tenant.entity.Tenant;
+import com.rick.site.theme.service.ThemeManifestResolver;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -33,24 +34,27 @@ public class ProductController {
 
     private final ProductService productService;
     private final SeoConfigService seoService;
+    private final ThemeManifestResolver manifestResolver;
 
-    public ProductController(ProductService productService, SeoConfigService seoService) {
+    public ProductController(ProductService productService, SeoConfigService seoService,
+                           ThemeManifestResolver manifestResolver) {
         this.productService = productService;
         this.seoService = seoService;
+        this.manifestResolver = manifestResolver;
     }
 
     @GetMapping(value = {"/products", "/{locale:[a-z]{2}-[a-z]{2}}/products",
             "/products/", "/{locale:[a-z]{2}-[a-z]{2}}/products/"})
     public String list(HttpServletRequest request, Model model) {
         Tenant tenant = TenantContext.require();
+        String dl = manifestResolver.defaultLocale(tenant);
         LocaleResolution loc = LocaleContext.get()
-                .orElseGet(() -> new LocaleResolution(tenant.getDefaultLanguage(), "/products"));
+                .orElseGet(() -> new LocaleResolution(dl, "/products"));
         List<ProductView> products = productService.listForDisplay(
-                        loc.language(), tenant.getDefaultLanguage()).stream()
+                        loc.language(), dl).stream()
                 .map(ProductView::from).toList();
         model.addAttribute("products", products);
-        seoService.resolveView(SeoConfigService.PRODUCTS_LIST, null, loc.language(),
-                tenant.getDefaultLanguage(),
+        seoService.resolveView(SeoConfigService.PRODUCTS_LIST, null, loc.language(), dl,
                 new SeoFallback("Products", "", "", request.getRequestURL().toString())).applyTo(model);
         return "themes/modern/products";
     }
@@ -59,12 +63,13 @@ public class ProductController {
     public String detail(@org.springframework.web.bind.annotation.PathVariable String slug,
                           HttpServletRequest request, Model model) {
         Tenant tenant = TenantContext.require();
+        String dl = manifestResolver.defaultLocale(tenant);
         LocaleResolution loc = LocaleContext.get()
-                .orElseGet(() -> new LocaleResolution(tenant.getDefaultLanguage(), "/products/" + slug));
+                .orElseGet(() -> new LocaleResolution(dl, "/products/" + slug));
         ResolvedProduct resolved;
         try {
             resolved = productService.resolveForDisplay(
-                    slug, loc.language(), tenant.getDefaultLanguage());
+                    slug, loc.language(), dl);
         } catch (BizException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
@@ -74,7 +79,7 @@ public class ProductController {
         String fbDesc = product.seoDescription() != null ? product.seoDescription()
                 : (product.subtitle() != null ? product.subtitle() : "");
         seoService.resolveView(SeoConfigService.PRODUCT, resolved.product().getId(),
-                loc.language(), tenant.getDefaultLanguage(),
+                loc.language(), dl,
                 new SeoFallback(fbTitle, fbDesc, product.cover(), request.getRequestURL().toString())).applyTo(model);
         return "themes/modern/product-detail";
     }

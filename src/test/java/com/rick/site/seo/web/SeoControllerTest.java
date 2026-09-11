@@ -54,7 +54,7 @@ class SeoControllerTest {
     @BeforeEach
     void setup() {
         tenant = tenantService.save(Tenant.builder()
-                .code("seo-ctrl").name("SEO Co").themeId("modern").defaultLanguage("en-US").build());
+                .code("seo-ctrl").name("SEO Co").themeId("modern").build());
         TenantContext.set(tenant);
         domainService.add("localhost", true);
 

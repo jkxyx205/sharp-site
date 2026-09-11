@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<!-- 语言切换(Phase 3 接入 LocaleResolver 后由 Controller 填充 languages)。
-     languages: List<{code,label,path}> -->
-<nav th:fragment="language(current, languages)" class="lang-switch" th:if="${languages != null and !languages.isEmpty()}">
+<!-- 语言切换(由 SiteCommonAttributes 装填 languages: List<LanguageOption{code,label,path}>)。
+     根元素用 span(嵌入 site-nav 内,避免 nav-in-nav);languages 为空时整体不渲染。
+     th:each 在内层 span 上,使 lStat 在分隔符 th:block 内可见。 -->
+<span th:fragment="language(current, languages)" class="lang-switch"
+      th:if="${languages != null and !languages.isEmpty()}">
     <span th:each="l : ${languages}">
         <a th:href="@{${l.path}}" th:text="${l.label}"
            th:classappend="${l.code == current} ? 'active' : ''">EN</a><th:block th:if="${!lStat.last}"> · </th:block>
     </span>
-</nav>
+</span>
 </html>

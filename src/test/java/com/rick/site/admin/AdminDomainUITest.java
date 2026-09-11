@@ -48,7 +48,7 @@ class AdminDomainUITest {
     @BeforeEach
     void setup() throws Exception {
         Tenant tenant = tenantService.save(Tenant.builder()
-                .code("domui").name("DomUI Co").themeId("modern").defaultLanguage("en-US").build());
+                .code("domui").name("DomUI Co").themeId("modern").build());
         TenantContext.set(tenant);
         domainService.add("localhost", true);
         adminUserService.create("domui-admin", PWD);

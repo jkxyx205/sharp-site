@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/fragments/head :: head(title='分类管理')}"></head>
+<body>
+<div class="card">
+    <h1>分类管理</h1>
+    <nav><a th:href="@{/admin/}">← 返回</a> <a th:href="@{/admin/categories/new}">+ 新建分类</a></nav>
+    <p class="error" th:if="${error}" th:text="${error}">错误</p>
+
+    <h2 style="font-size:16px;margin:16px 0 4px;">产品分类</h2>
+    <table>
+        <thead><tr><th>Slug</th><th>排序</th><th>状态</th><th>操作</th></tr></thead>
+        <tbody>
+        <tr th:each="c : ${categories}">
+            <td th:text="${c.slug}">slug</td>
+            <td th:text="${c.sort}">0</td>
+            <td th:text="${c.status == 1 ? '启用' : '停用'}">—</td>
+            <td>
+                <a th:href="@{/admin/categories/{id}/edit(id=${c.id})}">编辑</a>
+                <form th:action="@{/admin/categories/{id}/delete(id=${c.id})}" method="post" style="display:inline"
+                      onsubmit="return confirm('删除该分类?');">
+                    <button type="submit" class="btn-link">删除</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <p class="empty" th:if="${categories == null or categories.isEmpty()}">暂无产品分类。</p>
+
+    <h2 style="font-size:16px;margin:24px 0 4px;">新闻分类</h2>
+    <table>
+        <thead><tr><th>Slug</th><th>排序</th><th>状态</th><th>操作</th></tr></thead>
+        <tbody>
+        <tr th:each="c : ${newsCategories}">
+            <td th:text="${c.slug}">slug</td>
+            <td th:text="${c.sort}">0</td>
+            <td th:text="${c.status == 1 ? '启用' : '停用'}">—</td>
+            <td>
+                <a th:href="@{/admin/categories/{id}/edit(id=${c.id})}">编辑</a>
+                <form th:action="@{/admin/categories/{id}/delete(id=${c.id})}" method="post" style="display:inline"
+                      onsubmit="return confirm('删除该分类?');">
+                    <button type="submit" class="btn-link">删除</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <p class="empty" th:if="${newsCategories == null or newsCategories.isEmpty()}">暂无新闻分类。</p>
+</div>
+</body>
+</html>

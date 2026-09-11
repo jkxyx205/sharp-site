@@ -74,13 +74,13 @@ class DomainIsolationTest {
     @BeforeEach
     void setup() {
         tenantA = tenantService.save(Tenant.builder()
-                .code("iso-a").name("Iso A").themeId("modern").defaultLanguage("en-US").build());
+                .code("iso-a").name("Iso A").themeId("modern").build());
         TenantContext.set(tenantA);
         domainService.add("a-iso.example.com", true);
         seedContent();
 
         tenantB = tenantService.save(Tenant.builder()
-                .code("iso-b").name("Iso B").themeId("modern").defaultLanguage("en-US").build());
+                .code("iso-b").name("Iso B").themeId("modern").build());
         TenantContext.set(tenantB);
         domainService.add("b-iso.example.com", true);
         seedContent();

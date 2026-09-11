@@ -69,6 +69,13 @@ public class ProductService extends BaseServiceImpl<ProductDAO, Product, Long> {
         return i18nDAO.insertOrUpdate(i18n);
     }
 
+    /** 逻辑删除:校验归属(跨租户查不到)后置 is_deleted。 */
+    @Transactional(rollbackFor = Exception.class)
+    public void delete(Long productId) {
+        requireOwned(productId);
+        baseDAO.deleteById(productId);
+    }
+
     /** 单品展示:按 slug 查产品 + i18n(缺失回退默认语言)。 */
     public ResolvedProduct resolveForDisplay(String slug, String language, String defaultLanguage) {
         Product product = findBySlug(slug)
@@ -91,7 +98,7 @@ public class ProductService extends BaseServiceImpl<ProductDAO, Product, Long> {
         return out;
     }
 
-    Map<String, ProductI18n> loadI18nMap(Long productId) {
+    public Map<String, ProductI18n> loadI18nMap(Long productId) {
         Map<String, ProductI18n> map = new LinkedHashMap<>();
         for (ProductI18n row : i18nDAO.select("product_id = :productId", Map.of("productId", productId))) {
             map.put(row.getLanguage(), row);

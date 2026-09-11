@@ -39,7 +39,7 @@ class JsonbUpdateTest {
     @Test
     void updatingExistingProductI18nSpecificationJsonSucceeds() {
         Tenant t = tenantService.save(Tenant.builder()
-                .code("jsonb-upd").name("JsonbUpd").themeId("modern").defaultLanguage("en-US").build());
+                .code("jsonb-upd").name("JsonbUpd").themeId("modern").build());
         TenantContext.set(t);
 
         Product p = productService.saveProduct(Product.builder()

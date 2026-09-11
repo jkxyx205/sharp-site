@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/fragments/head :: head(title='区块编辑')}"></head>
+<body>
+<div class="card">
+    <h1><span th:text="${section.id == null ? '新建区块' : '编辑区块'}">区块</span></h1>
+    <nav><a th:href="@{/admin/home-sections}">← 返回列表</a></nav>
+    <p class="error" th:if="${error}" th:text="${error}">错误</p>
+    <form th:action="@{/admin/home-sections/save}" method="post">
+        <input type="hidden" name="id" th:value="${section.id}" />
+        <label>Section Key <span class="hint">如 hero/company/cta,租户内唯一,按此 upsert</span>
+            <input type="text" name="sectionKey" th:value="${section.sectionKey}" required placeholder="hero" /></label>
+        <label>排序 <span class="hint">升序</span>
+            <input type="number" name="sort" th:value="${section.sort}" /></label>
+        <label>启用
+            <select name="enabled">
+                <option value="1" th:selected="${section.enabled == 1}">启用</option>
+                <option value="0" th:selected="${section.enabled != 1}">禁用</option>
+            </select></label>
+
+        <th:block th:each="lang : ${languages}">
+            <fieldset th:classappend="${lang == defaultLanguage ? 'default-lang' : ''}">
+                <legend><span th:text="${lang}">语言</span>
+                    <span class="lang-tag" th:if="${lang == defaultLanguage}">· 默认语言</span></legend>
+                <label>Title
+                    <input type="text" th:name="'title_' + ${lang}"
+                           th:value="${i18nMap[lang] != null ? i18nMap[lang].title : ''}" /></label>
+                <label>Subtitle
+                    <input type="text" th:name="'subtitle_' + ${lang}"
+                           th:value="${i18nMap[lang] != null ? i18nMap[lang].subtitle : ''}" /></label>
+                <label>Content <span class="hint">富文本 HTML</span>
+                    <textarea th:name="'content_' + ${lang}"
+                              th:text="${i18nMap[lang] != null ? i18nMap[lang].content : ''}"></textarea></label>
+            </fieldset>
+        </th:block>
+
+        <div class="actions">
+            <button type="submit" class="btn">保存</button>
+            <a th:href="@{/admin/home-sections}" class="btn btn-secondary">取消</a>
+        </div>
+    </form>
+</div>
+</body>
+</html>

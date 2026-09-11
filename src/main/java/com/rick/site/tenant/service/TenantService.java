@@ -28,7 +28,6 @@ import java.util.Optional;
 public class TenantService extends BaseCodeServiceImpl<TenantDAO, Tenant, Long> {
 
     /** 与 DDL 默认值保持一致 */
-    static final String DEFAULT_LANGUAGE = "en-US";
     static final short STATUS_ENABLED = 1;
 
     public TenantService(TenantDAO baseDAO) {
@@ -37,14 +36,12 @@ public class TenantService extends BaseCodeServiceImpl<TenantDAO, Tenant, Long> 
 
     /**
      * 保存租户:id 为 null 走新增(code 必须唯一),否则走全列更新。
-     * 新增时补默认值(defaultLanguage / status);create_time/update_time 由框架填充。
+     * 新增时补默认值(status);语言配置由主题 theme.json 决定,租户不再持有。
+     * create_time/update_time 由框架填充。
      */
     @Transactional(rollbackFor = Exception.class)
     public Tenant save(Tenant tenant) {
         if (tenant.getId() == null) {
-            if (StringUtils.isBlank(tenant.getDefaultLanguage())) {
-                tenant.setDefaultLanguage(DEFAULT_LANGUAGE);
-            }
             if (tenant.getStatus() == null) {
                 tenant.setStatus(STATUS_ENABLED);
             }

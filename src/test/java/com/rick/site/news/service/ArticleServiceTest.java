@@ -43,7 +43,7 @@ class ArticleServiceTest {
 
     private Tenant createTenant(String code) {
         Tenant t = tenantService.save(Tenant.builder()
-                .code(code).name(code).themeId("modern").defaultLanguage("en-US").build());
+                .code(code).name(code).themeId("modern").build());
         TenantContext.set(t);
         return t;
     }

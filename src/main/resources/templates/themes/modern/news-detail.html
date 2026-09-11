@@ -9,7 +9,7 @@
     <p class="meta" th:if="${article.publishTime != null}"
        th:text="${#temporals.format(article.publishTime, 'yyyy-MM-dd')}"></p>
     <div class="rich-text" th:utext="${article.content} ?: ''">Article content.</div>
-    <p class="back"><a th:href="@{/news}">← Back to news</a></p>
+    <p class="back"><a th:href="@{${localePrefix + '/news'}}" th:text="#{news.back}">← Back to news</a></p>
 </article>
 
 <footer th:replace="~{themes/modern/fragments/footer :: footer(siteName=${siteName}, config=${config})}"></footer>

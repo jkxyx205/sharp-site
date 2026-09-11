@@ -71,6 +71,13 @@ public class HomeSectionService extends BaseServiceImpl<HomeSectionDAO, HomeSect
         return i18nDAO.insertOrUpdate(i18n);
     }
 
+    /** 逻辑删除:校验归属(跨租户查不到)后置 is_deleted。 */
+    @Transactional(rollbackFor = Exception.class)
+    public void delete(Long sectionId) {
+        requireOwned(sectionId);
+        baseDAO.deleteById(sectionId);
+    }
+
     /**
      * 展示用:加载启用区块(排序),每块取当前语言 i18n(缺失回退默认语言),
      * 返回按 section_key 索引的映射(保持顺序)。
@@ -86,7 +93,7 @@ public class HomeSectionService extends BaseServiceImpl<HomeSectionDAO, HomeSect
         return map;
     }
 
-    Map<String, HomeSectionI18n> loadI18nMap(Long sectionId) {
+    public Map<String, HomeSectionI18n> loadI18nMap(Long sectionId) {
         Map<String, HomeSectionI18n> map = new LinkedHashMap<>();
         for (HomeSectionI18n row : i18nDAO.select("section_id = :sectionId", Map.of("sectionId", sectionId))) {
             map.put(row.getLanguage(), row);

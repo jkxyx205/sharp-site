@@ -11,7 +11,6 @@ CREATE TABLE tenant (
     name VARCHAR(200) NOT NULL,
     code VARCHAR(100) NOT NULL,
     theme_id VARCHAR(100) NOT NULL,
-    default_language VARCHAR(20) NOT NULL DEFAULT 'en-US',
     status SMALLINT NOT NULL DEFAULT 1,
     create_by BIGINT,
     create_time TIMESTAMP NOT NULL,

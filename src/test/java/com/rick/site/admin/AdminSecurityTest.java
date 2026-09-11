@@ -64,7 +64,7 @@ class AdminSecurityTest {
     @BeforeEach
     void setup() {
         tenantA = tenantService.save(Tenant.builder()
-                .code("sec-a").name("Tenant A").themeId("modern").defaultLanguage("en-US").build());
+                .code("sec-a").name("Tenant A").themeId("modern").build());
         TenantContext.set(tenantA);
         domainService.add("a.example.com", true);
         adminA = adminUserService.create("a-admin", PWD);
@@ -72,7 +72,7 @@ class AdminSecurityTest {
                 .slug("widget-a").status((short) 1).sort(0).build());
 
         tenantB = tenantService.save(Tenant.builder()
-                .code("sec-b").name("Tenant B").themeId("modern").defaultLanguage("en-US").build());
+                .code("sec-b").name("Tenant B").themeId("modern").build());
         TenantContext.set(tenantB);
         domainService.add("b.example.com", true);
         Product bProduct = productService.saveProduct(Product.builder()

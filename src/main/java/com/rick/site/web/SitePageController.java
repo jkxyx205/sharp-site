@@ -9,6 +9,7 @@ import com.rick.site.seo.dto.SeoFallback;
 import com.rick.site.seo.service.SeoConfigService;
 import com.rick.site.tenant.context.TenantContext;
 import com.rick.site.tenant.entity.Tenant;
+import com.rick.site.theme.service.ThemeManifestResolver;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -37,10 +38,13 @@ public class SitePageController {
 
     private final SitePageService pageService;
     private final SeoConfigService seoService;
+    private final ThemeManifestResolver manifestResolver;
 
-    public SitePageController(SitePageService pageService, SeoConfigService seoService) {
+    public SitePageController(SitePageService pageService, SeoConfigService seoService,
+                             ThemeManifestResolver manifestResolver) {
         this.pageService = pageService;
         this.seoService = seoService;
+        this.manifestResolver = manifestResolver;
     }
 
     @GetMapping(
@@ -50,12 +54,13 @@ public class SitePageController {
             })
     public String page(HttpServletRequest request, Model model) {
         Tenant tenant = TenantContext.require();
+        String dl = manifestResolver.defaultLocale(tenant);
         LocaleResolution loc = LocaleContext.get()
                 .orElseThrow(() -> new BizException("当前请求未解析到语言"));
         ResolvedPage resolved;
         try {
             resolved = pageService.resolveForDisplay(
-                    loc.effectivePath(), loc.language(), tenant.getDefaultLanguage());
+                    loc.effectivePath(), loc.language(), dl);
         } catch (BizException e) {
             // 页面不存在 → 404,而非 500
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
@@ -67,7 +72,7 @@ public class SitePageController {
                 ? resolved.i18n().getTitle() : resolved.page().getPageKey();
         String fbImage = resolved.i18n() != null ? resolved.i18n().getCover() : "";
         seoService.resolveView(SeoConfigService.PAGE, resolved.page().getId(),
-                loc.language(), tenant.getDefaultLanguage(),
+                loc.language(), dl,
                 new SeoFallback(fbTitle, "", fbImage, request.getRequestURL().toString())).applyTo(model);
         return resolved.page().getTemplate();
     }
