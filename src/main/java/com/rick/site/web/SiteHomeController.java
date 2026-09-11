@@ -4,6 +4,10 @@ import com.rick.site.home.service.HomeSectionService;
 import com.rick.site.home.service.HomeSectionService.ResolvedSection;
 import com.rick.site.i18n.context.LocaleContext;
 import com.rick.site.i18n.model.LocaleResolution;
+import com.rick.site.news.dto.ArticleView;
+import com.rick.site.news.service.ArticleService;
+import com.rick.site.product.dto.ProductView;
+import com.rick.site.product.service.ProductService;
 import com.rick.site.seo.dto.SeoFallback;
 import com.rick.site.seo.service.SeoConfigService;
 import com.rick.site.tenant.context.TenantContext;
@@ -14,7 +18,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,15 +33,25 @@ import java.util.Map;
 @Controller
 public class SiteHomeController {
 
+    /** 首页「Latest News」展示条数(取最新已发布文章)。 */
+    private static final int HOME_NEWS_LIMIT = 5;
+    /** 首页「Featured Products」展示条数(取上架产品前 N)。 */
+    private static final int HOME_PRODUCT_LIMIT = 8;
+
     private final HomeSectionService homeSectionService;
     private final SeoConfigService seoService;
     private final ThemeManifestResolver manifestResolver;
+    private final ProductService productService;
+    private final ArticleService articleService;
 
     public SiteHomeController(HomeSectionService homeSectionService, SeoConfigService seoService,
-                             ThemeManifestResolver manifestResolver) {
+                             ThemeManifestResolver manifestResolver,
+                             ProductService productService, ArticleService articleService) {
         this.homeSectionService = homeSectionService;
         this.seoService = seoService;
         this.manifestResolver = manifestResolver;
+        this.productService = productService;
+        this.articleService = articleService;
     }
 
     @GetMapping(value = {"/", "/{locale:[a-z]{2}-[a-z]{2}}", "/{locale:[a-z]{2}-[a-z]{2}}/"})
@@ -58,9 +71,11 @@ public class SiteHomeController {
         model.addAttribute("intro", text(hero, SiteHomeController::i18nSubtitle));
         model.addAttribute("aboutTeaser", text(company, SiteHomeController::i18nContent));
         model.addAttribute("ctaTitle", text(cta, SiteHomeController::i18nTitle));
-        // 产品/新闻列表由 Phase 6/7 注入,当前为空态
-        model.addAttribute("products", List.of());
-        model.addAttribute("news", List.of());
+        // 首页精选产品 + 最新文章(与静态发布 StaticSiteGenerator.generateHome 一致)
+        model.addAttribute("products", productService.listForDisplay(loc.language(), defaultLanguage).stream()
+                .limit(HOME_PRODUCT_LIMIT).map(ProductView::from).toList());
+        model.addAttribute("news", articleService.listForDisplay(loc.language(), defaultLanguage).stream()
+                .limit(HOME_NEWS_LIMIT).map(ArticleView::from).toList());
 
         String fbTitle = text(hero, SiteHomeController::i18nTitle);
         String fbDesc = text(company, SiteHomeController::i18nSubtitle);

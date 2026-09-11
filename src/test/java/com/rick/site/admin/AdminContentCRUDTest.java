@@ -201,9 +201,10 @@ class AdminContentCRUDTest {
                 .andExpect(content().string(containsString("a-only")))
                 .andExpect(content().string(not(containsString("b-only"))));
 
-        // 未选分类 → 空表 + 提示
+        // 未选分类 → 显示全部分类下的产品(仍仅本租户)
         mockMvc.perform(get("/admin/products").with(host("crud-a.example.com")).session(sessionA))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("请先选择分类")));
+                .andExpect(content().string(containsString("a-only")))
+                .andExpect(content().string(not(containsString("b-only"))));
     }
 }

@@ -113,6 +113,20 @@ class ProductServiceTest {
     }
 
     @Test
+    void listForDisplayHidesItemsWithoutRequestedLanguageI18n() {
+        // 多语言:仅维护 en-US 文案的产品,在 zh-CN 列表里不展示
+        Tenant t = createTenant("prod-5");
+        Product p = productService.saveProduct(newProduct("en-only-p"));
+        productService.saveI18n(p.getId(), ProductI18n.builder()
+                .language("en-US").name("EN only P").build());
+
+        assertThat(productService.listForDisplay("en-US", "en-US"))
+                .map(rp -> rp.product().getSlug()).contains("en-only-p");
+        assertThat(productService.listForDisplay("zh-CN", "en-US"))
+                .map(rp -> rp.product().getSlug()).doesNotContain("en-only-p");
+    }
+
+    @Test
     void tenantIsolation() {
         Tenant a = createTenant("prod-isol-a");
         Product pa = productService.saveProduct(newProduct("shared-slug"));

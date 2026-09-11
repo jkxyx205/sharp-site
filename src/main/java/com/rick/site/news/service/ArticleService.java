@@ -88,10 +88,20 @@ public class ArticleService extends BaseServiceImpl<ArticleDAO, Article, Long> {
         return resolve(article, language, defaultLanguage);
     }
 
+    /**
+     * 列表展示(已发布文章):仅返回在指定语种已维护 i18n 内容的文章。
+     *
+     * <p>多语言语义:某文章在当前语种无 i18n 行 → 不展示(既不回退默认语种、也不回退 slug),
+     * 避免在 zh-CN 列表里露出仅有 en-US 文案的文章。默认语种列表同理:无默认语种 i18n 则不展示。
+     * 详情页仍走 {@link #resolveForDisplay},保留缺失回退默认语种的行为。
+     */
     public List<ResolvedArticle> listForDisplay(String language, String defaultLanguage) {
         List<ResolvedArticle> out = new ArrayList<>();
         for (Article article : listPublished()) {
-            out.add(resolve(article, language, defaultLanguage));
+            ResolvedArticle resolved = resolve(article, language, defaultLanguage);
+            if (resolved.i18n() != null && language.equals(resolved.i18n().getLanguage())) {
+                out.add(resolved);
+            }
         }
         return out;
     }

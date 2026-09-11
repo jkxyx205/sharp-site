@@ -12,8 +12,8 @@
                 <nav class="subnav"><a class="btn" th:href="@{/admin/products}">← 返回列表</a></nav>
                 <p class="error" th:if="${error}" th:text="${error}">错误</p>
 
-                <!-- 语种切换(独立 GET 表单,仅编辑已有产品时显示) -->
-                <form th:if="${product.id != null}" th:action="@{/admin/products/{id}/edit(id=${product.id})}" method="get">
+                <!-- 语种切换(独立 GET 表单;新增/编辑均需先选语种) -->
+                <form th:action="${product.id == null ? '/admin/products/new' : '/admin/products/' + product.id + '/edit'}" method="get">
                     <label>语种
                         <select name="lang" onchange="this.form.submit()">
                             <option th:each="l : ${languages}" th:value="${l}"
@@ -22,7 +22,7 @@
                         </select></label>
                 </form>
 
-                <form th:action="@{/admin/products/save}" method="post">
+                <form id="saveForm" th:action="@{/admin/products/save}" method="post">
                     <input type="hidden" name="id" th:value="${product.id}" />
                     <input type="hidden" name="language" th:value="${currentLang}" />
                     <label>Slug <span class="hint">租户内唯一 URL 标识</span>
@@ -59,8 +59,8 @@
                         <label>Content <span class="hint">富文本 HTML</span>
                             <textarea name="content"
                                       th:text="${i18nMap[currentLang] != null ? i18nMap[currentLang].content : ''}"></textarea></label>
-                        <label>Specification JSON
-                            <textarea name="specificationJson" style="min-height:80px"
+                        <label>Specification JSON <span class="hint">须为合法 JSON,空则存 {}</span>
+                            <textarea id="specificationJson" name="specificationJson" style="min-height:80px"
                                       th:text="${i18nMap[currentLang] != null ? i18nMap[currentLang].specificationJson : ''}"
                                       placeholder='{"weight":"0.5kg","color":"black"}'></textarea></label>
                         <label>SEO Title
@@ -80,5 +80,18 @@
         </main>
     </div>
 </div>
+<script>
+    document.getElementById('saveForm').addEventListener('submit', function (e) {
+        var spec = document.getElementById('specificationJson').value.trim();
+        if (spec !== '') {
+            try { JSON.parse(spec); }
+            catch (err) {
+                e.preventDefault();
+                alert('Specification JSON 格式不合法,请检查。\n' + err.message);
+                document.getElementById('specificationJson').focus();
+            }
+        }
+    });
+</script>
 </body>
 </html>

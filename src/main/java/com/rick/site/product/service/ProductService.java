@@ -71,6 +71,8 @@ public class ProductService extends BaseServiceImpl<ProductDAO, Product, Long> {
         requireOwned(productId);
         i18n.setProductId(productId);
         i18n.setContent(sanitizer.clean(i18n.getContent()));
+        String spec = i18n.getSpecificationJson();
+        i18n.setSpecificationJson((spec == null || spec.isBlank()) ? "{}" : spec);
         findByLanguage(productId, i18n.getLanguage()).ifPresent(existing -> i18n.setId(existing.getId()));
         return i18nDAO.insertOrUpdate(i18n);
     }
@@ -92,14 +94,21 @@ public class ProductService extends BaseServiceImpl<ProductDAO, Product, Long> {
         return new ResolvedProduct(product, resolved.orElse(null), effectiveLanguage);
     }
 
-    /** 列表展示:启用产品(排序),每条取当前语言 i18n(缺失回退默认语言)。 */
+    /**
+     * 列表展示(启用产品):仅返回在指定语种已维护 i18n 内容的产品。
+     *
+     * <p>多语言语义:某产品在当前语种无 i18n 行 → 不展示(既不回退默认语种、也不回退 slug),
+     * 避免在 zh-CN 列表里露出仅有 en-US 文案的产品。详情页仍走 {@link #resolveForDisplay},
+     * 保留缺失回退默认语种的行为。
+     */
     public List<ResolvedProduct> listForDisplay(String language, String defaultLanguage) {
         List<ResolvedProduct> out = new ArrayList<>();
         for (Product product : listEnabled()) {
             Map<String, ProductI18n> byLanguage = loadI18nMap(product.getId());
             Optional<ProductI18n> resolved = i18nService.resolve(byLanguage, language, defaultLanguage);
-            String effectiveLanguage = resolved.map(ProductI18n::getLanguage).orElse(defaultLanguage);
-            out.add(new ResolvedProduct(product, resolved.orElse(null), effectiveLanguage));
+            if (resolved.isPresent() && language.equals(resolved.get().getLanguage())) {
+                out.add(new ResolvedProduct(product, resolved.get(), resolved.get().getLanguage()));
+            }
         }
         return out;
     }

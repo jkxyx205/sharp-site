@@ -114,6 +114,22 @@ class ArticleServiceTest {
     }
 
     @Test
+    void listForDisplayHidesItemsWithoutRequestedLanguageI18n() {
+        // 多语言:仅维护 en-US 文案的文章,在 zh-CN 列表里不展示(不回退默认语种、不露 slug)
+        Tenant t = createTenant("news-6");
+        Article a = articleService.saveArticle(newArticle("en-only"));
+        articleService.saveI18n(a.getId(), ArticleI18n.builder()
+                .language("en-US").title("EN only").build());
+
+        // en-US 列表可见
+        assertThat(articleService.listForDisplay("en-US", "en-US"))
+                .map(ra -> ra.article().getSlug()).contains("en-only");
+        // zh-CN 列表不可见(无 zh-CN i18n 行,即便默认语种 en-US 命中也不回退)
+        assertThat(articleService.listForDisplay("zh-CN", "en-US"))
+                .map(ra -> ra.article().getSlug()).doesNotContain("en-only");
+    }
+
+    @Test
     void tenantIsolation() {
         Tenant a = createTenant("news-isol-a");
         Article pa = articleService.saveArticle(newArticle("shared"));

@@ -12,7 +12,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -43,7 +42,7 @@ public class AdminProductController {
     public String list(@RequestParam(required = false) Long categoryId, Model model) {
         model.addAttribute("categories", categoryService.listByType("PRODUCT"));
         model.addAttribute("selectedCategoryId", categoryId);
-        model.addAttribute("products", categoryId == null ? List.of() : productService.listByCategory(categoryId));
+        model.addAttribute("products", categoryId == null ? productService.listByTenant() : productService.listByCategory(categoryId));
         return "admin/products";
     }
 

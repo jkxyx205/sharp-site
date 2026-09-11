@@ -12,7 +12,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -42,7 +41,7 @@ public class AdminArticleController {
     public String list(@RequestParam(required = false) Long categoryId, Model model) {
         model.addAttribute("categories", categoryService.listByType("NEWS"));
         model.addAttribute("selectedCategoryId", categoryId);
-        model.addAttribute("articles", categoryId == null ? List.of() : articleService.listByCategory(categoryId));
+        model.addAttribute("articles", categoryId == null ? articleService.listByTenant() : articleService.listByCategory(categoryId));
         return "admin/news";
     }
 

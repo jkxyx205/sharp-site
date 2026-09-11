@@ -12,8 +12,8 @@
                 <nav class="subnav"><a class="btn" th:href="@{/admin/news}">← 返回列表</a></nav>
                 <p class="error" th:if="${error}" th:text="${error}">错误</p>
 
-                <!-- 语种切换(独立 GET 表单,仅编辑已有文章时显示) -->
-                <form th:if="${article.id != null}" th:action="@{/admin/news/{id}/edit(id=${article.id})}" method="get">
+                <!-- 语种切换(独立 GET 表单;新增/编辑均需先选语种) -->
+                <form th:action="${article.id == null ? '/admin/news/new' : '/admin/news/' + article.id + '/edit'}" method="get">
                     <label>语种
                         <select name="lang" onchange="this.form.submit()">
                             <option th:each="l : ${languages}" th:value="${l}"

@@ -12,8 +12,8 @@
                 <nav class="subnav"><a class="btn" th:href="@{/admin/categories}">← 返回列表</a></nav>
                 <p class="error" th:if="${error}" th:text="${error}">错误</p>
 
-                <!-- 语种切换(独立 GET 表单,仅编辑已有分类时显示;切换后重新加载该语种内容) -->
-                <form th:if="${category.id != null}" th:action="@{/admin/categories/{id}/edit(id=${category.id})}" method="get">
+                <!-- 语种切换(独立 GET 表单;新增/编辑均需先选语种) -->
+                <form th:action="${category.id == null ? '/admin/categories/new' : '/admin/categories/' + category.id + '/edit'}" method="get">
                     <label>语种
                         <select name="lang" onchange="this.form.submit()">
                             <option th:each="l : ${languages}" th:value="${l}"

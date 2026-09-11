@@ -13,15 +13,15 @@
             <form class="filter" method="get">
                 <label>分类</label>
                 <select name="categoryId" onchange="this.form.submit()">
-                    <option value="">— 请选择分类 —</option>
+                    <option value="">— 全部分类 —</option>
                     <option th:each="c : ${categories}" th:value="${c.id}"
                             th:selected="${selectedCategoryId != null && selectedCategoryId == c.id}"
                             th:text="${c.slug}">category</option>
                 </select>
-                <a class="btn" th:href="@{/admin/news/new}" th:if="${selectedCategoryId != null}">+ 新建文章</a>
+                <a class="btn" th:href="@{/admin/news/new}">+ 新建文章</a>
             </form>
 
-            <table th:if="${selectedCategoryId != null}">
+            <table>
                 <thead>
                 <tr><th>Slug</th><th>作者</th><th>状态</th><th>排序</th><th>操作</th></tr>
                 </thead>
@@ -41,8 +41,7 @@
                 </tr>
                 </tbody>
             </table>
-            <p class="empty" th:if="${selectedCategoryId != null and (articles == null or articles.isEmpty())}">该分类下暂无文章。</p>
-            <p class="empty" th:if="${selectedCategoryId == null}">请先选择分类。</p>
+            <p class="empty" th:if="${articles == null or articles.isEmpty()}">暂无文章。</p>
         </main>
     </div>
 </div>

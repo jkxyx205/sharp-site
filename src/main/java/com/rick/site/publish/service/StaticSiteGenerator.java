@@ -78,6 +78,11 @@ public class StaticSiteGenerator {
     @Value("${sharp.site.page-size:12}")
     private int pageSize;
 
+    /** 首页「Latest News」展示条数(取最新已发布文章)。 */
+    private static final int HOME_NEWS_LIMIT = 5;
+    /** 首页「Featured Products」展示条数(取上架产品前 N)。 */
+    private static final int HOME_PRODUCT_LIMIT = 8;
+
     private final TemplateEngine templateEngine;
     private final HomeSectionService homeSectionService;
     private final SitePageService pageService;
@@ -170,8 +175,10 @@ public class StaticSiteGenerator {
         ctx.setVariable("intro", text(hero, StaticSiteGenerator::i18nSubtitle));
         ctx.setVariable("aboutTeaser", text(company, StaticSiteGenerator::i18nContent));
         ctx.setVariable("ctaTitle", text(cta, StaticSiteGenerator::i18nTitle));
-        ctx.setVariable("products", List.of());
-        ctx.setVariable("news", List.of());
+        ctx.setVariable("products", productService.listForDisplay(locale, defaultLocale).stream()
+                .limit(HOME_PRODUCT_LIMIT).map(ProductView::from).toList());
+        ctx.setVariable("news", articleService.listForDisplay(locale, defaultLocale).stream()
+                .limit(HOME_NEWS_LIMIT).map(ArticleView::from).toList());
         seoService.resolveView(SeoConfigService.HOME, null, locale, defaultLocale,
                 new SeoFallback(text(hero, StaticSiteGenerator::i18nTitle),
                         text(company, StaticSiteGenerator::i18nSubtitle),
