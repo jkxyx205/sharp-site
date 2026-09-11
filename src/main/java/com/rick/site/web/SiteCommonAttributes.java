@@ -1,5 +1,6 @@
 package com.rick.site.web;
 
+import com.rick.site.i18n.SupportedLanguage;
 import com.rick.site.i18n.context.LocaleContext;
 import com.rick.site.i18n.model.LanguageOption;
 import com.rick.site.i18n.model.LocaleResolution;
@@ -110,12 +111,8 @@ public class SiteCommonAttributes {
         return options;
     }
 
-    /** 语言展示文案;新增语言在此追加。 */
+    /** 语言展示文案;派生自 {@link SupportedLanguage}(新增语言改一处)。 */
     private static String label(String lang) {
-        return switch (lang) {
-            case "zh-CN" -> "中文";
-            case "en-US" -> "EN";
-            default -> lang;
-        };
+        return SupportedLanguage.labelOf(lang);
     }
 }

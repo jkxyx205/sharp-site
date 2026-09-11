@@ -1,5 +1,6 @@
 package com.rick.site.i18n.service;
 
+import com.rick.site.i18n.SupportedLanguage;
 import com.rick.site.i18n.model.LocaleResolution;
 import com.rick.site.tenant.context.TenantContext;
 import com.rick.site.theme.model.ThemeManifest;
@@ -20,7 +21,7 @@ import java.util.Optional;
  * <p>语种与多语言判定的唯一来源是 Theme(§26.1):{@link #supportedLanguages()} 返回当前租户主题
  * 的 {@code theme.json.locales}(不再返回平台固定列表),后台编辑/语言切换据此遍历。
  *
- * <p>平台支持语种仍为 {@link #SUPPORTED_LANGUAGES}(zh-CN / en-US),作为 URL 段识别白名单,
+ * <p>平台支持语种仍为 {@link SupportedLanguage#CODES}(zh-CN / en-US),作为 URL 段识别白名单,
  * 架构允许后续扩展(§13)。{@code theme.json.locales} 必须是其子集。
  *
  * @author Rick.Xu
@@ -28,11 +29,11 @@ import java.util.Optional;
 @Component
 public class DefaultLocaleResolver implements LocaleResolver {
 
-    /** Phase 2 平台支持语言;URL 段识别白名单。新增语言在此追加即可。 */
-    static final List<String> SUPPORTED_LANGUAGES = List.of("zh-CN", "en-US");
+    /** Phase 2 平台支持语言;URL 段识别白名单。派生自 {@link SupportedLanguage}。 */
+    static final List<String> SUPPORTED_LANGUAGES = SupportedLanguage.CODES;
 
-    /** 无租户时的平台默认语言。 */
-    static final String PLATFORM_DEFAULT = "en-US";
+    /** 无租户时的平台默认语言。派生自 {@link SupportedLanguage}。 */
+    static final String PLATFORM_DEFAULT = SupportedLanguage.PLATFORM_DEFAULT;
 
     private final ThemeManifestResolver manifestResolver;
 
