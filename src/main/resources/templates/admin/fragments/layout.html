@@ -25,7 +25,9 @@
     </div>
     <div class="spacer" style="flex:1"></div>
     <div class="foot">
-        <a th:href="@{/admin/logout}">退出</a>
+        <form th:action="@{/admin/logout}" method="post" style="display:inline;margin:0">
+            <button type="submit" style="font:inherit;font-size:13px;color:inherit;background:none;border:0;padding:0;cursor:pointer">退出</button>
+        </form>
     </div>
 </aside>
 

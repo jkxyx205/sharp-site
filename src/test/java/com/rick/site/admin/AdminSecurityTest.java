@@ -149,6 +149,29 @@ class AdminSecurityTest {
         assertThat(adminA.getPasswordHash()).isNotEqualTo(PWD);
     }
 
+    /**
+     * 登出验收:POST /admin/logout(含 CSRF)→ 重定向到登录页 ?logout;
+     * 之后会话失效,再访问后台被重定向回登录页(修复原 GET 退出返回 404)。
+     */
+    @Test
+    void logoutRedirectsToLoginAndInvalidatesSession() throws Exception {
+        MvcResult login = mockMvc.perform(post("/admin/login").with(host("a.example.com")).with(csrf())
+                        .param("username", "a-admin").param("password", PWD))
+                .andExpect(status().is3xxRedirection())
+                .andReturn();
+        MockHttpSession session = (MockHttpSession) login.getRequest().getSession(false);
+
+        // POST /admin/logout → /admin/login?logout(不再是 404)
+        mockMvc.perform(post("/admin/logout").with(host("a.example.com")).session(session).with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/admin/login?logout"));
+
+        // 会话已失效:再访问后台 → 重定向到登录页
+        mockMvc.perform(get("/admin/").with(host("a.example.com")).session(session))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("http://a.example.com/admin/login"));
+    }
+
     @Test
     void crossTenantWriteRejected() {
         // 上下文为 A,直接对 B 的产品写 i18n → selectById 按 A 隔离查不到 → BizException
