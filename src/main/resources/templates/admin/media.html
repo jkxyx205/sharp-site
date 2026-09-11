@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/fragments/head :: head(title='素材管理')}"></head>
+<body>
+<div class="shell">
+    <aside th:replace="~{admin/fragments/layout :: sidebar(active='media')}"></aside>
+    <div class="main">
+        <header th:replace="~{admin/fragments/layout :: topbar()}"></header>
+        <main class="content">
+            <h1>素材管理</h1>
+            <p class="error" th:if="${error}" th:text="${error}">错误</p>
+
+            <!-- 上传:multipart POST(CSRF 隐藏域由 Thymeleaf+Spring 自动注入) -->
+            <form class="card upload" method="post" enctype="multipart/form-data"
+                  th:action="@{/admin/media/upload}">
+                <label>选择文件 <span class="hint">图片/文档/压缩包,≤20MB</span>
+                    <input type="file" name="file" required /></label>
+                <label>标题 <input type="text" name="title" placeholder="可选" /></label>
+                <label>替代文本 <input type="text" name="altText" placeholder="图片描述(可选)" /></label>
+                <button type="submit" class="btn btn-primary">上传</button>
+            </form>
+
+            <table>
+                <thead>
+                <tr><th>预览</th><th>文件名</th><th>类型</th><th>大小</th><th>链接</th><th>操作</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="m : ${medias}">
+                    <td class="preview">
+                        <img th:if="${m.mimeType != null and m.mimeType.startsWith('image/')}"
+                             th:src="${m.url}" th:alt="${m.altText != null ? m.altText : m.filename}"
+                             loading="lazy"
+                             style="max-width:64px;max-height:64px;object-fit:cover;border-radius:4px" />
+                        <span th:unless="${m.mimeType != null and m.mimeType.startsWith('image/')}"
+                              style="font-size:24px">📄</span>
+                    </td>
+                    <td th:text="${m.filename != null ? m.filename : '—'}">file.png</td>
+                    <td th:text="${m.mimeType != null ? m.mimeType : '—'}">image/png</td>
+                    <td th:text="${m.size != null ? T(java.lang.Math).round(m.size / 1024.0 * 10) / 10.0 + ' KB' : '—'}">0 KB</td>
+                    <td>
+                        <input type="text" readonly th:value="${m.url}"
+                               th:id="'url-' + ${m.id}"
+                               style="width:240px" />
+                        <button type="button" class="btn-link"
+                                th:onclick="|copyUrl('url-${m.id}')|">复制</button>
+                    </td>
+                    <td>
+                        <form th:action="@{/admin/media/{id}/delete(id=${m.id})}" method="post" style="display:inline"
+                              onsubmit="return confirm('删除该文件?底层文件一并回收。');">
+                            <button type="submit" class="btn-link">删除</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <p class="empty" th:if="${medias == null or medias.isEmpty()}">暂无素材。</p>
+        </main>
+    </div>
+</div>
+<script>
+    function copyUrl(inputId) {
+        var el = document.getElementById(inputId);
+        if (!el) return;
+        el.select();
+        try {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(el.value);
+            } else {
+                document.execCommand('copy');
+            }
+        } catch (e) { document.execCommand('copy'); }
+    }
+</script>
+</body>
+</html>

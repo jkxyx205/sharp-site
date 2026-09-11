@@ -7,6 +7,7 @@ import com.rick.fileupload.core.model.FileMeta;
 import com.rick.site.media.dao.MediaDAO;
 import com.rick.site.media.entity.Media;
 import com.rick.site.tenant.context.TenantContext;
+import com.rick.site.tenant.entity.Tenant;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -62,8 +63,10 @@ public class MediaService extends BaseServiceImpl<MediaDAO, Media, Long> {
     @Transactional(rollbackFor = Exception.class)
     public Media upload(MultipartFile file, String title, String altText) throws IOException {
         validate(file);
-        Long tenantId = TenantContext.requireTenantId();
-        String groupName = groupName(tenantId);
+        Tenant tenant = TenantContext.require();
+        Long tenantId = tenant.getId();
+        // 目录按租户 code 划分:/{tenant_code}/{文件名};与 media.url 一并暴露给前台
+        String groupName = tenant.getCode();
         List<? extends FileMeta> metas = fileStore.upload(List.of(file), groupName);
         if (metas == null || metas.isEmpty()) {
             throw new BizException("文件上传失败");
@@ -84,11 +87,11 @@ public class MediaService extends BaseServiceImpl<MediaDAO, Media, Long> {
 
     @Transactional(rollbackFor = Exception.class)
     public void delete(Long mediaId) throws IOException {
-        Long tenantId = TenantContext.requireTenantId();
+        Tenant tenant = TenantContext.require();
         Media owned = requireOwned(mediaId);
         // 先回收底层文件(失败不阻断元数据逻辑删除:记录后继续)
         try {
-            fileStore.delete(groupName(tenantId), owned.getObjectKey());
+            fileStore.delete(tenant.getCode(), owned.getObjectKey());
         } catch (Exception ignored) {
             // 文件缺失等不阻断;元数据仍逻辑删除
         }
@@ -123,10 +126,6 @@ public class MediaService extends BaseServiceImpl<MediaDAO, Media, Long> {
         // selectById 已按 TenantContext 隔离(跨租户查不到),无需再手动比对 tenantId
         return baseDAO.selectById(mediaId)
                 .orElseThrow(() -> new BizException("媒体不存在: id=" + mediaId));
-    }
-
-    private static String groupName(Long tenantId) {
-        return "tenant-" + tenantId;
     }
 
     private static String extension(String filename) {
