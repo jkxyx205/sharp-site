@@ -4,6 +4,7 @@
   "nav.products": { "zh-CN": "产品",        "en-US": "Products",  "ar-SA": "المنتجات",    "fr-FR": "Produits",    "ru-RU": "Продукты",    "es-ES": "Productos" },
   "nav.news":     { "zh-CN": "新闻",        "en-US": "News",       "ar-SA": "الأخبار",     "fr-FR": "Actualités",  "ru-RU": "Новости",     "es-ES": "Noticias" },
   "nav.contact":  { "zh-CN": "联系我们",     "en-US": "Contact",    "ar-SA": "اتصل بنا",    "fr-FR": "Contact",     "ru-RU": "Контакты",    "es-ES": "Contacto" },
+  "nav.info":  { "zh-CN": "信息",     "en-US": "Info",    "ar-SA": "اتصل بنا",    "fr-FR": "Contact",     "ru-RU": "Контакты",    "es-ES": "Contacto" },
 
   "home.about.title":    { "zh-CN": "关于我们",           "en-US": "About Us",                "ar-SA": "من نحن",                  "fr-FR": "À propos",                "ru-RU": "О нас",                  "es-ES": "Nosotros" },
   "home.about.readmore": { "zh-CN": "了解更多 →",         "en-US": "Read more →",             "ar-SA": "اقرأ المزيد →",          "fr-FR": "Lire la suite →",         "ru-RU": "Подробнее →",            "es-ES": "Leer más →" },

@@ -11,6 +11,7 @@
             <a th:href="@{${localePrefix + '/products'}}" th:text="#{nav.products}" th:classappend="${active == 'products'} ? 'active' : ''">Products</a>
             <a th:href="@{${localePrefix + '/news'}}" th:text="#{nav.news}" th:classappend="${active == 'news'} ? 'active' : ''">News</a>
             <a th:href="@{${localePrefix + '/contact'}}" th:text="#{nav.contact}" th:classappend="${active == 'contact'} ? 'active' : ''">Contact</a>
+            <a th:href="@{${localePrefix + '/info'}}" th:text="#{nav.info}" th:classappend="${active == 'info'} ? 'active' : ''">Contact</a>
             <th:block th:replace="~{themes/modern/fragments/language :: language(current=${currentLanguage}, languages=${languages})}"></th:block>
         </nav>
     </div>

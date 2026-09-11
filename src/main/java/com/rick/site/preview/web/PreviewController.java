@@ -1,6 +1,7 @@
 package com.rick.site.preview.web;
 
 import com.rick.common.http.exception.BizException;
+import com.rick.site.catalog.service.CategoryService;
 import com.rick.site.i18n.context.LocaleContext;
 import com.rick.site.i18n.model.LocaleResolution;
 import com.rick.site.news.dto.ArticleView;
@@ -54,17 +55,19 @@ public class PreviewController {
     private final ArticleService articleService;
     private final SeoConfigService seoService;
     private final ThemeManifestResolver manifestResolver;
+    private final CategoryService categoryService;
 
     /** 列表分页大小;与 StaticSiteGenerator 共用同一配置项,保证预览/线上一致。 */
     @org.springframework.beans.factory.annotation.Value("${sharp.site.page-size:12}")
     private int pageSize;
 
     public PreviewController(ProductService productService, ArticleService articleService,
-                            SeoConfigService seoService, ThemeManifestResolver manifestResolver) {
+                            SeoConfigService seoService, ThemeManifestResolver manifestResolver, CategoryService categoryService) {
         this.productService = productService;
         this.articleService = articleService;
         this.seoService = seoService;
         this.manifestResolver = manifestResolver;
+        this.categoryService = categoryService;
     }
 
     @GetMapping({"/preview", "/preview/"})
@@ -95,7 +98,7 @@ public class PreviewController {
         LocaleContext.set(new LocaleResolution(language, "/products/page/" + Math.max(1, page) + "/"));
         List<ProductView> products = productService.listForDisplay(language, dl)
                 .stream().map(ProductView::from).toList();
-        model.addAttribute("allProducts", products);
+        model.addAttribute("products", products);
         model.addAttribute("categories", productService.listCategoryViews(language, dl));
         applyPreviewPagination(model, products, page, "/preview/products");
         seoService.resolveView("/products", null, language, dl,
@@ -137,7 +140,7 @@ public class PreviewController {
         LocaleContext.set(new LocaleResolution(language, "/news/page/" + Math.max(1, page) + "/"));
         List<ArticleView> news = articleService.listForDisplay(language, dl)
                 .stream().map(ArticleView::from).toList();
-        model.addAttribute("allNews", news);
+        model.addAttribute("news", news);
         model.addAttribute("categories", articleService.listCategoryViews(language, dl));
         applyPreviewPagination(model, news, page, "/preview/news");
         seoService.resolveView("/news", null, language, dl,
@@ -184,6 +187,18 @@ public class PreviewController {
                 .findFirst()
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "页面不存在: " + pagePath));
         model.addAttribute("page", page);
+
+        List<ArticleView> news = articleService.listForDisplay(
+                        language, dl).stream()
+                .map(ArticleView::from).toList();
+        model.addAttribute("news", news);
+
+        List<ProductView> products = productService.listForDisplay(
+                        language, dl).stream()
+                .map(ProductView::from).toList();
+        model.addAttribute("products", products);
+        model.addAttribute("categories", categoryService.selectAll());
+
         // 单页 SEO:page_type = 页面路径(如 /about),page_id 恒为空
         seoService.resolveView(page.path(), null, language, dl,
                 new SeoFallback(page.label(), "", "", request.getRequestURL().toString())).applyTo(model);

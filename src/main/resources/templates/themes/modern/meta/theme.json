@@ -6,6 +6,7 @@
     { "path": "/products",  "template": "themes/modern/products", "label": "产品列表" },
     { "path": "/news",      "template": "themes/modern/news",     "label": "新闻列表" },
     { "path": "/about",     "template": "themes/modern/about",    "label": "关于我们" },
-    { "path": "/contact",   "template": "themes/modern/contact",   "label": "联系我们" }
+    { "path": "/contact",   "template": "themes/modern/contact",   "label": "联系我们" },
+    { "path": "/info",   "template": "themes/modern/info",   "label": "信息" }
   ]
 }

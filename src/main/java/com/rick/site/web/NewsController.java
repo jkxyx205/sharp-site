@@ -54,7 +54,6 @@ public class NewsController {
                         loc.language(), dl).stream()
                 .map(ArticleView::from).toList();
         model.addAttribute("news", news);
-        model.addAttribute("allNews", news);
         model.addAttribute("categories", articleService.listCategoryViews(loc.language(), dl));
         seoService.resolveView("/news", null, loc.language(), dl,
                 new SeoFallback("News", "", "", request.getRequestURL().toString())).applyTo(model);

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html th:lang="${currentLanguage}" th:dir="${currentLanguage == 'ar-SA' ? 'rtl' : 'ltr'}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{themes/modern/fragments/head :: head(pageTitle=${pageTitle}, pageDescription=${pageDescription}, pageKeywords=${pageKeywords}, canonical=${canonical}, robots=${robots}, siteName=${siteName})}"></head>
+<body>
+<header th:replace="~{themes/modern/fragments/header :: header(siteName=${siteName}, active='info')}"></header>
+
+<article class="container section">
+    <h1 th:text="#{about.title}"></h1>
+    <h1>这里是 info 页面</h1>
+
+    <h2>news</h2>
+    <th:block th:if="${news != null}" th:with="cnews=${news.?[categorySlug == 'c-news']}">
+        <section class="container section" th:if="${!cnews.isEmpty()}">
+            <h2 th:text="${cnews[0].categoryName}">c-news</h2>
+            <ul class="news-list">
+                <li th:each="a : ${cnews}">
+                    <a th:href="@{${localePrefix + '/news/' + a.slug}}" th:text="${a.title}">News title</a>
+                    <span th:if="${a.publishTime != null}" th:text="${#temporals.format(a.publishTime, 'yyyy-MM-dd')}"></span>
+                </li>
+            </ul>
+        </section>
+    </th:block>
+
+    <h2>product</h2>
+    <th:block th:if="${products != null}" th:with="gallery=${products.?[categorySlug == 'test']}">
+        <section class="container section" th:if="${!gallery.isEmpty()}">
+            <h2 th:text="${gallery[0].categoryName}">Gallery</h2>
+            <div class="product-grid">
+                <a class="product-card" th:each="p : ${gallery}" th:href="@{${localePrefix + '/products/' + p.slug}}">
+                    <img th:if="${p.cover != null}" th:src="${p.cover}" th:alt="${p.name}" src="" loading="lazy" />
+                    <h3 th:text="${p.name}">Product</h3>
+                </a>
+            </div>
+        </section>
+    </th:block>
+</article>
+
+<footer th:replace="~{themes/modern/fragments/footer :: footer(siteName=${siteName}, config=${config})}"></footer>
+</body>
+</html>
