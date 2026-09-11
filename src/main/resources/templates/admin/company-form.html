@@ -10,34 +10,60 @@
             <div class="card">
                 <h1>企业信息</h1>
                 <p class="error" th:if="${error}" th:text="${error}">错误</p>
-                <form th:action="@{/admin/company/save}" method="post">
+
+                <!-- 语种切换(独立 GET 表单;company_name 等按语种编辑) -->
+                <form th:action="@{/admin/company}" method="get">
+                    <label>语种
+                        <select name="lang" onchange="this.form.submit()">
+                            <option th:each="l : ${languages}" th:value="${l}"
+                                    th:selected="${l == currentLang}"
+                                    th:text="${l + (l == defaultLanguage ? ' · 默认' : '')}">lang</option>
+                        </select></label>
+                </form>
+
+                <form id="saveForm" th:action="@{/admin/company/save}" method="post">
                     <input type="hidden" name="id" th:value="${config.id}" />
-                    <label>Logo URL
-                        <input type="url" name="logo" th:value="${config.logo}" placeholder="/img/logo.png" /></label>
-                    <label>公司名称
-                        <input type="text" name="companyName" th:value="${config.companyName}" /></label>
-                    <label>公司简称
-                        <input type="text" name="companyNameShort" th:value="${config.companyNameShort}" /></label>
-                    <label>地址
-                        <input type="text" name="address" th:value="${config.address}" /></label>
-                    <label>电话
-                        <input type="text" name="phone" th:value="${config.phone}" /></label>
-                    <label>手机
-                        <input type="text" name="mobile" th:value="${config.mobile}" /></label>
-                    <label>Email
-                        <input type="text" name="email" th:value="${config.email}" /></label>
-                    <label>WhatsApp
-                        <input type="text" name="whatsapp" th:value="${config.whatsapp}" /></label>
-                    <label>Facebook 链接
-                        <input type="url" name="facebook" th:value="${config.facebook}" /></label>
-                    <label>LinkedIn 链接
-                        <input type="url" name="linkedin" th:value="${config.linkedin}" /></label>
-                    <label>YouTube 链接
-                        <input type="url" name="youtube" th:value="${config.youtube}" /></label>
-                    <label>版权信息
-                        <input type="text" name="copyright" th:value="${config.copyright}" /></label>
-                    <label>ICP 备案号
-                        <input type="text" name="icp" th:value="${config.icp}" /></label>
+                    <input type="hidden" name="language" th:value="${currentLang}" />
+
+                    <fieldset>
+                        <legend>联系方式 / 备案(跨语种共享)</legend>
+                        <label>Logo URL
+                            <input type="url" name="logo" th:value="${config.logo}" placeholder="/img/logo.png" /></label>
+                        <label>电话
+                            <input type="text" name="phone" th:value="${config.phone}" /></label>
+                        <label>手机
+                            <input type="text" name="mobile" th:value="${config.mobile}" /></label>
+                        <label>Email
+                            <input type="text" name="email" th:value="${config.email}" /></label>
+                        <label>WhatsApp
+                            <input type="text" name="whatsapp" th:value="${config.whatsapp}" /></label>
+                        <label>Facebook 链接
+                            <input type="url" name="facebook" th:value="${config.facebook}" /></label>
+                        <label>LinkedIn 链接
+                            <input type="url" name="linkedin" th:value="${config.linkedin}" /></label>
+                        <label>YouTube 链接
+                            <input type="url" name="youtube" th:value="${config.youtube}" /></label>
+                        <label>ICP 备案号
+                            <input type="text" name="icp" th:value="${config.icp}" /></label>
+                    </fieldset>
+
+                    <fieldset th:classappend="${currentLang == defaultLanguage ? 'default-lang' : ''}">
+                        <legend><span th:text="${currentLang}">语言</span>
+                            <span class="lang-tag" th:if="${currentLang == defaultLanguage}">· 默认语言</span></legend>
+                        <label>公司名称 <span class="hint">必填,空则不保存该语种</span>
+                            <input type="text" name="companyName"
+                                   th:value="${i18nMap[currentLang] != null ? i18nMap[currentLang].companyName : ''}" /></label>
+                        <label>公司简称
+                            <input type="text" name="companyNameShort"
+                                   th:value="${i18nMap[currentLang] != null ? i18nMap[currentLang].companyNameShort : ''}" /></label>
+                        <label>地址
+                            <input type="text" name="address"
+                                   th:value="${i18nMap[currentLang] != null ? i18nMap[currentLang].address : ''}" /></label>
+                        <label>版权信息
+                            <input type="text" name="copyright"
+                                   th:value="${i18nMap[currentLang] != null ? i18nMap[currentLang].copyright : ''}" /></label>
+                    </fieldset>
+
                     <div class="actions">
                         <button type="submit" class="btn btn-primary">保存</button>
                     </div>

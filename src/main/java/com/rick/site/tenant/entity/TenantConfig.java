@@ -32,18 +32,6 @@ public class TenantConfig extends TenantBaseEntity<Long> {
     @Column(comment = "Logo URL")
     String logo;
 
-    @Length(max = 500)
-    @Column(comment = "公司名称")
-    String companyName;
-
-    @Length(max = 200)
-    @Column(comment = "公司简称")
-    String companyNameShort;
-
-    @Length(max = 1000)
-    @Column(comment = "地址")
-    String address;
-
     @Length(max = 100)
     @Column(comment = "电话")
     String phone;
@@ -72,10 +60,6 @@ public class TenantConfig extends TenantBaseEntity<Long> {
     @Length(max = 500)
     @Column(comment = "YouTube 链接")
     String youtube;
-
-    @Length(max = 500)
-    @Column(comment = "版权信息")
-    String copyright;
 
     @Length(max = 200)
     @Column(comment = "ICP 备案号")

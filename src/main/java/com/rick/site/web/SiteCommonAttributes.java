@@ -5,8 +5,8 @@ import com.rick.site.i18n.model.LanguageOption;
 import com.rick.site.i18n.model.LocaleResolution;
 import com.rick.site.i18n.service.DefaultLocaleResolver;
 import com.rick.site.tenant.context.TenantContext;
+import com.rick.site.tenant.dto.TenantConfigView;
 import com.rick.site.tenant.entity.Tenant;
-import com.rick.site.tenant.entity.TenantConfig;
 import com.rick.site.tenant.service.TenantConfigService;
 import com.rick.site.theme.model.ThemeManifest;
 import com.rick.site.theme.service.ThemeManifestResolver;
@@ -50,24 +50,32 @@ public class SiteCommonAttributes {
             return;
         }
         Tenant tenant = tenantOpt.get();
-        TenantConfig config = tenantConfigService.findByTenant().orElse(null);
-        String siteName = (config != null && config.getCompanyName() != null)
-                ? config.getCompanyName() : tenant.getName();
+
+        ThemeManifest manifest;
+        try {
+            manifest = manifestResolver.resolve(tenant);
+        } catch (Exception e) {
+            // 无主题清单时回退 tenant.name;config 留空
+            model.addAttribute("siteName", tenant.getName());
+            model.addAttribute("localePrefix", "");
+            return;
+        }
+        String defaultLanguage = manifest.defaultLocale();
+        String currentLanguage = LocaleContext.get().map(r -> r.language()).orElse(null);
+
+        // 企业信息按当前语种解析(公司名等四字段 i18n,缺失回退默认语种;联系方式共享)
+        TenantConfigView config = tenantConfigService
+                .resolveForDisplay(currentLanguage != null ? currentLanguage : defaultLanguage, defaultLanguage)
+                .orElse(null);
+        String siteName = (config != null && config.companyName() != null)
+                ? config.companyName() : tenant.getName();
         model.addAttribute("siteName", siteName);
         model.addAttribute("config", config);
-        String currentLanguage = LocaleContext.get().map(r -> r.language()).orElse(null);
         model.addAttribute("currentLanguage", currentLanguage);
 
         // 语言切换链接仅装配前台页面;admin(自带 languages List<String>)与 preview(?lang= 参数)各自处理
         String uri = request.getRequestURI();
         if (uri.startsWith("/admin") || uri.startsWith("/preview")) {
-            return;
-        }
-        ThemeManifest manifest;
-        try {
-            manifest = manifestResolver.resolve(tenant);
-        } catch (Exception e) {
-            model.addAttribute("localePrefix", "");
             return;
         }
         // localePrefix:默认语种无前缀(根),其余语种带小写前缀(/{locale});单语言恒为 ""

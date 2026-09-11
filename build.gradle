@@ -64,4 +64,10 @@ tasks.named('test') {
     if (project.hasProperty('sharpSeed')) {
         systemProperty 'sharp.seed', 'true'
     }
+
+    // 建表迁移开关:仅 `-PsharpMigrate` 时注入 sharp.migrate=true,激活
+    // @EnabledIfSystemProperty 的 SchemaMigrationTest(幂等 DDL,默认构建跳过)。
+    if (project.hasProperty('sharpMigrate')) {
+        systemProperty 'sharp.migrate', 'true'
+    }
 }

@@ -12,8 +12,8 @@ import com.rick.site.product.service.ProductService.ResolvedProduct;
 import com.rick.site.seo.dto.SeoFallback;
 import com.rick.site.seo.service.SeoConfigService;
 import com.rick.site.tenant.context.TenantContext;
+import com.rick.site.tenant.dto.TenantConfigView;
 import com.rick.site.tenant.entity.Tenant;
-import com.rick.site.tenant.entity.TenantConfig;
 import com.rick.site.tenant.entity.TenantDomain;
 import com.rick.site.tenant.service.TenantConfigService;
 import com.rick.site.tenant.service.TenantDomainService;
@@ -362,14 +362,23 @@ public class StaticSiteGenerator {
 
     /** 注入 siteName / config / currentLanguage / localePrefix / languages(等同 SiteCommonAttributes)。 */
     private void applyCommon(OfflineWebContext ctx, Tenant tenant, String locale, String localePrefix) {
-        TenantConfig config = tenantConfigService.findByTenant().orElse(null);
-        String siteName = (config != null && config.getCompanyName() != null)
-                ? config.getCompanyName() : tenant.getName();
+        String defaultLocale = defaultLocaleOf(tenant);
+        TenantConfigView config = tenantConfigService.resolveForDisplay(locale, defaultLocale).orElse(null);
+        String siteName = (config != null && config.companyName() != null)
+                ? config.companyName() : tenant.getName();
         ctx.setVariable("siteName", siteName);
         ctx.setVariable("config", config);
         ctx.setVariable("currentLanguage", locale);
         ctx.setVariable("localePrefix", localePrefix);
         ctx.setVariable("languages", buildLanguageOptions(tenant, locale, localePrefix));
+    }
+
+    private String defaultLocaleOf(Tenant tenant) {
+        try {
+            return manifestResolver.resolve(tenant).defaultLocale();
+        } catch (Exception e) {
+            return "en-US";
+        }
     }
 
     /**

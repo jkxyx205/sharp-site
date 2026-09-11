@@ -1,6 +1,6 @@
 package com.rick.site.theme;
 
-import com.rick.site.tenant.entity.TenantConfig;
+import com.rick.site.tenant.dto.TenantConfigView;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -57,16 +57,12 @@ class ModernThemeRenderTest {
         return ctx;
     }
 
-    private TenantConfig sampleConfig() {
-        return TenantConfig.builder()
-                .companyName("Acme Corp")
-                .address("1 Industrial Park, Shanghai")
-                .email("info@acme.com")
-                .phone("+86-21-1000")
-                .whatsapp("+86-21-1000")
-                .copyright("© 2026 Acme Corp")
-                .icp("沪ICP备0000号")
-                .build();
+    private TenantConfigView sampleConfig() {
+        // company_name/address/copyright 已移入 tenant_config_i18n;此处用 view 模拟已解析语种。
+        return new TenantConfigView(null, "Acme Corp", null,
+                "1 Industrial Park, Shanghai", "© 2026 Acme Corp",
+                "+86-21-1000", null, "info@acme.com", "+86-21-1000",
+                null, null, null, "沪ICP备0000号");
     }
 
     @Test

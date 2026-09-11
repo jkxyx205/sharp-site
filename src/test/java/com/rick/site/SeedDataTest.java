@@ -63,6 +63,8 @@ class SeedDataTest {
     private ProductService productService;
     @Autowired
     private ArticleService articleService;
+    @Autowired
+    private com.rick.site.tenant.service.TenantConfigService tenantConfigService;
 
     private Tenant tenant;
 
@@ -81,6 +83,7 @@ class SeedDataTest {
 
         ensureDomain();
         ensureAdmin();
+        ensureTenantConfig();
         seedContent();
     }
 
@@ -94,6 +97,27 @@ class SeedDataTest {
         if (adminUserService.findByUsername(ADMIN_USERNAME).isEmpty()) {
             adminUserService.create(ADMIN_USERNAME, ADMIN_PASSWORD);
         }
+    }
+
+    private void ensureTenantConfig() {
+        // base 行(联系方式 / 备案,跨语种共享)
+        com.rick.site.tenant.entity.TenantConfig base = tenantConfigService.findByTenant()
+                .orElseGet(() -> tenantConfigService.save(com.rick.site.tenant.entity.TenantConfig.builder()
+                        .logo("/img/logo.png")
+                        .phone("+86-21-1000")
+                        .email("info@demo.localhost")
+                        .whatsapp("+86-21-1000")
+                        .icp("沪ICP备0000号")
+                        .build()));
+        // company_name/company_name_short/address/copyright 按语种维护(幂等 upsert)
+        tenantConfigService.saveI18n(base.getId(), com.rick.site.tenant.entity.TenantConfigI18n.builder()
+                .language("en-US").companyName("Demo Site")
+                .companyNameShort("Demo").address("1 Industrial Park, Shanghai")
+                .copyright("© 2026 Demo Site").build());
+        tenantConfigService.saveI18n(base.getId(), com.rick.site.tenant.entity.TenantConfigI18n.builder()
+                .language("zh-CN").companyName("示例站点")
+                .companyNameShort("示例").address("上海市工业园区1号")
+                .copyright("© 2026 示例站点").build());
     }
 
     private void seedContent() {

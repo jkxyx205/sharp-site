@@ -38,14 +38,12 @@ CREATE UNIQUE INDEX uk_domain ON tenant_domain (domain) WHERE is_deleted = false
 CREATE INDEX idx_domain_tenant ON tenant_domain (tenant_id);
 
 -- TASK-0103: tenant_config(DATABASE.md §3)
+-- company_name/company_name_short/address/copyright 改由 tenant_config_i18n 按语种维护。
 DROP TABLE IF EXISTS tenant_config;
 CREATE TABLE tenant_config (
     id BIGINT PRIMARY KEY,
     tenant_id BIGINT NOT NULL,
     logo VARCHAR(1000),
-    company_name VARCHAR(500),
-    company_name_short VARCHAR(200),
-    address VARCHAR(1000),
     phone VARCHAR(100),
     mobile VARCHAR(100),
     email VARCHAR(200),
@@ -53,7 +51,6 @@ CREATE TABLE tenant_config (
     facebook VARCHAR(500),
     linkedin VARCHAR(500),
     youtube VARCHAR(500),
-    copyright VARCHAR(500),
     icp VARCHAR(200),
     create_by BIGINT,
     create_time TIMESTAMP NOT NULL,
@@ -62,6 +59,24 @@ CREATE TABLE tenant_config (
     is_deleted BOOLEAN NOT NULL DEFAULT FALSE
 );
 CREATE UNIQUE INDEX uk_tenant_config ON tenant_config (tenant_id) WHERE is_deleted = false;
+
+-- TASK-0103: 企业固定信息多语言(company_name/company_name_short/address/copyright)。
+DROP TABLE IF EXISTS tenant_config_i18n;
+CREATE TABLE tenant_config_i18n (
+    id BIGINT PRIMARY KEY,
+    tenant_config_id BIGINT NOT NULL,
+    language VARCHAR(20) NOT NULL,
+    company_name VARCHAR(500) NOT NULL,
+    company_name_short VARCHAR(200),
+    address VARCHAR(1000),
+    copyright VARCHAR(500),
+    create_by BIGINT,
+    create_time TIMESTAMP NOT NULL,
+    update_by BIGINT,
+    update_time TIMESTAMP NOT NULL,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE
+);
+CREATE UNIQUE INDEX uk_tenant_config_i18n ON tenant_config_i18n (tenant_config_id, language) WHERE is_deleted = false;
 
 -- 站点静态页面(about/contact 等)与首页区块(hero/cta 等)均改由前端模板维护,
 -- 清单见 themes/{themeId}/meta/theme.json 的 pages,文案见 messages.json;
