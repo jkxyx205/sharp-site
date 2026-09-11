@@ -687,6 +687,8 @@ Chinese
 - 保存：仅按启用语种写 i18n 行。
 - 测试：单语言租户编辑产品 → 仅该语种 i18n 行。
 
+> Phase 19 修订：多语言编辑改为「先选语种 → 单语种表单 → 保存仅写该语种一行」，取代此处描述的 per-language fieldset。见 §26.2。
+
 ## TASK-1803 模板 i18n（messages.json）
 
 - `MessageSource` bean（`classpath:i18n/messages`）+ Thymeleaf `#{}` 集成。
@@ -694,6 +696,8 @@ Chinese
 - modern 主题界面文案改 `#{key}`：nav / hero / 按钮 / footer。
 - `LocaleFilter` 设置 `LocaleContextHolder`；`OfflineWebContext(locale)`。
 - 测试：`#{}` 在 zh-cn / en-us 下分别解析为对应文案。
+
+> Phase 19 修订：后台多语言内容编辑改为单语种表单（先选语种再编辑），不再一次性渲染所有语种 fieldset；messages 文件已移至 `themes/{themeId}/meta/`。
 
 ## TASK-1804 多语种静态发布
 

@@ -3,6 +3,7 @@ package com.rick.site.admin;
 import com.rick.common.http.exception.BizException;
 import com.rick.site.admin.entity.AdminUser;
 import com.rick.site.admin.service.AdminUserService;
+import com.rick.site.catalog.service.CategoryService;
 import com.rick.site.product.entity.Product;
 import com.rick.site.product.entity.ProductI18n;
 import com.rick.site.product.service.ProductService;
@@ -55,10 +56,13 @@ class AdminSecurityTest {
     private AdminUserService adminUserService;
     @Autowired
     private ProductService productService;
+    @Autowired
+    private CategoryService categoryService;
 
     private Tenant tenantA;
     private Tenant tenantB;
     private Long bProductId;
+    private Long aCategoryId;
     private AdminUser adminA;
 
     @BeforeEach
@@ -68,15 +72,20 @@ class AdminSecurityTest {
         TenantContext.set(tenantA);
         domainService.add("a.example.com", true);
         adminA = adminUserService.create("a-admin", PWD);
+        var aCat = categoryService.saveCategory(com.rick.site.catalog.entity.Category.builder()
+                .type("PRODUCT").slug("cat-a").status((short) 1).sort(0).build());
+        aCategoryId = aCat.getId();
         productService.saveProduct(Product.builder()
-                .slug("widget-a").status((short) 1).sort(0).build());
+                .slug("widget-a").categoryId(aCategoryId).status((short) 1).sort(0).build());
 
         tenantB = tenantService.save(Tenant.builder()
                 .code("sec-b").name("Tenant B").themeId("modern").build());
         TenantContext.set(tenantB);
         domainService.add("b.example.com", true);
+        var bCat = categoryService.saveCategory(com.rick.site.catalog.entity.Category.builder()
+                .type("PRODUCT").slug("cat-b").status((short) 1).sort(0).build());
         Product bProduct = productService.saveProduct(Product.builder()
-                .slug("secret-b").status((short) 1).sort(0).build());
+                .slug("secret-b").categoryId(bCat.getId()).status((short) 1).sort(0).build());
         bProductId = bProduct.getId();
         TenantContext.clear();
     }
@@ -120,13 +129,15 @@ class AdminSecurityTest {
         MockHttpSession session = (MockHttpSession) login.getRequest().getSession(false);
 
         // A 会话 + B 域名 → 仍只见本租户(A)产品,读不到 B 的 secret-b(作用域来自 principal 而非 Host)
-        mockMvc.perform(get("/admin/products").with(host("b.example.com")).session(session))
+        mockMvc.perform(get("/admin/products").param("categoryId", String.valueOf(aCategoryId))
+                        .with(host("b.example.com")).session(session))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("widget-a")))
                 .andExpect(content().string(not(containsString("secret-b"))));
 
         // A 域名同样只见本租户
-        mockMvc.perform(get("/admin/products").with(host("a.example.com")).session(session))
+        mockMvc.perform(get("/admin/products").param("categoryId", String.valueOf(aCategoryId))
+                        .with(host("a.example.com")).session(session))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("widget-a")))
                 .andExpect(content().string(not(containsString("secret-b"))));

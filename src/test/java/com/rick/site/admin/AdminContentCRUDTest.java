@@ -2,8 +2,8 @@ package com.rick.site.admin;
 
 import com.rick.common.http.exception.BizException;
 import com.rick.site.admin.service.AdminUserService;
+import com.rick.site.catalog.service.CategoryService;
 import com.rick.site.news.service.ArticleService;
-import com.rick.site.page.service.SitePageService;
 import com.rick.site.product.entity.ProductI18n;
 import com.rick.site.product.service.ProductService;
 import com.rick.site.tenant.context.TenantContext;
@@ -54,7 +54,7 @@ class AdminContentCRUDTest {
     @Autowired private TenantDomainService domainService;
     @Autowired private AdminUserService adminUserService;
     @Autowired private ProductService productService;
-    @Autowired private SitePageService pageService;
+    @Autowired private CategoryService categoryService;
     @Autowired private ArticleService articleService;
 
     private Tenant tenantA;
@@ -89,12 +89,22 @@ class AdminContentCRUDTest {
 
     @Test
     void saveProductWritesBothLanguages() throws Exception {
-        mockMvc.perform(post("/admin/products/save").with(host("crud-a.example.com")).session(sessionA).with(csrf())
+        // Phase 19 单语种表单:每次保存仅写该语种一行;分两次保存 en-US / zh-CN
+        MvcResult r = mockMvc.perform(post("/admin/products/save").with(host("crud-a.example.com")).session(sessionA).with(csrf())
                         .param("slug", "widget-crud").param("status", "1").param("sort", "0")
-                        .param("name_en-US", "Widget CRUD").param("content_en-US", "<p>en</p>")
-                        .param("name_zh-CN", "小工具").param("content_zh-CN", "<p>中</p>"))
+                        .param("language", "en-US").param("name", "Widget CRUD").param("content", "<p>en</p>"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/admin/products"));
+                .andExpect(redirectedUrlPattern("/admin/products/*/edit?lang=en-US"))
+                .andReturn();
+        Long id = Long.valueOf(r.getResponse().getRedirectedUrl()
+                .replaceAll(".*/(\\d+)/edit.*", "$1"));
+
+        mockMvc.perform(post("/admin/products/save").with(host("crud-a.example.com")).session(sessionA).with(csrf())
+                        .param("id", String.valueOf(id))
+                        .param("slug", "widget-crud").param("status", "1").param("sort", "0")
+                        .param("language", "zh-CN").param("name", "小工具").param("content", "<p>中</p>"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrlPattern("/admin/products/*/edit?lang=zh-CN"));
 
         TenantContext.set(tenantA);
         var product = productService.findBySlug("widget-crud").orElseThrow();
@@ -107,26 +117,25 @@ class AdminContentCRUDTest {
     }
 
     @Test
-    void savePageAndArticleWriteBothLanguages() throws Exception {
-        // 页面:title+content+cover 三项全空则跳过该语言;这里两种语言都填
-        mockMvc.perform(post("/admin/pages/save").with(host("crud-a.example.com")).session(sessionA).with(csrf())
-                        .param("pageKey", "services").param("path", "/services")
-                        .param("template", "themes/modern/about").param("status", "1")
-                        .param("title_en-US", "Services").param("content_en-US", "<p>en</p>")
-                        .param("title_zh-CN", "服务").param("content_zh-CN", "<p>中</p>"))
+    void saveArticleWritesBothLanguages() throws Exception {
+        // 文章(单语种表单):分两次保存 en-US / zh-CN
+        MvcResult r = mockMvc.perform(post("/admin/news/save").with(host("crud-a.example.com")).session(sessionA).with(csrf())
+                        .param("slug", "launch-crud").param("status", "1").param("sort", "0")
+                        .param("language", "en-US").param("title", "Launched").param("content", "<p>en</p>"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/admin/pages"));
+                .andExpect(redirectedUrlPattern("/admin/news/*/edit?lang=en-US"))
+                .andReturn();
+        Long articleId = Long.valueOf(r.getResponse().getRedirectedUrl()
+                .replaceAll(".*/(\\d+)/edit.*", "$1"));
 
         mockMvc.perform(post("/admin/news/save").with(host("crud-a.example.com")).session(sessionA).with(csrf())
+                        .param("id", String.valueOf(articleId))
                         .param("slug", "launch-crud").param("status", "1").param("sort", "0")
-                        .param("title_en-US", "Launched").param("content_en-US", "<p>en</p>")
-                        .param("title_zh-CN", "上线").param("content_zh-CN", "<p>中</p>"))
+                        .param("language", "zh-CN").param("title", "上线").param("content", "<p>中</p>"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/admin/news"));
+                .andExpect(redirectedUrlPattern("/admin/news/*/edit?lang=zh-CN"));
 
         TenantContext.set(tenantA);
-        var page = pageService.findByKey("services").orElseThrow();
-        assertThat(pageService.loadI18nMap(page.getId())).containsKeys("en-US", "zh-CN");
         var article = articleService.findBySlug("launch-crud").orElseThrow();
         assertThat(articleService.loadI18nMap(article.getId())).containsKeys("en-US", "zh-CN");
         TenantContext.clear();
@@ -170,21 +179,31 @@ class AdminContentCRUDTest {
 
     @Test
     void listScopedToOwnTenant() throws Exception {
-        // A 与 B 各一产品
+        // A 与 B 各建一个 PRODUCT 分类 + 一个归属该分类的产品
         TenantContext.set(tenantA);
+        var aCat = categoryService.saveCategory(com.rick.site.catalog.entity.Category.builder()
+                .type("PRODUCT").slug("cat-a").status((short) 1).sort(0).build());
         productService.saveProduct(com.rick.site.product.entity.Product.builder()
-                .slug("a-only").status((short) 1).sort(0).build());
+                .slug("a-only").categoryId(aCat.getId()).status((short) 1).sort(0).build());
         Tenant tenantB = tenantService.save(Tenant.builder()
                 .code("crud-b2").name("CRUD B2").themeId("modern").build());
         TenantContext.set(tenantB);
+        var bCat = categoryService.saveCategory(com.rick.site.catalog.entity.Category.builder()
+                .type("PRODUCT").slug("cat-b").status((short) 1).sort(0).build());
         productService.saveProduct(com.rick.site.product.entity.Product.builder()
-                .slug("b-only").status((short) 1).sort(0).build());
+                .slug("b-only").categoryId(bCat.getId()).status((short) 1).sort(0).build());
         TenantContext.clear();
 
-        // A 会话列表只见 a-only,不见 b-only
-        mockMvc.perform(get("/admin/products").with(host("crud-a.example.com")).session(sessionA))
+        // A 会话按 A 的分类筛选,只见 a-only,不见 b-only
+        mockMvc.perform(get("/admin/products").param("categoryId", String.valueOf(aCat.getId()))
+                        .with(host("crud-a.example.com")).session(sessionA))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("a-only")))
                 .andExpect(content().string(not(containsString("b-only"))));
+
+        // 未选分类 → 空表 + 提示
+        mockMvc.perform(get("/admin/products").with(host("crud-a.example.com")).session(sessionA))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("请先选择分类")));
     }
 }

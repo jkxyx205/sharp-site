@@ -1,75 +1,59 @@
 <!DOCTYPE html>
-<html lang="zh" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>域名管理</title>
-    <style>
-        body { font-family: system-ui, sans-serif; background:#f5f5f5; margin:0; padding:40px; }
-        .card { max-width:840px; margin:20px auto; background:#fff; padding:24px; border-radius:8px; box-shadow:0 1px 4px rgba(0,0,0,.12); }
-        h1 { font-size:20px; margin:0 0 16px; }
-        nav a { margin-right:16px; color:#2563eb; }
-        form.inline { display:inline; margin:0; }
-        button, input[type=submit] { background:#2563eb; color:#fff; border:0; padding:6px 14px; border-radius:4px; cursor:pointer; font-size:13px; }
-        input[type=text] { padding:6px 10px; border:1px solid #ccc; border-radius:4px; font-size:14px; min-width:240px; }
-        .add-bar { display:flex; gap:10px; align-items:center; margin:16px 0 24px; flex-wrap:wrap; }
-        .primary { background:#16a34a; }
-        .danger { background:#dc2626; }
-        .err { color:#dc2626; margin-bottom:12px; }
-        table { width:100%; border-collapse:collapse; font-size:14px; }
-        th, td { text-align:left; padding:8px 10px; border-bottom:1px solid #eee; }
-        th { color:#666; font-weight:600; }
-        .tag { display:inline-block; padding:2px 8px; border-radius:3px; font-size:12px; }
-        .tag-primary { background:#dcfce7; color:#16a34a; }
-        .tag-secondary { background:#f1f5f9; color:#64748b; }
-        .empty { color:#888; }
-    </style>
-</head>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/fragments/head :: head(title='域名管理')}"></head>
 <body>
-<div class="card">
-    <h1>域名管理</h1>
-    <nav>
-        <a th:href="@{/admin/}">后台首页</a>
-        <a th:href="@{/admin/products}">产品管理</a>
-        <a th:href="@{/admin/publish}">网站发布</a>
-        <a th:href="@{/preview/}" target="_blank">预览站点</a>
-    </nav>
+<div class="shell">
+    <aside th:replace="~{admin/fragments/layout :: sidebar(active='domains')}"></aside>
+    <div class="main">
+        <header th:replace="~{admin/fragments/layout :: topbar()}"></header>
+        <main class="content">
+            <h1>域名管理</h1>
+            <p class="error" th:if="${error}" th:text="${error}">错误</p>
 
-    <div class="err" th:if="${error != null}" th:text="${error}"></div>
-
-    <form class="add-bar" method="post" th:action="@{/admin/domains}">
-        <input type="text" name="domain" placeholder="例如 www.example.com" required />
-        <label><input type="checkbox" name="primary" /> 设为主域名</label>
-        <input type="submit" value="添加域名" />
-    </form>
-
-    <table>
-        <thead>
-        <tr><th>域名</th><th>类型</th><th>状态</th><th>操作</th></tr>
-        </thead>
-        <tbody>
-        <tr th:each="d : ${domains}">
-            <td th:text="${d.domain}">example.com</td>
-            <td>
-                <span th:if="${d.isPrimary != null and d.isPrimary == 1}" class="tag tag-primary">主域名</span>
-                <span th:if="${d.isPrimary == null or d.isPrimary != 1}" class="tag tag-secondary">普通</span>
-            </td>
-            <td>
-                <span th:if="${d.status != null and d.status == 1}">启用</span>
-                <span th:if="${d.status == null or d.status != 1}">停用</span>
-            </td>
-            <td>
-                <form class="inline" method="post" th:action="@{/admin/domains/{id}/primary(id=${d.id})}" th:if="${d.isPrimary == null or d.isPrimary != 1}">
-                    <button type="submit">设为主域名</button>
+            <div class="card">
+                <h1 style="font-size:15px;">添加域名</h1>
+                <form class="filter" method="post" th:action="@{/admin/domains}">
+                    <input type="text" name="domain" placeholder="例如 www.example.com" required />
+                    <label><input type="checkbox" name="primary" /> 设为主域名</label>
+                    <button type="submit" class="btn btn-primary">添加域名</button>
                 </form>
-                <form class="inline" method="post" th:action="@{/admin/domains/{id}/delete(id=${d.id})}">
-                    <button type="submit" class="danger">删除</button>
-                </form>
-            </td>
-        </tr>
-        <tr th:if="${domains.isEmpty()}"><td colspan="4" class="empty">暂无域名,添加一个以发布站点</td></tr>
-        </tbody>
-    </table>
+            </div>
+
+            <div class="card">
+                <table>
+                    <thead>
+                    <tr><th>域名</th><th>类型</th><th>状态</th><th>操作</th></tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="d : ${domains}">
+                        <td th:text="${d.domain}">example.com</td>
+                        <td>
+                            <span th:if="${d.isPrimary != null and d.isPrimary == 1}" class="tag tag-primary">主域名</span>
+                            <span th:if="${d.isPrimary == null or d.isPrimary != 1}" class="tag tag-secondary">普通</span>
+                        </td>
+                        <td>
+                            <span th:if="${d.status != null and d.status == 1}">启用</span>
+                            <span th:if="${d.status == null or d.status != 1}">停用</span>
+                        </td>
+                        <td>
+                            <form method="post" style="display:inline"
+                                  th:action="@{/admin/domains/{id}/primary(id=${d.id})}"
+                                  th:if="${d.isPrimary == null or d.isPrimary != 1}">
+                                <button type="submit" class="btn-link">设为主域名</button>
+                            </form>
+                            <form method="post" style="display:inline"
+                                  th:action="@{/admin/domains/{id}/delete(id=${d.id})}"
+                                  onsubmit="return confirm('删除该域名?');">
+                                <button type="submit" class="btn-link danger">删除</button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <p class="empty" th:if="${domains == null or domains.isEmpty()}">暂无域名,添加一个以发布站点。</p>
+            </div>
+        </main>
+    </div>
 </div>
 </body>
 </html>

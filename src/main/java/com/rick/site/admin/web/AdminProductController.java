@@ -9,12 +9,10 @@ import com.rick.site.product.service.ProductService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -42,13 +40,17 @@ public class AdminProductController {
     }
 
     @GetMapping
-    public String list(Model model) {
-        model.addAttribute("products", productService.listByTenant());
+    public String list(@RequestParam(required = false) Long categoryId, Model model) {
+        model.addAttribute("categories", categoryService.listByType("PRODUCT"));
+        model.addAttribute("selectedCategoryId", categoryId);
+        model.addAttribute("products", categoryId == null ? List.of() : productService.listByCategory(categoryId));
         return "admin/products";
     }
 
     @GetMapping({"/new", "/{id}/edit"})
-    public String form(@PathVariable(required = false) Long id, Model model) {
+    public String form(@PathVariable(required = false) Long id,
+                       @RequestParam(required = false) String lang, Model model) {
+        String language = (lang == null || lang.isBlank()) ? localeResolver.defaultLanguage() : lang;
         Product product;
         Map<String, ProductI18n> i18nMap;
         if (id == null) {
@@ -62,6 +64,7 @@ public class AdminProductController {
         }
         model.addAttribute("product", product);
         model.addAttribute("i18nMap", i18nMap);
+        model.addAttribute("currentLang", language);
         model.addAttribute("categories", categoryService.listByType("PRODUCT"));
         addLanguages(model);
         return "admin/product-form";
@@ -69,28 +72,27 @@ public class AdminProductController {
 
     @PostMapping("/save")
     public String save(Product product, HttpServletRequest req, RedirectAttributes ra) {
+        String language = req.getParameter("language");
         try {
             Product saved = productService.saveProduct(product);
-            for (String lang : localeResolver.supportedLanguages()) {
-                String name = req.getParameter("name_" + lang);
-                if (name == null || name.isBlank()) {
-                    continue; // name 必填,空则跳过该语言(保留回退)
-                }
+            String name = req.getParameter("name");
+            if (name != null && !name.isBlank()) {
                 productService.saveI18n(saved.getId(), ProductI18n.builder()
-                        .language(lang)
+                        .language(language)
                         .name(name)
-                        .subtitle(req.getParameter("subtitle_" + lang))
-                        .description(req.getParameter("description_" + lang))
-                        .content(req.getParameter("content_" + lang))
-                        .specificationJson(req.getParameter("specificationJson_" + lang))
-                        .seoTitle(req.getParameter("seoTitle_" + lang))
-                        .seoDescription(req.getParameter("seoDescription_" + lang))
+                        .subtitle(req.getParameter("subtitle"))
+                        .description(req.getParameter("description"))
+                        .content(req.getParameter("content"))
+                        .specificationJson(req.getParameter("specificationJson"))
+                        .seoTitle(req.getParameter("seoTitle"))
+                        .seoDescription(req.getParameter("seoDescription"))
                         .build());
             }
+            return "redirect:/admin/products/" + saved.getId() + "/edit?lang=" + language;
         } catch (BizException e) {
             ra.addFlashAttribute("error", e.getMessage());
+            return "redirect:/admin/products";
         }
-        return "redirect:/admin/products";
     }
 
     @PostMapping("/{id}/delete")

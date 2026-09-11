@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/fragments/head :: head(title='SEO 编辑')}"></head>
+<body>
+<div class="shell">
+    <aside th:replace="~{admin/fragments/layout :: sidebar(active='seo')}"></aside>
+    <div class="main">
+        <header th:replace="~{admin/fragments/layout :: topbar()}"></header>
+        <main class="content">
+            <div class="card">
+                <h1>SEO 编辑</h1>
+                <nav class="subnav"><a class="btn" th:href="@{/admin/seo}">← 返回列表</a></nav>
+
+                <!-- 导航 GET 表单:选 pageType / pageId / 语种,切换后重新加载该 (pageType,pageId,lang) 行 -->
+                <form th:action="@{/admin/seo/edit}" method="get">
+                    <label>页类型
+                        <select name="pageType" onchange="this.form.submit()">
+                            <option value="home" th:selected="${config.pageType == 'home'}">首页(home)</option>
+                            <option value="products_list" th:selected="${config.pageType == 'products_list'}">产品列表(products_list)</option>
+                            <option value="news_list" th:selected="${config.pageType == 'news_list'}">新闻列表(news_list)</option>
+                            <option value="page" th:selected="${config.pageType == 'page'}">单页(page)</option>
+                            <option value="product" th:selected="${config.pageType == 'product'}">产品(product)</option>
+                            <option value="article" th:selected="${config.pageType == 'article'}">新闻(article)</option>
+                        </select></label>
+                    <label th:if="${config.pageType == 'page'}">页面
+                        <select name="pageId" onchange="this.form.submit()">
+                            <option th:each="p : ${pages}" th:value="${p.id}"
+                                    th:selected="${config.pageId != null && config.pageId == p.id}"
+                                    th:text="${p.pageKey + ' (' + p.path + ')'}">page</option>
+                        </select></label>
+                    <label th:if="${config.pageType == 'product'}">产品
+                        <select name="pageId" onchange="this.form.submit()">
+                            <option th:each="p : ${products}" th:value="${p.id}"
+                                    th:selected="${config.pageId != null && config.pageId == p.id}"
+                                    th:text="${p.slug}">product</option>
+                        </select></label>
+                    <label th:if="${config.pageType == 'article'}">新闻
+                        <select name="pageId" onchange="this.form.submit()">
+                            <option th:each="a : ${articles}" th:value="${a.id}"
+                                    th:selected="${config.pageId != null && config.pageId == a.id}"
+                                    th:text="${a.slug}">article</option>
+                        </select></label>
+                    <label>语种
+                        <select name="lang" onchange="this.form.submit()">
+                            <option th:each="l : ${languages}" th:value="${l}"
+                                    th:selected="${l == currentLang}"
+                                    th:text="${l + (l == defaultLanguage ? ' · 默认' : '')}">lang</option>
+                        </select></label>
+                </form>
+
+                <!-- 保存 POST 表单:仅写当前 (pageType,pageId,language) 一行 -->
+                <form th:action="@{/admin/seo/save}" method="post">
+                    <input type="hidden" name="pageType" th:value="${config.pageType}" />
+                    <input type="hidden" name="pageId" th:value="${config.pageId}" />
+                    <input type="hidden" name="language" th:value="${currentLang}" />
+                    <fieldset>
+                        <legend><span th:text="${config.pageType} + ' · ' + ${currentLang}">type · lang</span></legend>
+                        <label>SEO 标题
+                            <input type="text" name="title" th:value="${config.title}" /></label>
+                        <label>SEO 描述
+                            <textarea name="description" style="min-height:60px" th:text="${config.description}"></textarea></label>
+                        <label>SEO 关键词
+                            <textarea name="keywords" style="min-height:60px" th:text="${config.keywords}"></textarea></label>
+                        <label>Canonical 链接
+                            <input type="text" name="canonical" th:value="${config.canonical}" /></label>
+                        <label>robots 指令 <span class="hint">如 index, follow</span>
+                            <input type="text" name="robots" th:value="${config.robots}" placeholder="index, follow" /></label>
+                        <label>OG 标题
+                            <input type="text" name="ogTitle" th:value="${config.ogTitle}" /></label>
+                        <label>OG 描述
+                            <textarea name="ogDescription" style="min-height:60px" th:text="${config.ogDescription}"></textarea></label>
+                        <label>OG 图片 URL
+                            <input type="url" name="ogImage" th:value="${config.ogImage}" /></label>
+                    </fieldset>
+                    <div class="actions">
+                        <button type="submit" class="btn btn-primary">保存</button>
+                        <a th:href="@{/admin/seo}" class="btn btn-secondary">取消</a>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+</div>
+</body>
+</html>

@@ -2,62 +2,80 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{admin/fragments/head :: head(title='文章编辑')}"></head>
 <body>
-<div class="card">
-    <h1><span th:text="${article.id == null ? '新建文章' : '编辑文章'}">文章</span></h1>
-    <nav><a th:href="@{/admin/news}">← 返回列表</a></nav>
-    <p class="error" th:if="${error}" th:text="${error}">错误</p>
-    <form th:action="@{/admin/news/save}" method="post">
-        <input type="hidden" name="id" th:value="${article.id}" />
-        <label>Slug <span class="hint">租户内唯一 URL 标识</span>
-            <input type="text" name="slug" th:value="${article.slug}" required placeholder="company-launched" /></label>
-        <label>分类
-            <select name="categoryId">
-                <option value="">— 无 —</option>
-                <option th:each="c : ${categories}" th:value="${c.id}"
-                        th:selected="${article.categoryId != null && article.categoryId == c.id}"
-                        th:text="${c.slug}">category</option>
-            </select></label>
-        <label>Cover URL
-            <input type="url" name="cover" th:value="${article.cover}" placeholder="/img/news.jpg" /></label>
-        <label>作者
-            <input type="text" name="author" th:value="${article.author}" /></label>
-        <label>发布时间
-            <input type="datetime-local" name="publishTime" th:value="${article.publishTime}" /></label>
-        <label>排序 <span class="hint">升序</span>
-            <input type="number" name="sort" th:value="${article.sort}" /></label>
-        <label>Status
-            <select name="status">
-                <option value="1" th:selected="${article.status == 1}">发布</option>
-                <option value="0" th:selected="${article.status != 1}">草稿</option>
-            </select></label>
+<div class="shell">
+    <aside th:replace="~{admin/fragments/layout :: sidebar(active='news')}"></aside>
+    <div class="main">
+        <header th:replace="~{admin/fragments/layout :: topbar()}"></header>
+        <main class="content">
+            <div class="card">
+                <h1><span th:text="${article.id == null ? '新建文章' : '编辑文章'}">文章</span></h1>
+                <nav class="subnav"><a class="btn" th:href="@{/admin/news}">← 返回列表</a></nav>
+                <p class="error" th:if="${error}" th:text="${error}">错误</p>
 
-        <th:block th:each="lang : ${languages}">
-            <fieldset th:classappend="${lang == defaultLanguage ? 'default-lang' : ''}">
-                <legend><span th:text="${lang}">语言</span>
-                    <span class="lang-tag" th:if="${lang == defaultLanguage}">· 默认语言</span></legend>
-                <label>Title <span class="hint">必填,空则不保存该语言</span>
-                    <input type="text" th:name="'title_' + ${lang}"
-                           th:value="${i18nMap[lang] != null ? i18nMap[lang].title : ''}" /></label>
-                <label>Summary
-                    <textarea th:name="'summary_' + ${lang}" style="min-height:60px"
-                              th:text="${i18nMap[lang] != null ? i18nMap[lang].summary : ''}"></textarea></label>
-                <label>Content <span class="hint">富文本 HTML</span>
-                    <textarea th:name="'content_' + ${lang}"
-                              th:text="${i18nMap[lang] != null ? i18nMap[lang].content : ''}"></textarea></label>
-                <label>SEO Title
-                    <input type="text" th:name="'seoTitle_' + ${lang}"
-                           th:value="${i18nMap[lang] != null ? i18nMap[lang].seoTitle : ''}" /></label>
-                <label>SEO Description
-                    <input type="text" th:name="'seoDescription_' + ${lang}"
-                           th:value="${i18nMap[lang] != null ? i18nMap[lang].seoDescription : ''}" /></label>
-            </fieldset>
-        </th:block>
+                <!-- 语种切换(独立 GET 表单,仅编辑已有文章时显示) -->
+                <form th:if="${article.id != null}" th:action="@{/admin/news/{id}/edit(id=${article.id})}" method="get">
+                    <label>语种
+                        <select name="lang" onchange="this.form.submit()">
+                            <option th:each="l : ${languages}" th:value="${l}"
+                                    th:selected="${l == currentLang}"
+                                    th:text="${l + (l == defaultLanguage ? ' · 默认' : '')}">lang</option>
+                        </select></label>
+                </form>
 
-        <div class="actions">
-            <button type="submit" class="btn">保存</button>
-            <a th:href="@{/admin/news}" class="btn btn-secondary">取消</a>
-        </div>
-    </form>
+                <form th:action="@{/admin/news/save}" method="post">
+                    <input type="hidden" name="id" th:value="${article.id}" />
+                    <input type="hidden" name="language" th:value="${currentLang}" />
+                    <label>Slug <span class="hint">租户内唯一 URL 标识</span>
+                        <input type="text" name="slug" th:value="${article.slug}" required placeholder="company-launched" /></label>
+                    <label>分类 <span class="hint">必填</span>
+                        <select name="categoryId" required>
+                            <option value="">— 请选择 —</option>
+                            <option th:each="c : ${categories}" th:value="${c.id}"
+                                    th:selected="${article.categoryId != null && article.categoryId == c.id}"
+                                    th:text="${c.slug}">category</option>
+                        </select></label>
+                    <label>Cover URL
+                        <input type="url" name="cover" th:value="${article.cover}" placeholder="/img/news.jpg" /></label>
+                    <label>作者
+                        <input type="text" name="author" th:value="${article.author}" /></label>
+                    <label>发布时间
+                        <input type="datetime-local" name="publishTime" th:value="${article.publishTime}" /></label>
+                    <label>排序 <span class="hint">升序</span>
+                        <input type="number" name="sort" th:value="${article.sort}" /></label>
+                    <label>Status
+                        <select name="status">
+                            <option value="1" th:selected="${article.status == 1}">发布</option>
+                            <option value="0" th:selected="${article.status != 1}">草稿</option>
+                        </select></label>
+
+                    <fieldset th:classappend="${currentLang == defaultLanguage ? 'default-lang' : ''}">
+                        <legend><span th:text="${currentLang}">语言</span>
+                            <span class="lang-tag" th:if="${currentLang == defaultLanguage}">· 默认语言</span></legend>
+                        <label>Title <span class="hint">必填,空则不保存该语种</span>
+                            <input type="text" name="title"
+                                   th:value="${i18nMap[currentLang] != null ? i18nMap[currentLang].title : ''}" /></label>
+                        <label>Summary
+                            <textarea name="summary" style="min-height:60px"
+                                      th:text="${i18nMap[currentLang] != null ? i18nMap[currentLang].summary : ''}"></textarea></label>
+                        <label>Content <span class="hint">富文本 HTML</span>
+                            <textarea name="content"
+                                      th:text="${i18nMap[currentLang] != null ? i18nMap[currentLang].content : ''}"></textarea></label>
+                        <label>SEO Title
+                            <input type="text" name="seoTitle"
+                                   th:value="${i18nMap[currentLang] != null ? i18nMap[currentLang].seoTitle : ''}" /></label>
+                        <label>SEO Description
+                            <input type="text" name="seoDescription"
+                                   th:value="${i18nMap[currentLang] != null ? i18nMap[currentLang].seoDescription : ''}" /></label>
+                    </fieldset>
+
+                    <div class="actions">
+                        <button type="submit" class="btn btn-primary">保存</button>
+                        <a th:href="@{/admin/news}" class="btn btn-secondary">取消</a>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
 </div>
 </body>
 </html>

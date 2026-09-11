@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/fragments/head :: head(title='SEO 管理')}"></head>
+<body>
+<div class="shell">
+    <aside th:replace="~{admin/fragments/layout :: sidebar(active='seo')}"></aside>
+    <div class="main">
+        <header th:replace="~{admin/fragments/layout :: topbar()}"></header>
+        <main class="content">
+            <h1>SEO 管理</h1>
+            <form class="filter" th:action="@{/admin/seo/edit}" method="get">
+                <label>新建 / 编辑 SEO
+                    <select name="pageType" onchange="this.form.submit()">
+                        <option value="home" selected>首页(home)</option>
+                        <option value="products_list">产品列表(products_list)</option>
+                        <option value="news_list">新闻列表(news_list)</option>
+                        <option value="page">单页(page)</option>
+                        <option value="product">产品(product)</option>
+                        <option value="article">新闻(article)</option>
+                    </select></label>
+            </form>
+            <div class="card">
+                <table>
+                    <thead>
+                    <tr><th>页类型</th><th>页面ID</th><th>语种</th><th>标题</th><th>操作</th></tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="c : ${configs}">
+                        <td th:text="${c.pageType}">type</td>
+                        <td th:text="${c.pageId != null ? c.pageId : '—'}">—</td>
+                        <td th:text="${c.language}">lang</td>
+                        <td th:text="${c.title}">title</td>
+                        <td>
+                            <a th:href="@{/admin/seo/edit(pageType=${c.pageType},pageId=${c.pageId},lang=${c.language})}">编辑</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <p class="empty" th:if="${configs == null or configs.isEmpty()}">暂无 SEO 配置。</p>
+            </div>
+        </main>
+    </div>
+</div>
+</body>
+</html>

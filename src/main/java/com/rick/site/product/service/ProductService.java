@@ -48,6 +48,12 @@ public class ProductService extends BaseServiceImpl<ProductDAO, Product, Long> {
         return baseDAO.select("status = 1 ORDER BY sort, id", Map.of());
     }
 
+    /** 后台按分类筛选(租户隔离由 SiteDatabaseConfig 统一追加)。 */
+    public List<Product> listByCategory(Long categoryId) {
+        return baseDAO.select("category_id = :categoryId ORDER BY sort, id",
+                Map.of("categoryId", categoryId));
+    }
+
     public Optional<Product> findBySlug(String slug) {
         List<Product> found = baseDAO.select("slug = :slug", Map.of("slug", slug));
         return found.isEmpty() ? Optional.empty() : Optional.of(found.get(0));

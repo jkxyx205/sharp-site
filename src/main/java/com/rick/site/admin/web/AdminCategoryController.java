@@ -8,10 +8,7 @@ import com.rick.site.i18n.service.DefaultLocaleResolver;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Map;
@@ -43,7 +40,9 @@ public class AdminCategoryController {
     }
 
     @GetMapping({"/new", "/{id}/edit"})
-    public String form(@PathVariable(required = false) Long id, Model model) {
+    public String form(@PathVariable(required = false) Long id,
+                       @RequestParam(required = false) String lang, Model model) {
+        String language = (lang == null || lang.isBlank()) ? localeResolver.defaultLanguage() : lang;
         Category category;
         Map<String, CategoryI18n> i18nMap;
         if (id == null) {
@@ -58,29 +57,29 @@ public class AdminCategoryController {
         }
         model.addAttribute("category", category);
         model.addAttribute("i18nMap", i18nMap);
+        model.addAttribute("currentLang", language);
         addLanguages(model);
         return "admin/category-form";
     }
 
     @PostMapping("/save")
     public String save(Category category, HttpServletRequest req, RedirectAttributes ra) {
+        String language = req.getParameter("language");
         try {
             Category saved = categoryService.saveCategory(category);
-            for (String lang : localeResolver.supportedLanguages()) {
-                String name = req.getParameter("name_" + lang);
-                if (name == null || name.isBlank()) {
-                    continue;
-                }
+            String name = req.getParameter("name");
+            if (name != null && !name.isBlank()) {
                 categoryService.saveI18n(saved.getId(), CategoryI18n.builder()
-                        .language(lang)
+                        .language(language)
                         .name(name)
-                        .description(req.getParameter("description_" + lang))
+                        .description(req.getParameter("description"))
                         .build());
             }
+            return "redirect:/admin/categories/" + saved.getId() + "/edit?lang=" + language;
         } catch (BizException e) {
             ra.addFlashAttribute("error", e.getMessage());
+            return "redirect:/admin/categories";
         }
-        return "redirect:/admin/categories";
     }
 
     @PostMapping("/{id}/delete")

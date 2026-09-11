@@ -9,12 +9,10 @@ import com.rick.site.news.service.ArticleService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -41,13 +39,17 @@ public class AdminArticleController {
     }
 
     @GetMapping
-    public String list(Model model) {
-        model.addAttribute("articles", articleService.listByTenant());
+    public String list(@RequestParam(required = false) Long categoryId, Model model) {
+        model.addAttribute("categories", categoryService.listByType("NEWS"));
+        model.addAttribute("selectedCategoryId", categoryId);
+        model.addAttribute("articles", categoryId == null ? List.of() : articleService.listByCategory(categoryId));
         return "admin/news";
     }
 
     @GetMapping({"/new", "/{id}/edit"})
-    public String form(@PathVariable(required = false) Long id, Model model) {
+    public String form(@PathVariable(required = false) Long id,
+                       @RequestParam(required = false) String lang, Model model) {
+        String language = (lang == null || lang.isBlank()) ? localeResolver.defaultLanguage() : lang;
         Article article;
         Map<String, ArticleI18n> i18nMap;
         if (id == null) {
@@ -61,6 +63,7 @@ public class AdminArticleController {
         }
         model.addAttribute("article", article);
         model.addAttribute("i18nMap", i18nMap);
+        model.addAttribute("currentLang", language);
         model.addAttribute("categories", categoryService.listByType("NEWS"));
         addLanguages(model);
         return "admin/news-form";
@@ -68,26 +71,25 @@ public class AdminArticleController {
 
     @PostMapping("/save")
     public String save(Article article, HttpServletRequest req, RedirectAttributes ra) {
+        String language = req.getParameter("language");
         try {
             Article saved = articleService.saveArticle(article);
-            for (String lang : localeResolver.supportedLanguages()) {
-                String title = req.getParameter("title_" + lang);
-                if (title == null || title.isBlank()) {
-                    continue;
-                }
+            String title = req.getParameter("title");
+            if (title != null && !title.isBlank()) {
                 articleService.saveI18n(saved.getId(), ArticleI18n.builder()
-                        .language(lang)
+                        .language(language)
                         .title(title)
-                        .summary(req.getParameter("summary_" + lang))
-                        .content(req.getParameter("content_" + lang))
-                        .seoTitle(req.getParameter("seoTitle_" + lang))
-                        .seoDescription(req.getParameter("seoDescription_" + lang))
+                        .summary(req.getParameter("summary"))
+                        .content(req.getParameter("content"))
+                        .seoTitle(req.getParameter("seoTitle"))
+                        .seoDescription(req.getParameter("seoDescription"))
                         .build());
             }
+            return "redirect:/admin/news/" + saved.getId() + "/edit?lang=" + language;
         } catch (BizException e) {
             ra.addFlashAttribute("error", e.getMessage());
+            return "redirect:/admin/news";
         }
-        return "redirect:/admin/news";
     }
 
     @PostMapping("/{id}/delete")

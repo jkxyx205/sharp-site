@@ -48,6 +48,12 @@ public class ArticleService extends BaseServiceImpl<ArticleDAO, Article, Long> {
         return baseDAO.select("status = 1 ORDER BY publish_time DESC NULLS LAST, sort, id", Map.of());
     }
 
+    /** 后台按分类筛选(租户隔离由 SiteDatabaseConfig 统一追加)。 */
+    public List<Article> listByCategory(Long categoryId) {
+        return baseDAO.select("category_id = :categoryId ORDER BY sort, publish_time DESC NULLS LAST, id",
+                Map.of("categoryId", categoryId));
+    }
+
     public Optional<Article> findBySlug(String slug) {
         List<Article> found = baseDAO.select("slug = :slug", Map.of("slug", slug));
         return found.isEmpty() ? Optional.empty() : Optional.of(found.get(0));

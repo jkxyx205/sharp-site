@@ -158,7 +158,36 @@ com.rick.site
 ├── web         公开前台路由(按 Host 解析租户)
 └── common      TenantBaseEntity / TenantContext / DatabaseConfig
 ```
+# 创建网站
+给出提示词：
+```
+创建用户 xhope，密码 111111。
+创建新的 tenant：
+	- 域名使用 www.abc.com
+	- 创建新的模版 xhope 并应用。
 
+模版要求：
+
+	模版风格：
+		- 展示家清产品：吸尘器，布艺清洗机等
+		- 突出科技感
+		- 蓝色风格
+
+	板块：
+		- 首页
+		- 产品中心
+			分类：
+				吸尘器、布艺清洗机等
+		- 公司新闻
+			不需要分类
+		- 联系我们
+
+	其他：
+		- 支持中文和英文，默认显示英文
+		- 多终端友好
+		- SEO 友好
+		- 没有提供的数据，自己造数据显示。
+```
 ## 更多
 
 - 设计需求:`docs/REQUIREMENTS.md`

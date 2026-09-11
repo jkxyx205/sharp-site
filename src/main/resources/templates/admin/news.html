@@ -1,32 +1,50 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{admin/fragments/head :: head(title='新闻管理')}"></head>
+<head th:replace="~{admin/fragments/head :: head(title='新闻')}"></head>
 <body>
-<div class="card">
-    <h1>新闻管理</h1>
-    <nav><a th:href="@{/admin/}">← 返回</a> <a th:href="@{/admin/news/new}">+ 新建文章</a></nav>
-    <p class="error" th:if="${error}" th:text="${error}">错误</p>
-    <table>
-        <thead>
-        <tr><th>Slug</th><th>作者</th><th>状态</th><th>排序</th><th>操作</th></tr>
-        </thead>
-        <tbody>
-        <tr th:each="a : ${articles}">
-            <td th:text="${a.slug}">slug</td>
-            <td th:text="${a.author}">author</td>
-            <td th:text="${a.status == 1 ? '发布' : '草稿'}">—</td>
-            <td th:text="${a.sort}">0</td>
-            <td>
-                <a th:href="@{/admin/news/{id}/edit(id=${a.id})}">编辑</a>
-                <form th:action="@{/admin/news/{id}/delete(id=${a.id})}" method="post" style="display:inline"
-                      onsubmit="return confirm('删除该文章?');">
-                    <button type="submit" class="btn-link">删除</button>
-                </form>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-    <p class="empty" th:if="${articles == null or articles.isEmpty()}">暂无文章。</p>
+<div class="shell">
+    <aside th:replace="~{admin/fragments/layout :: sidebar(active='news')}"></aside>
+    <div class="main">
+        <header th:replace="~{admin/fragments/layout :: topbar()}"></header>
+        <main class="content">
+            <h1>新闻管理</h1>
+            <p class="error" th:if="${error}" th:text="${error}">错误</p>
+
+            <form class="filter" method="get">
+                <label>分类</label>
+                <select name="categoryId" onchange="this.form.submit()">
+                    <option value="">— 请选择分类 —</option>
+                    <option th:each="c : ${categories}" th:value="${c.id}"
+                            th:selected="${selectedCategoryId != null && selectedCategoryId == c.id}"
+                            th:text="${c.slug}">category</option>
+                </select>
+                <a class="btn" th:href="@{/admin/news/new}" th:if="${selectedCategoryId != null}">+ 新建文章</a>
+            </form>
+
+            <table th:if="${selectedCategoryId != null}">
+                <thead>
+                <tr><th>Slug</th><th>作者</th><th>状态</th><th>排序</th><th>操作</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="a : ${articles}">
+                    <td th:text="${a.slug}">slug</td>
+                    <td th:text="${a.author}">author</td>
+                    <td th:text="${a.status == 1 ? '发布' : '草稿'}">—</td>
+                    <td th:text="${a.sort}">0</td>
+                    <td>
+                        <a th:href="@{/admin/news/{id}/edit(id=${a.id})}">编辑</a>
+                        <form th:action="@{/admin/news/{id}/delete(id=${a.id})}" method="post" style="display:inline"
+                              onsubmit="return confirm('删除该文章?');">
+                            <button type="submit" class="btn-link">删除</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <p class="empty" th:if="${selectedCategoryId != null and (articles == null or articles.isEmpty())}">该分类下暂无文章。</p>
+            <p class="empty" th:if="${selectedCategoryId == null}">请先选择分类。</p>
+        </main>
+    </div>
 </div>
 </body>
 </html>

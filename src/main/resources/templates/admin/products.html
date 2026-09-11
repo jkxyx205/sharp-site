@@ -1,31 +1,49 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{admin/fragments/head :: head(title='产品管理')}"></head>
+<head th:replace="~{admin/fragments/head :: head(title='产品')}"></head>
 <body>
-<div class="card">
-    <h1>产品管理</h1>
-    <nav><a th:href="@{/admin/}">← 返回</a> <a th:href="@{/admin/products/new}">+ 新建产品</a></nav>
-    <p class="error" th:if="${error}" th:text="${error}">错误</p>
-    <table>
-        <thead>
-        <tr><th>Slug</th><th>状态</th><th>排序</th><th>操作</th></tr>
-        </thead>
-        <tbody>
-        <tr th:each="p : ${products}">
-            <td th:text="${p.slug}">slug</td>
-            <td th:text="${p.status == 1 ? '上架' : '下架'}">—</td>
-            <td th:text="${p.sort}">0</td>
-            <td>
-                <a th:href="@{/admin/products/{id}/edit(id=${p.id})}">编辑</a>
-                <form th:action="@{/admin/products/{id}/delete(id=${p.id})}" method="post" style="display:inline"
-                      onsubmit="return confirm('删除该产品?');">
-                    <button type="submit" class="btn-link">删除</button>
-                </form>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-    <p class="empty" th:if="${products == null or products.isEmpty()}">暂无产品。</p>
+<div class="shell">
+    <aside th:replace="~{admin/fragments/layout :: sidebar(active='products')}"></aside>
+    <div class="main">
+        <header th:replace="~{admin/fragments/layout :: topbar()}"></header>
+        <main class="content">
+            <h1>产品管理</h1>
+            <p class="error" th:if="${error}" th:text="${error}">错误</p>
+
+            <form class="filter" method="get">
+                <label>分类</label>
+                <select name="categoryId" onchange="this.form.submit()">
+                    <option value="">— 请选择分类 —</option>
+                    <option th:each="c : ${categories}" th:value="${c.id}"
+                            th:selected="${selectedCategoryId != null && selectedCategoryId == c.id}"
+                            th:text="${c.slug}">category</option>
+                </select>
+                <a class="btn" th:href="@{/admin/products/new}" th:if="${selectedCategoryId != null}">+ 新建产品</a>
+            </form>
+
+            <table th:if="${selectedCategoryId != null}">
+                <thead>
+                <tr><th>Slug</th><th>状态</th><th>排序</th><th>操作</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="p : ${products}">
+                    <td th:text="${p.slug}">slug</td>
+                    <td th:text="${p.status == 1 ? '上架' : '下架'}">—</td>
+                    <td th:text="${p.sort}">0</td>
+                    <td>
+                        <a th:href="@{/admin/products/{id}/edit(id=${p.id})}">编辑</a>
+                        <form th:action="@{/admin/products/{id}/delete(id=${p.id})}" method="post" style="display:inline"
+                              onsubmit="return confirm('删除该产品?');">
+                            <button type="submit" class="btn-link">删除</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <p class="empty" th:if="${selectedCategoryId != null and (products == null or products.isEmpty())}">该分类下暂无产品。</p>
+            <p class="empty" th:if="${selectedCategoryId == null}">请先选择分类。</p>
+        </main>
+    </div>
 </div>
 </body>
 </html>

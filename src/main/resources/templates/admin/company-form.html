@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/fragments/head :: head(title='企业信息')}"></head>
+<body>
+<div class="shell">
+    <aside th:replace="~{admin/fragments/layout :: sidebar(active='company')}"></aside>
+    <div class="main">
+        <header th:replace="~{admin/fragments/layout :: topbar()}"></header>
+        <main class="content">
+            <div class="card">
+                <h1>企业信息</h1>
+                <p class="error" th:if="${error}" th:text="${error}">错误</p>
+                <form th:action="@{/admin/company/save}" method="post">
+                    <input type="hidden" name="id" th:value="${config.id}" />
+                    <label>Logo URL
+                        <input type="url" name="logo" th:value="${config.logo}" placeholder="/img/logo.png" /></label>
+                    <label>公司名称
+                        <input type="text" name="companyName" th:value="${config.companyName}" /></label>
+                    <label>公司简称
+                        <input type="text" name="companyNameShort" th:value="${config.companyNameShort}" /></label>
+                    <label>地址
+                        <input type="text" name="address" th:value="${config.address}" /></label>
+                    <label>电话
+                        <input type="text" name="phone" th:value="${config.phone}" /></label>
+                    <label>手机
+                        <input type="text" name="mobile" th:value="${config.mobile}" /></label>
+                    <label>Email
+                        <input type="text" name="email" th:value="${config.email}" /></label>
+                    <label>WhatsApp
+                        <input type="text" name="whatsapp" th:value="${config.whatsapp}" /></label>
+                    <label>Facebook 链接
+                        <input type="url" name="facebook" th:value="${config.facebook}" /></label>
+                    <label>LinkedIn 链接
+                        <input type="url" name="linkedin" th:value="${config.linkedin}" /></label>
+                    <label>YouTube 链接
+                        <input type="url" name="youtube" th:value="${config.youtube}" /></label>
+                    <label>版权信息
+                        <input type="text" name="copyright" th:value="${config.copyright}" /></label>
+                    <label>ICP 备案号
+                        <input type="text" name="icp" th:value="${config.icp}" /></label>
+                    <div class="actions">
+                        <button type="submit" class="btn btn-primary">保存</button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+</div>
+</body>
+</html>

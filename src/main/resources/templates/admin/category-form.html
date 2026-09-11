@@ -2,47 +2,65 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{admin/fragments/head :: head(title='分类编辑')}"></head>
 <body>
-<div class="card">
-    <h1><span th:text="${category.id == null ? '新建分类' : '编辑分类'}">分类</span></h1>
-    <nav><a th:href="@{/admin/categories}">← 返回列表</a></nav>
-    <p class="error" th:if="${error}" th:text="${error}">错误</p>
-    <form th:action="@{/admin/categories/save}" method="post">
-        <input type="hidden" name="id" th:value="${category.id}" />
-        <label>Type
-            <select name="type">
-                <option value="PRODUCT" th:selected="${category.type == 'PRODUCT'}">产品分类(PRODUCT)</option>
-                <option value="NEWS" th:selected="${category.type == 'NEWS'}">新闻分类(NEWS)</option>
-            </select></label>
-        <label>Slug <span class="hint">同 type 内唯一</span>
-            <input type="text" name="slug" th:value="${category.slug}" required placeholder="electronics" /></label>
-        <label>Parent ID <span class="hint">可选,父分类 id;留空为顶级</span>
-            <input type="number" name="parentId" th:value="${category.parentId}" /></label>
-        <label>排序 <span class="hint">升序</span>
-            <input type="number" name="sort" th:value="${category.sort}" /></label>
-        <label>Status
-            <select name="status">
-                <option value="1" th:selected="${category.status == 1}">启用</option>
-                <option value="0" th:selected="${category.status != 1}">停用</option>
-            </select></label>
+<div class="shell">
+    <aside th:replace="~{admin/fragments/layout :: sidebar(active='categories')}"></aside>
+    <div class="main">
+        <header th:replace="~{admin/fragments/layout :: topbar()}"></header>
+        <main class="content">
+            <div class="card">
+                <h1><span th:text="${category.id == null ? '新建分类' : '编辑分类'}">分类</span></h1>
+                <nav class="subnav"><a class="btn" th:href="@{/admin/categories}">← 返回列表</a></nav>
+                <p class="error" th:if="${error}" th:text="${error}">错误</p>
 
-        <th:block th:each="lang : ${languages}">
-            <fieldset th:classappend="${lang == defaultLanguage ? 'default-lang' : ''}">
-                <legend><span th:text="${lang}">语言</span>
-                    <span class="lang-tag" th:if="${lang == defaultLanguage}">· 默认语言</span></legend>
-                <label>Name <span class="hint">必填,空则不保存该语言</span>
-                    <input type="text" th:name="'name_' + ${lang}"
-                           th:value="${i18nMap[lang] != null ? i18nMap[lang].name : ''}" /></label>
-                <label>Description
-                    <textarea th:name="'description_' + ${lang}" style="min-height:60px"
-                              th:text="${i18nMap[lang] != null ? i18nMap[lang].description : ''}"></textarea></label>
-            </fieldset>
-        </th:block>
+                <!-- 语种切换(独立 GET 表单,仅编辑已有分类时显示;切换后重新加载该语种内容) -->
+                <form th:if="${category.id != null}" th:action="@{/admin/categories/{id}/edit(id=${category.id})}" method="get">
+                    <label>语种
+                        <select name="lang" onchange="this.form.submit()">
+                            <option th:each="l : ${languages}" th:value="${l}"
+                                    th:selected="${l == currentLang}"
+                                    th:text="${l + (l == defaultLanguage ? ' · 默认' : '')}">lang</option>
+                        </select></label>
+                </form>
 
-        <div class="actions">
-            <button type="submit" class="btn">保存</button>
-            <a th:href="@{/admin/categories}" class="btn btn-secondary">取消</a>
-        </div>
-    </form>
+                <form th:action="@{/admin/categories/save}" method="post">
+                    <input type="hidden" name="id" th:value="${category.id}" />
+                    <input type="hidden" name="language" th:value="${currentLang}" />
+                    <label>Type
+                        <select name="type">
+                            <option value="PRODUCT" th:selected="${category.type == 'PRODUCT'}">产品分类(PRODUCT)</option>
+                            <option value="NEWS" th:selected="${category.type == 'NEWS'}">新闻分类(NEWS)</option>
+                        </select></label>
+                    <label>Slug <span class="hint">同 type 内唯一</span>
+                        <input type="text" name="slug" th:value="${category.slug}" required placeholder="electronics" /></label>
+                    <label>Parent ID <span class="hint">可选,父分类 id;留空为顶级</span>
+                        <input type="number" name="parentId" th:value="${category.parentId}" /></label>
+                    <label>排序 <span class="hint">升序</span>
+                        <input type="number" name="sort" th:value="${category.sort}" /></label>
+                    <label>Status
+                        <select name="status">
+                            <option value="1" th:selected="${category.status == 1}">启用</option>
+                            <option value="0" th:selected="${category.status != 1}">停用</option>
+                        </select></label>
+
+                    <fieldset th:classappend="${currentLang == defaultLanguage ? 'default-lang' : ''}">
+                        <legend><span th:text="${currentLang}">语言</span>
+                            <span class="lang-tag" th:if="${currentLang == defaultLanguage}">· 默认语言</span></legend>
+                        <label>Name <span class="hint">必填,空则不保存该语种</span>
+                            <input type="text" name="name"
+                                   th:value="${i18nMap[currentLang] != null ? i18nMap[currentLang].name : ''}" /></label>
+                        <label>Description
+                            <textarea name="description" style="min-height:60px"
+                                      th:text="${i18nMap[currentLang] != null ? i18nMap[currentLang].description : ''}"></textarea></label>
+                    </fieldset>
+
+                    <div class="actions">
+                        <button type="submit" class="btn btn-primary">保存</button>
+                        <a th:href="@{/admin/categories}" class="btn btn-secondary">取消</a>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
 </div>
 </body>
 </html>
