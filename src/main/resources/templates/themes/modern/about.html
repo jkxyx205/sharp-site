@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html th:lang="${currentLanguage}" th:dir="${currentLanguage == 'ar-SA' ? 'rtl' : 'ltr'}" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{themes/modern/fragments/head :: head(pageTitle=${pageTitle}, pageDescription=${pageDescription}, pageKeywords=${pageKeywords}, canonical=${canonical}, robots=${robots}, siteName=${siteName})}"></head>
 <body>
 <header th:replace="~{themes/modern/fragments/header :: header(siteName=${siteName}, active='about')}"></header>

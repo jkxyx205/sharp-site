@@ -15,7 +15,11 @@ import java.util.List;
  */
 public enum SupportedLanguage {
     ZH_CN("zh-CN", "中文"),
-    EN_US("en-US", "EN");
+    EN_US("en-US", "EN"),
+    AR_SA("ar-SA", "العربية"),
+    FR_FR("fr-FR", "Français"),
+    RU_RU("ru-RU", "Русский"),
+    ES_ES("es-ES", "Español");
 
     /** 平台支持语言代码列表(URL 段识别白名单)。 */
     public static final List<String> CODES =

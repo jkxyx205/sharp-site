@@ -1,5 +1,5 @@
 {
-  "locales": ["zh-CN", "en-US"],
+  "locales": ["zh-CN", "en-US", "ar-SA", "fr-FR", "ru-RU", "es-ES"],
   "defaultLocale": "en-US",
   "pages": [
     { "path": "/",         "template": "themes/modern/index",    "label": "首页" },

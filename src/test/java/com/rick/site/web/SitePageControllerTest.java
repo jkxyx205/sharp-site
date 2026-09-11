@@ -72,6 +72,36 @@ class SitePageControllerTest {
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("贸易公司")));
     }
 
+    /**
+     * 多语言扩展(阿/法/俄/西):新增语种经 theme.json.locales + messages.json 渲染,
+     * 无需改 Java(SupportedLanguage.CODES 白名单已含)。法语渲染 LTR,阿拉伯语 RTL。
+     */
+    @Test
+    void extendedLocalesRenderLocalized() throws Exception {
+        // 法语:LTR + 法文文案
+        mockMvc.perform(get("/fr-fr/about"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("À propos")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("société de commerce")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("dir=\"ltr\"")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("lang=\"fr-FR\"")));
+        // 西班牙语
+        mockMvc.perform(get("/es-es/about"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Nosotros")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("empresa comercial")));
+        // 俄语
+        mockMvc.perform(get("/ru-ru/about"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("торговая компания")));
+        // 阿拉伯语:RTL + 阿语文案
+        mockMvc.perform(get("/ar-sa/about"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("dir=\"rtl\"")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("lang=\"ar-SA\"")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("شركة تجارية")));
+    }
+
     @Test
     void missingPageReturns404() throws Exception {
         mockMvc.perform(get("/nope"))
