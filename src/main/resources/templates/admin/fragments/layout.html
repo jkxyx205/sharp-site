@@ -40,7 +40,10 @@
 <header class="topbar" th:fragment="topbar()">
     <div class="who">
         已登录:<strong th:text="${username}">admin</strong>
-        · 租户:<strong th:text="${tenantName}">—</strong>
+        · 租户:<span th:with="hasSite=${tenantSiteUrl != null and !#strings.isEmpty(tenantSiteUrl)}"><a
+            th:if="${hasSite}" th:href="${tenantSiteUrl}" target="_blank" rel="noopener"
+            style="text-decoration:none"><strong th:text="${tenantName}">—</strong></a><strong
+            th:unless="${hasSite}" th:text="${tenantName}">—</strong></span>
     </div>
     <div class="actions" style="margin-top: 0">
         <a class="btn" th:href="@{/preview/}" target="_blank">网站预览</a>

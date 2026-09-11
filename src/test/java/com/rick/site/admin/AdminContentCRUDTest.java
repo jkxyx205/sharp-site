@@ -211,6 +211,15 @@ class AdminContentCRUDTest {
     }
 
     @Test
+    void topbarTenantNameLinksToPrimaryDomain() throws Exception {
+        // 顶栏「租户:xxx」应渲染为指向主(自定义)域名的链接,点击跳转线上站点
+        mockMvc.perform(get("/admin/news").with(host("crud-a.example.com")).session(sessionA))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("href=\"https://crud-a.example.com\"")))
+                .andExpect(content().string(containsString("CRUD A")));
+    }
+
+    @Test
     void crossTenantWriteRejected() {
         // 租户 B 的产品
         Tenant tenantB = tenantService.save(Tenant.builder()
