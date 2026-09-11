@@ -196,6 +196,8 @@ public class StaticSiteGenerator {
                                  String baseUrl, Path outputDir, Path releaseDir) throws IOException {
         List<ResolvedProduct> resolved = productService.listForDisplay(locale, defaultLocale);
         List<ProductView> views = resolved.stream().map(ProductView::from).toList();
+        List<ProductService.CategoryView> categories =
+                productService.listCategoryViews(locale, defaultLocale);
         int pages = pageCount(views.size());
 
         // products/index.html → 重定向到 page/1/
@@ -210,6 +212,8 @@ public class StaticSiteGenerator {
             LocaleContext.set(new LocaleResolution(locale, pagePath));
             OfflineWebContext ctx = newContext(locale);
             ctx.setVariable("products", slice);
+            ctx.setVariable("allProducts", views);
+            ctx.setVariable("categories", categories);
             applyPagination(ctx, n, pages, localePrefix, "/products/page/");
             seoService.resolveView("/products", null, locale, defaultLocale,
                     new SeoFallback("Products", "", "", baseUrl + localePrefix + pagePath))
@@ -245,6 +249,8 @@ public class StaticSiteGenerator {
                              String baseUrl, Path outputDir, Path releaseDir) throws IOException {
         List<ResolvedArticle> resolved = articleService.listForDisplay(locale, defaultLocale);
         List<ArticleView> views = resolved.stream().map(ArticleView::from).toList();
+        List<ArticleService.CategoryView> categories =
+                articleService.listCategoryViews(locale, defaultLocale);
         int pages = pageCount(views.size());
 
         writeRedirect(outputDir, "news/index.html",
@@ -257,6 +263,8 @@ public class StaticSiteGenerator {
             LocaleContext.set(new LocaleResolution(locale, pagePath));
             OfflineWebContext ctx = newContext(locale);
             ctx.setVariable("news", slice);
+            ctx.setVariable("allNews", views);
+            ctx.setVariable("categories", categories);
             applyPagination(ctx, n, pages, localePrefix, "/news/page/");
             seoService.resolveView("/news", null, locale, defaultLocale,
                     new SeoFallback("News", "", "", baseUrl + localePrefix + pagePath))
@@ -441,8 +449,10 @@ public class StaticSiteGenerator {
     private void write(Path outputDir, String relativePath, String content) throws IOException {
         Path target = outputDir.resolve(relativePath);
         Files.createDirectories(target.getParent());
-        Files.writeString(target, content);
-        log.debug("static write: {}", target);
+        // 发布产物压缩体积:HTML 删除注释 + 折叠冗余空白(sitemap.xml/robots.txt 保持原样)。
+        String output = relativePath.endsWith(".html") ? HtmlMinifier.minify(content) : content;
+        Files.writeString(target, output);
+        log.debug("static write: {} ({} -> {} bytes)", target, content.length(), output.length());
     }
 
     /** meta-refresh 跳板页,把 {@code {list}/} 转向 {@code {list}/page/1/}(静态站无服务端 30x)。 */

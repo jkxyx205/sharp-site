@@ -30,10 +30,12 @@ class ModernThemeRenderTest {
     private TemplateEngine templateEngine;
 
     record SampleProduct(String slug, String name, String subtitle, String cover,
-                          String content, String specificationJson) {
+                          String content, String specificationJson,
+                          String categorySlug, String categoryName) {
     }
 
-    record SampleArticle(String slug, String title, String summary, String content, LocalDateTime publishTime) {
+    record SampleArticle(String slug, String title, String summary, String content, LocalDateTime publishTime,
+                         String categorySlug, String categoryName) {
     }
 
     private WebContext sampleContext() {
@@ -49,10 +51,10 @@ class ModernThemeRenderTest {
         ctx.setVariable("canonical", "https://acme.example.com/");
         ctx.setVariable("robots", "index, follow");
         ctx.setVariable("products", List.of(
-                new SampleProduct("widget-a", "Widget A", "Pro", "/img/a.jpg", null, null),
-                new SampleProduct("widget-b", "Widget B", null, null, null, null)));
+                new SampleProduct("widget-a", "Widget A", "Pro", "/img/a.jpg", null, null, "test", "Test Category"),
+                new SampleProduct("widget-b", "Widget B", null, null, null, null, "other", "Other")));
         ctx.setVariable("news", List.of(
-                new SampleArticle("n1", "We exhibited at Canton Fair", null, null, null)));
+                new SampleArticle("n1", "We exhibited at Canton Fair", null, null, null, "c-news", "Company News")));
         ctx.setVariable("config", sampleConfig());
         return ctx;
     }
@@ -94,9 +96,9 @@ class ModernThemeRenderTest {
                 "news", "news-detail", "contact")) {
             WebContext ctx = sampleContext();
             if ("product-detail".equals(page)) {
-                ctx.setVariable("product", new SampleProduct("widget-a", "Widget A", "Pro", "/img/a.jpg", "<p>Detail</p>", null));
+                ctx.setVariable("product", new SampleProduct("widget-a", "Widget A", "Pro", "/img/a.jpg", "<p>Detail</p>", null, "test", "Test Category"));
             } else if ("news-detail".equals(page)) {
-                ctx.setVariable("article", new SampleArticle("n1", "Canton Fair", "We exhibited", "<p>News body</p>", null));
+                ctx.setVariable("article", new SampleArticle("n1", "Canton Fair", "We exhibited", "<p>News body</p>", null, "c-news", "Company News"));
             }
             String html = templateEngine.process("themes/modern/" + page, ctx);
             assertThat(html).as(page).contains("Acme Corp").contains("<style");

@@ -95,6 +95,8 @@ public class PreviewController {
         LocaleContext.set(new LocaleResolution(language, "/products/page/" + Math.max(1, page) + "/"));
         List<ProductView> products = productService.listForDisplay(language, dl)
                 .stream().map(ProductView::from).toList();
+        model.addAttribute("allProducts", products);
+        model.addAttribute("categories", productService.listCategoryViews(language, dl));
         applyPreviewPagination(model, products, page, "/preview/products");
         seoService.resolveView("/products", null, language, dl,
                 new SeoFallback("Products", "", "", request.getRequestURL().toString())).applyTo(model);
@@ -135,6 +137,8 @@ public class PreviewController {
         LocaleContext.set(new LocaleResolution(language, "/news/page/" + Math.max(1, page) + "/"));
         List<ArticleView> news = articleService.listForDisplay(language, dl)
                 .stream().map(ArticleView::from).toList();
+        model.addAttribute("allNews", news);
+        model.addAttribute("categories", articleService.listCategoryViews(language, dl));
         applyPreviewPagination(model, news, page, "/preview/news");
         seoService.resolveView("/news", null, language, dl,
                 new SeoFallback("News", "", "", request.getRequestURL().toString())).applyTo(model);

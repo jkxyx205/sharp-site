@@ -20,6 +20,20 @@
     </nav>
 </section>
 
+<th:block th:if="${categories != null and allNews != null}">
+    <th:block th:each="cat : ${categories}" th:with="items=${allNews.?[categorySlug == cat.slug]}">
+        <section class="container section" th:if="${!items.isEmpty()}">
+            <h2 th:text="${cat.name}">Category</h2>
+            <ul class="news-list">
+                <li th:each="a : ${items}">
+                    <a th:href="@{${localePrefix + '/news/' + a.slug}}" th:text="${a.title}">News title</a>
+                    <span th:if="${a.publishTime != null}" th:text="${#temporals.format(a.publishTime, 'yyyy-MM-dd')}"></span>
+                </li>
+            </ul>
+        </section>
+    </th:block>
+</th:block>
+
 <footer th:replace="~{themes/modern/fragments/footer :: footer(siteName=${siteName}, config=${config})}"></footer>
 </body>
 </html>

@@ -2,6 +2,7 @@ package com.rick.site.news.service;
 
 import com.rick.common.http.exception.BizException;
 import com.rick.db.plugin.BaseServiceImpl;
+import com.rick.site.catalog.service.CategoryService;
 import com.rick.site.i18n.service.I18nService;
 import com.rick.site.news.dao.ArticleDAO;
 import com.rick.site.news.dao.ArticleI18nDAO;
@@ -31,13 +32,16 @@ public class ArticleService extends BaseServiceImpl<ArticleDAO, Article, Long> {
     private final ArticleI18nDAO i18nDAO;
     private final HtmlSanitizer sanitizer;
     private final I18nService i18nService;
+    private final CategoryService categoryService;
 
     public ArticleService(ArticleDAO baseDAO, ArticleI18nDAO i18nDAO,
-                          HtmlSanitizer sanitizer, I18nService i18nService) {
+                          HtmlSanitizer sanitizer, I18nService i18nService,
+                          CategoryService categoryService) {
         super(baseDAO);
         this.i18nDAO = i18nDAO;
         this.sanitizer = sanitizer;
         this.i18nService = i18nService;
+        this.categoryService = categoryService;
     }
 
     public List<Article> listByTenant() {
@@ -85,7 +89,11 @@ public class ArticleService extends BaseServiceImpl<ArticleDAO, Article, Long> {
     public ResolvedArticle resolveForDisplay(String slug, String language, String defaultLanguage) {
         Article article = findBySlug(slug)
                 .orElseThrow(() -> new BizException("新闻不存在: " + slug));
-        return resolve(article, language, defaultLanguage);
+        Map<String, ArticleI18n> byLanguage = loadI18nMap(article.getId());
+        Optional<ArticleI18n> resolved = i18nService.resolve(byLanguage, language, defaultLanguage);
+        String effectiveLanguage = resolved.map(ArticleI18n::getLanguage).orElse(defaultLanguage);
+        CategoryInfo ci = categoryInfo(resolvedCategoryById(language, defaultLanguage), article.getCategoryId());
+        return new ResolvedArticle(article, resolved.orElse(null), effectiveLanguage, ci.slug(), ci.name());
     }
 
     /**
@@ -96,9 +104,10 @@ public class ArticleService extends BaseServiceImpl<ArticleDAO, Article, Long> {
      * 详情页仍走 {@link #resolveForDisplay},保留缺失回退默认语种的行为。
      */
     public List<ResolvedArticle> listForDisplay(String language, String defaultLanguage) {
+        Map<Long, CategoryService.ResolvedCategory> catById = resolvedCategoryById(language, defaultLanguage);
         List<ResolvedArticle> out = new ArrayList<>();
         for (Article article : listPublished()) {
-            ResolvedArticle resolved = resolve(article, language, defaultLanguage);
+            ResolvedArticle resolved = resolve(article, language, defaultLanguage, catById);
             if (resolved.i18n() != null && language.equals(resolved.i18n().getLanguage())) {
                 out.add(resolved);
             }
@@ -106,11 +115,54 @@ public class ArticleService extends BaseServiceImpl<ArticleDAO, Article, Long> {
         return out;
     }
 
-    private ResolvedArticle resolve(Article article, String language, String defaultLanguage) {
+    /** 取所有启用 NEWS 分类的 id→已解析(含 i18n 名称)映射,供文章解析 categorySlug/categoryName。 */
+    private Map<Long, CategoryService.ResolvedCategory> resolvedCategoryById(String language, String defaultLanguage) {
+        Map<Long, CategoryService.ResolvedCategory> map = new HashMap<>();
+        for (CategoryService.ResolvedCategory rc
+                : categoryService.resolveForDisplay("NEWS", language, defaultLanguage).values()) {
+            map.put(rc.category().getId(), rc);
+        }
+        return map;
+    }
+
+    /**
+     * 取启用 NEWS 分类的展示视图(slug + 已解析 i18n 名称),按 sort 排序。
+     * 供新闻页遍历所有分类、按分类分组展示文章(模板用 {@code cat.slug} 过滤全量文章)。
+     */
+    public List<CategoryView> listCategoryViews(String language, String defaultLanguage) {
+        List<CategoryView> out = new ArrayList<>();
+        for (CategoryService.ResolvedCategory rc
+                : categoryService.resolveForDisplay("NEWS", language, defaultLanguage).values()) {
+            out.add(new CategoryView(rc.category().getSlug(),
+                    rc.i18n() != null ? rc.i18n().getName() : null));
+        }
+        return out;
+    }
+
+    /** 从已解析分类映射取 (slug, name);categoryId 为空或分类未启用 → (null, null)。 */
+    private static CategoryInfo categoryInfo(Map<Long, CategoryService.ResolvedCategory> map, Long categoryId) {
+        if (categoryId == null) {
+            return new CategoryInfo(null, null);
+        }
+        CategoryService.ResolvedCategory rc = map.get(categoryId);
+        if (rc == null) {
+            return new CategoryInfo(null, null);
+        }
+        return new CategoryInfo(rc.category().getSlug(),
+                rc.i18n() != null ? rc.i18n().getName() : null);
+    }
+
+    /** 分类展示信息(slug + 已解析 i18n 名称)。 */
+    private record CategoryInfo(String slug, String name) {
+    }
+
+    private ResolvedArticle resolve(Article article, String language, String defaultLanguage,
+                                    Map<Long, CategoryService.ResolvedCategory> catById) {
         Map<String, ArticleI18n> byLanguage = loadI18nMap(article.getId());
         Optional<ArticleI18n> resolved = i18nService.resolve(byLanguage, language, defaultLanguage);
         String effectiveLanguage = resolved.map(ArticleI18n::getLanguage).orElse(defaultLanguage);
-        return new ResolvedArticle(article, resolved.orElse(null), effectiveLanguage);
+        CategoryInfo ci = categoryInfo(catById, article.getCategoryId());
+        return new ResolvedArticle(article, resolved.orElse(null), effectiveLanguage, ci.slug(), ci.name());
     }
 
     public Map<String, ArticleI18n> loadI18nMap(Long articleId) {
@@ -133,7 +185,12 @@ public class ArticleService extends BaseServiceImpl<ArticleDAO, Article, Long> {
                 .orElseThrow(() -> new BizException("新闻不存在: id=" + articleId));
     }
 
-    /** 展示结果:文章 + 命中语言 + i18n(可能为 null)。 */
-    public record ResolvedArticle(Article article, ArticleI18n i18n, String language) {
+    /** 展示结果:文章 + 命中语言 + i18n(可能为 null) + 分类 slug/name(所属 NEWS 分类,可能为 null)。 */
+    public record ResolvedArticle(Article article, ArticleI18n i18n, String language,
+                                  String categorySlug, String categoryName) {
+    }
+
+    /** 分类展示视图(slug + 已解析 i18n 名称),用于新闻页按分类遍历分组。 */
+    public record CategoryView(String slug, String name) {
     }
 }

@@ -10,12 +10,14 @@ import java.time.LocalDateTime;
  * 新闻前台视图(合并 Article + 命中 i18n),供 Thymeleaf 单对象属性访问。
  *
  * <p>列表页用 {@code a.slug/title/publishTime};详情页用 {@code article.title/summary/content}。
+ * {@code categorySlug} 来自文章所属分类(type=NEWS),用于模板按分类过滤(分类分组板块)。
  *
  * @author Rick.Xu
  */
 public record ArticleView(String slug, String cover, String author, LocalDateTime publishTime,
                           String title, String summary, String content,
-                          String seoTitle, String seoDescription) {
+                          String seoTitle, String seoDescription,
+                          String categorySlug, String categoryName) {
 
     /** 从解析结果构建;i18n 缺失时 title 回退为 slug,其余为 null。 */
     public static ArticleView from(ResolvedArticle resolved) {
@@ -30,6 +32,8 @@ public record ArticleView(String slug, String cover, String author, LocalDateTim
                 i18n != null ? i18n.getSummary() : null,
                 i18n != null ? i18n.getContent() : null,
                 i18n != null ? i18n.getSeoTitle() : null,
-                i18n != null ? i18n.getSeoDescription() : null);
+                i18n != null ? i18n.getSeoDescription() : null,
+                resolved.categorySlug(),
+                resolved.categoryName());
     }
 }

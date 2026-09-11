@@ -2,6 +2,7 @@ package com.rick.site.product.service;
 
 import com.rick.common.http.exception.BizException;
 import com.rick.db.plugin.BaseServiceImpl;
+import com.rick.site.catalog.service.CategoryService;
 import com.rick.site.i18n.service.I18nService;
 import com.rick.site.page.service.HtmlSanitizer;
 import com.rick.site.product.dao.ProductDAO;
@@ -30,13 +31,16 @@ public class ProductService extends BaseServiceImpl<ProductDAO, Product, Long> {
     private final ProductI18nDAO i18nDAO;
     private final HtmlSanitizer sanitizer;
     private final I18nService i18nService;
+    private final CategoryService categoryService;
 
     public ProductService(ProductDAO baseDAO, ProductI18nDAO i18nDAO,
-                          HtmlSanitizer sanitizer, I18nService i18nService) {
+                          HtmlSanitizer sanitizer, I18nService i18nService,
+                          CategoryService categoryService) {
         super(baseDAO);
         this.i18nDAO = i18nDAO;
         this.sanitizer = sanitizer;
         this.i18nService = i18nService;
+        this.categoryService = categoryService;
     }
 
     public List<Product> listByTenant() {
@@ -91,7 +95,8 @@ public class ProductService extends BaseServiceImpl<ProductDAO, Product, Long> {
         Map<String, ProductI18n> byLanguage = loadI18nMap(product.getId());
         Optional<ProductI18n> resolved = i18nService.resolve(byLanguage, language, defaultLanguage);
         String effectiveLanguage = resolved.map(ProductI18n::getLanguage).orElse(defaultLanguage);
-        return new ResolvedProduct(product, resolved.orElse(null), effectiveLanguage);
+        CategoryInfo ci = categoryInfo(resolvedCategoryById(language, defaultLanguage), product.getCategoryId());
+        return new ResolvedProduct(product, resolved.orElse(null), effectiveLanguage, ci.slug(), ci.name());
     }
 
     /**
@@ -99,18 +104,63 @@ public class ProductService extends BaseServiceImpl<ProductDAO, Product, Long> {
      *
      * <p>多语言语义:某产品在当前语种无 i18n 行 → 不展示(既不回退默认语种、也不回退 slug),
      * 避免在 zh-CN 列表里露出仅有 en-US 文案的产品。详情页仍走 {@link #resolveForDisplay},
-     * 保留缺失回退默认语种的行为。
+     * 保留缺失回退默认语种的行为。categorySlug/categoryName 来自产品所属 PRODUCT 分类,
+     * 便于模板按分类过滤并以分类名作为板块标题。
      */
     public List<ResolvedProduct> listForDisplay(String language, String defaultLanguage) {
+        Map<Long, CategoryService.ResolvedCategory> catById = resolvedCategoryById(language, defaultLanguage);
         List<ResolvedProduct> out = new ArrayList<>();
         for (Product product : listEnabled()) {
             Map<String, ProductI18n> byLanguage = loadI18nMap(product.getId());
             Optional<ProductI18n> resolved = i18nService.resolve(byLanguage, language, defaultLanguage);
             if (resolved.isPresent() && language.equals(resolved.get().getLanguage())) {
-                out.add(new ResolvedProduct(product, resolved.get(), resolved.get().getLanguage()));
+                CategoryInfo ci = categoryInfo(catById, product.getCategoryId());
+                out.add(new ResolvedProduct(product, resolved.get(), resolved.get().getLanguage(),
+                        ci.slug(), ci.name()));
             }
         }
         return out;
+    }
+
+    /** 取所有启用 PRODUCT 分类的 id→已解析(含 i18n 名称)映射,供产品解析 categorySlug/categoryName。 */
+    private Map<Long, CategoryService.ResolvedCategory> resolvedCategoryById(String language, String defaultLanguage) {
+        Map<Long, CategoryService.ResolvedCategory> map = new HashMap<>();
+        for (CategoryService.ResolvedCategory rc
+                : categoryService.resolveForDisplay("PRODUCT", language, defaultLanguage).values()) {
+            map.put(rc.category().getId(), rc);
+        }
+        return map;
+    }
+
+    /**
+     * 取启用 PRODUCT 分类的展示视图(slug + 已解析 i18n 名称),按 sort 排序。
+     * 供产品页遍历所有分类、按分类分组展示产品(模板用 {@code cat.slug} 过滤全量产品)。
+     */
+    public List<CategoryView> listCategoryViews(String language, String defaultLanguage) {
+        List<CategoryView> out = new ArrayList<>();
+        for (CategoryService.ResolvedCategory rc
+                : categoryService.resolveForDisplay("PRODUCT", language, defaultLanguage).values()) {
+            out.add(new CategoryView(rc.category().getSlug(),
+                    rc.i18n() != null ? rc.i18n().getName() : null));
+        }
+        return out;
+    }
+
+    /** 从已解析分类映射取 (slug, name);categoryId 为空或分类未启用 → (null, null)。 */
+    private static CategoryInfo categoryInfo(Map<Long, CategoryService.ResolvedCategory> map, Long categoryId) {
+        if (categoryId == null) {
+            return new CategoryInfo(null, null);
+        }
+        CategoryService.ResolvedCategory rc = map.get(categoryId);
+        if (rc == null) {
+            return new CategoryInfo(null, null);
+        }
+        return new CategoryInfo(rc.category().getSlug(),
+                rc.i18n() != null ? rc.i18n().getName() : null);
+    }
+
+    /** 分类展示信息(slug + 已解析 i18n 名称)。 */
+    private record CategoryInfo(String slug, String name) {
     }
 
     public Map<String, ProductI18n> loadI18nMap(Long productId) {
@@ -133,7 +183,12 @@ public class ProductService extends BaseServiceImpl<ProductDAO, Product, Long> {
                 .orElseThrow(() -> new BizException("产品不存在: id=" + productId));
     }
 
-    /** 展示结果:产品 + 命中语言 + i18n(可能为 null)。 */
-    public record ResolvedProduct(Product product, ProductI18n i18n, String language) {
+    /** 展示结果:产品 + 命中语言 + i18n(可能为 null) + 分类 slug/name(所属 PRODUCT 分类,可能为 null)。 */
+    public record ResolvedProduct(Product product, ProductI18n i18n, String language,
+                                  String categorySlug, String categoryName) {
+    }
+
+    /** 分类展示视图(slug + 已解析 i18n 名称),用于产品页按分类遍历分组。 */
+    public record CategoryView(String slug, String name) {
     }
 }
