@@ -7,11 +7,17 @@
 
   "home.about.title":    { "zh-CN": "关于我们",           "en-US": "About Us" },
   "home.about.readmore": { "zh-CN": "了解更多 →",         "en-US": "Read more →" },
+  "home.about.teaser":  { "zh-CN": "我们向全球合作伙伴供应优质商品。", "en-US": "We supply quality goods to partners worldwide." },
   "home.featured.title": { "zh-CN": "精选产品",           "en-US": "Featured Products" },
   "home.news.title":     { "zh-CN": "最新动态",           "en-US": "Latest News" },
   "home.products.btn":   { "zh-CN": "查看产品",           "en-US": "View Products" },
+  "home.hero.title":     { "zh-CN": "欢迎来到我们的网站",   "en-US": "Welcome to Our Site" },
+  "home.hero.subtitle":  { "zh-CN": "优质产品 · 全球贸易",  "en-US": "Premium products for global trade" },
   "home.cta.title":      { "zh-CN": "准备好与我们合作了吗？", "en-US": "Ready to work with us?" },
   "home.cta.btn":        { "zh-CN": "联系我们",          "en-US": "Contact Us" },
+
+  "about.title":         { "zh-CN": "关于我们",           "en-US": "About Us" },
+  "about.body":          { "zh-CN": "<p>我们是一家连接制造商与全球采购商的贸易公司,致力于提供优质商品与可靠服务。</p>", "en-US": "<p>We are a trading company connecting manufacturers and buyers globally, committed to quality goods and reliable service.</p>" },
 
   "product.title":  { "zh-CN": "产品",      "en-US": "Products" },
   "product.empty":   { "zh-CN": "暂无产品",   "en-US": "No products yet." },

@@ -40,7 +40,7 @@ class LocaleResolverTest {
 
     /** 构造解析器,其主题清单由 stub 提供(defaultLocale/locales 可定制)。 */
     private static DefaultLocaleResolver resolver(String defaultLocale, String... locales) {
-        ThemeManifest manifest = new ThemeManifest(defaultLocale, List.of(locales));
+        ThemeManifest manifest = new ThemeManifest(defaultLocale, List.of(locales), List.of());
         ThemeManifestResolver mm = new ThemeManifestResolver(null, new ObjectMapper(), null) {
             @Override
             public ThemeManifest resolve(Tenant tenant) {

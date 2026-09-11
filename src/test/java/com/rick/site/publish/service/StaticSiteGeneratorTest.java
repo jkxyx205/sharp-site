@@ -1,14 +1,8 @@
 package com.rick.site.publish.service;
 
-import com.rick.site.home.entity.HomeSection;
-import com.rick.site.home.entity.HomeSectionI18n;
-import com.rick.site.home.service.HomeSectionService;
 import com.rick.site.news.entity.Article;
 import com.rick.site.news.entity.ArticleI18n;
 import com.rick.site.news.service.ArticleService;
-import com.rick.site.page.entity.SitePage;
-import com.rick.site.page.entity.SitePageI18n;
-import com.rick.site.page.service.SitePageService;
 import com.rick.site.product.entity.Product;
 import com.rick.site.product.entity.ProductI18n;
 import com.rick.site.product.service.ProductService;
@@ -35,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * TASK-1201..1206 验收测试:StaticSiteGenerator 生成首页/页面/产品/新闻/sitemap/robots,
  * 输出到 {wwwRoot}/{tenantId}/releases/{version}/。发布站点默认 index,follow(非 noindex)。
+ * 首页/静态页文案由模板 + messages.json 提供(无 home_section / site_page 表)。
  */
 @SpringBootTest
 @Transactional
@@ -55,10 +50,6 @@ class StaticSiteGeneratorTest {
     @Autowired
     private TenantDomainService domainService;
     @Autowired
-    private HomeSectionService homeSectionService;
-    @Autowired
-    private SitePageService pageService;
-    @Autowired
     private ProductService productService;
     @Autowired
     private ArticleService articleService;
@@ -72,20 +63,6 @@ class StaticSiteGeneratorTest {
                 .code("stg").name("Static Co").themeId("modern").build());
         TenantContext.set(tenant);
         domainService.add("www.example.com", true);
-
-        HomeSection hero = homeSectionService.saveSection(HomeSection.builder()
-                .sectionKey("hero").sort(0).enabled((short) 1).build());
-        homeSectionService.saveI18n(hero.getId(), HomeSectionI18n.builder()
-                .language("en-US").title("Welcome Home").subtitle("We build great things").build());
-        HomeSection company = homeSectionService.saveSection(HomeSection.builder()
-                .sectionKey("company").sort(1).enabled((short) 1).build());
-        homeSectionService.saveI18n(company.getId(), HomeSectionI18n.builder()
-                .language("en-US").title("About Us").content("<p>Founded in 2010</p>").build());
-
-        SitePage about = pageService.savePage(SitePage.builder()
-                .pageKey("about").path("/about").template("themes/modern/about").status((short) 1).build());
-        pageService.saveI18n(about.getId(), SitePageI18n.builder()
-                .language("en-US").title("About Us").content("<p>We are great</p>").build());
 
         Product p = productService.saveProduct(Product.builder()
                 .slug("widget-a").status((short) 1).sort(0).build());
@@ -112,13 +89,12 @@ class StaticSiteGeneratorTest {
     @Test
     void generatesHomeIndexHtml() throws Exception {
         String html = read("index.html");
-        assertTrue(html.contains("Welcome Home"), "home hero title");
-        assertTrue(html.contains("Founded in 2010"), "company teaser");
+        assertTrue(html.contains("Welcome to Our Site"), "home hero title (message)");
+        assertTrue(html.contains("We supply quality goods"), "home about teaser (message)");
         assertTrue(html.contains("/products"), "root-relative product link");
         // 发布站点默认 index,follow(非预览 noindex)
         assertTrue(html.contains("index, follow"));
         // 主题样式内联进模板,发布产物自带 <style>;不再外部引用 static/themes/modern/css
-        // (静态站点由 Nginx 提供文件,不经 Spring app,外部 CSS 路径会 404 → 样式丢失)
         assertTrue(html.contains("<style"), "inline theme style");
         assertTrue(!html.contains("/themes/modern/css/style.css"), "no external css link");
         // ThemeMessageSource 按 themeId+locale 解析 #{key}(en-US 默认语种),
@@ -133,7 +109,7 @@ class StaticSiteGeneratorTest {
     void generatesPages() throws Exception {
         String about = read("about/index.html");
         assertTrue(about.contains("About Us"));
-        assertTrue(about.contains("We are great"));
+        assertTrue(about.contains("trading company"));
     }
 
     @Test

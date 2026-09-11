@@ -1,14 +1,8 @@
 package com.rick.site.publish.service;
 
-import com.rick.site.home.entity.HomeSection;
-import com.rick.site.home.entity.HomeSectionI18n;
-import com.rick.site.home.service.HomeSectionService;
 import com.rick.site.news.entity.Article;
 import com.rick.site.news.entity.ArticleI18n;
 import com.rick.site.news.service.ArticleService;
-import com.rick.site.page.entity.SitePage;
-import com.rick.site.page.entity.SitePageI18n;
-import com.rick.site.page.service.SitePageService;
 import com.rick.site.product.entity.Product;
 import com.rick.site.product.entity.ProductI18n;
 import com.rick.site.product.service.ProductService;
@@ -55,10 +49,6 @@ class PublishServiceTest {
     @Autowired
     private TenantService tenantService;
     @Autowired
-    private HomeSectionService homeSectionService;
-    @Autowired
-    private SitePageService pageService;
-    @Autowired
     private ProductService productService;
     @Autowired
     private ArticleService articleService;
@@ -79,16 +69,6 @@ class PublishServiceTest {
     }
 
     private void seedContent() {
-        HomeSection hero = homeSectionService.saveSection(HomeSection.builder()
-                .sectionKey("hero").sort(0).enabled((short) 1).build());
-        homeSectionService.saveI18n(hero.getId(), HomeSectionI18n.builder()
-                .language("en-US").title("Welcome").subtitle("We build").build());
-
-        SitePage about = pageService.savePage(SitePage.builder()
-                .pageKey("about").path("/about").template("themes/modern/about").status((short) 1).build());
-        pageService.saveI18n(about.getId(), SitePageI18n.builder()
-                .language("en-US").title("About").content("<p>about</p>").build());
-
         Product p = productService.saveProduct(Product.builder()
                 .slug("widget-a").status((short) 1).sort(0).build());
         productService.saveI18n(p.getId(), ProductI18n.builder()
@@ -127,10 +107,13 @@ class PublishServiceTest {
         Path targetBefore = Files.readSymbolicLink(current);
         assertTrue(targetBefore.toString().contains("v001"));
 
-        // 制造失败:将页面模板改为不存在的模板,生成阶段抛 TemplateProcessingException
-        SitePage about = pageService.listByTenant().get(0);
-        about.setTemplate("themes/modern/__nonexistent__");
-        pageService.savePage(about);
+        // 制造失败:在 v002 release 路径占位一个普通文件,使 generate() 的
+        // Files.createDirectories(releases/v002) 抛异常(目标存在且非目录)。
+        // 不再依赖 site_page 改模板来注入失败。
+        Path blocker = tempDir.resolve(tenant.getId().toString())
+                .resolve("releases").resolve("v002");
+        Files.createDirectories(blocker.getParent());
+        Files.createFile(blocker);
 
         // v002 发布应失败,抛 BizException
         assertThrows(Exception.class, () -> publishService.publish());

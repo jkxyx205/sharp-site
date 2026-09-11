@@ -1,15 +1,11 @@
 package com.rick.site.preview.web;
 
 import com.rick.common.http.exception.BizException;
-import com.rick.site.home.service.HomeSectionService;
-import com.rick.site.home.service.HomeSectionService.ResolvedSection;
 import com.rick.site.i18n.context.LocaleContext;
 import com.rick.site.i18n.model.LocaleResolution;
 import com.rick.site.news.dto.ArticleView;
 import com.rick.site.news.service.ArticleService;
 import com.rick.site.news.service.ArticleService.ResolvedArticle;
-import com.rick.site.page.service.SitePageService;
-import com.rick.site.page.service.SitePageService.ResolvedPage;
 import com.rick.site.product.dto.ProductView;
 import com.rick.site.product.service.ProductService;
 import com.rick.site.product.service.ProductService.ResolvedProduct;
@@ -17,6 +13,7 @@ import com.rick.site.seo.dto.SeoFallback;
 import com.rick.site.seo.service.SeoConfigService;
 import com.rick.site.tenant.context.TenantContext;
 import com.rick.site.tenant.entity.Tenant;
+import com.rick.site.theme.model.ThemeManifest.ThemePage;
 import com.rick.site.theme.service.ThemeManifestResolver;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -28,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 后台预览(TASK-1101):动态渲染前台 Theme 模板,读取最新(draft)数据,
@@ -39,6 +35,9 @@ import java.util.Map;
  * 多语言经 {@code ?lang=zh-CN} 查询参数(默认主题默认语种,来自 theme.json),缺失回退默认语种。
  * 预览页 robots 强制 noindex,避免被索引。
  *
+ * <p>首页 hero/cta 文案由模板 + {@code messages.json} 文案键提供(无 home_section 表);
+ * 静态页(about/contact)由主题清单 {@code pages} 查找渲染(无 site_page 表)。
+ *
  * @author Rick.Xu
  */
 @Controller
@@ -46,8 +45,11 @@ public class PreviewController {
 
     private static final String NOINDEX_ROBOTS = "noindex, nofollow";
 
-    private final HomeSectionService homeSectionService;
-    private final SitePageService pageService;
+    /** 首页「Latest News」展示条数。 */
+    private static final int HOME_NEWS_LIMIT = 5;
+    /** 首页「Featured Products」展示条数。 */
+    private static final int HOME_PRODUCT_LIMIT = 8;
+
     private final ProductService productService;
     private final ArticleService articleService;
     private final SeoConfigService seoService;
@@ -57,11 +59,8 @@ public class PreviewController {
     @org.springframework.beans.factory.annotation.Value("${sharp.site.page-size:12}")
     private int pageSize;
 
-    public PreviewController(HomeSectionService homeSectionService, SitePageService pageService,
-                            ProductService productService, ArticleService articleService,
+    public PreviewController(ProductService productService, ArticleService articleService,
                             SeoConfigService seoService, ThemeManifestResolver manifestResolver) {
-        this.homeSectionService = homeSectionService;
-        this.pageService = pageService;
         this.productService = productService;
         this.articleService = articleService;
         this.seoService = seoService;
@@ -75,22 +74,14 @@ public class PreviewController {
         String language = language(tenant, lang);
         String dl = defaultLocale(tenant);
         LocaleContext.set(new LocaleResolution(language, "/"));
-        Map<String, ResolvedSection> sections = homeSectionService.resolveForDisplay(language, dl);
-        ResolvedSection hero = sections.get("hero");
-        ResolvedSection company = sections.get("company");
-        ResolvedSection cta = sections.get("cta");
 
-        model.addAttribute("tagline", text(hero, PreviewController::i18nTitle));
-        model.addAttribute("intro", text(hero, PreviewController::i18nSubtitle));
-        model.addAttribute("aboutTeaser", text(company, PreviewController::i18nContent));
-        model.addAttribute("ctaTitle", text(cta, PreviewController::i18nTitle));
-        model.addAttribute("products", List.of());
-        model.addAttribute("news", List.of());
+        model.addAttribute("products", productService.listForDisplay(language, dl).stream()
+                .limit(HOME_PRODUCT_LIMIT).map(ProductView::from).toList());
+        model.addAttribute("news", articleService.listForDisplay(language, dl).stream()
+                .limit(HOME_NEWS_LIMIT).map(ArticleView::from).toList());
 
-        seoService.resolveView(SeoConfigService.HOME, null, language, dl,
-                new SeoFallback(text(hero, PreviewController::i18nTitle),
-                        text(company, PreviewController::i18nSubtitle),
-                        "", request.getRequestURL().toString())).applyTo(model);
+        seoService.resolveView("/", null, language, dl,
+                new SeoFallback("", "", "", request.getRequestURL().toString())).applyTo(model);
         return finish("themes/modern/index", language, model);
     }
 
@@ -105,7 +96,7 @@ public class PreviewController {
         List<ProductView> products = productService.listForDisplay(language, dl)
                 .stream().map(ProductView::from).toList();
         applyPreviewPagination(model, products, page, "/preview/products");
-        seoService.resolveView(SeoConfigService.PRODUCTS_LIST, null, language, dl,
+        seoService.resolveView("/products", null, language, dl,
                 new SeoFallback("Products", "", "", request.getRequestURL().toString())).applyTo(model);
         return finish("themes/modern/products", language, model);
     }
@@ -145,7 +136,7 @@ public class PreviewController {
         List<ArticleView> news = articleService.listForDisplay(language, dl)
                 .stream().map(ArticleView::from).toList();
         applyPreviewPagination(model, news, page, "/preview/news");
-        seoService.resolveView(SeoConfigService.NEWS_LIST, null, language, dl,
+        seoService.resolveView("/news", null, language, dl,
                 new SeoFallback("News", "", "", request.getRequestURL().toString())).applyTo(model);
         return finish("themes/modern/news", language, model);
     }
@@ -183,20 +174,16 @@ public class PreviewController {
         String dl = defaultLocale(tenant);
         String pagePath = "/" + path;
         LocaleContext.set(new LocaleResolution(language, pagePath));
-        ResolvedPage resolved;
-        try {
-            resolved = pageService.resolveForDisplay(pagePath, language, dl);
-        } catch (BizException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
-        }
-        model.addAttribute("page", resolved.page());
-        model.addAttribute("content", resolved.i18n() != null ? resolved.i18n().getContent() : "");
-        String fbTitle = resolved.i18n() != null && resolved.i18n().getTitle() != null
-                ? resolved.i18n().getTitle() : resolved.page().getPageKey();
-        String fbImage = resolved.i18n() != null ? resolved.i18n().getCover() : "";
-        seoService.resolveView(SeoConfigService.PAGE, resolved.page().getId(), language, dl,
-                new SeoFallback(fbTitle, "", fbImage, request.getRequestURL().toString())).applyTo(model);
-        return finish(resolved.page().getTemplate(), language, model);
+        // 页面改由前端模板维护:按路径在主题清单 pages 中查找,无则 404
+        ThemePage page = manifestResolver.resolve(tenant).pages().stream()
+                .filter(p -> p.path().equals(pagePath))
+                .findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "页面不存在: " + pagePath));
+        model.addAttribute("page", page);
+        // 单页 SEO:page_type = 页面路径(如 /about),page_id 恒为空
+        seoService.resolveView(page.path(), null, language, dl,
+                new SeoFallback(page.label(), "", "", request.getRequestURL().toString())).applyTo(model);
+        return finish(page.template(), language, model);
     }
 
     /** 解析预览语言:空则取主题默认语种(theme.json.defaultLocale)。 */
@@ -228,9 +215,6 @@ public class PreviewController {
         int p = Math.min(Math.max(1, page), totalPages);
         int from = Math.min((p - 1) * pageSize, total);
         int to = Math.min(from + pageSize, total);
-        model.addAttribute(all.size() == total && all.isEmpty() ? "products" : "listSlice", all.subList(from, to));
-        // 上行按集合名绑定:products 列表页用 "products",news 列表页需用 "news"
-        // —— 为避免猜测集合名,直接按调用方已 set 的属性覆盖:
         model.addAttribute(paginationSliceKey(base), all.subList(from, to));
         model.addAttribute("page", p);
         model.addAttribute("totalPages", totalPages);
@@ -241,22 +225,5 @@ public class PreviewController {
     /** 预览列表分页切片绑定的模型键:products→"products",news→"news"。 */
     private static String paginationSliceKey(String base) {
         return base.endsWith("/products") ? "products" : "news";
-    }
-
-    /** 区块 i18n 存在则取其字段,否则空串。 */
-    private String text(ResolvedSection section, java.util.function.Function<ResolvedSection, String> getter) {
-        return section != null ? getter.apply(section) : "";
-    }
-
-    private static String i18nTitle(ResolvedSection s) {
-        return s.i18n() != null ? s.i18n().getTitle() : "";
-    }
-
-    private static String i18nSubtitle(ResolvedSection s) {
-        return s.i18n() != null ? s.i18n().getSubtitle() : "";
-    }
-
-    private static String i18nContent(ResolvedSection s) {
-        return s.i18n() != null ? s.i18n().getContent() : "";
     }
 }

@@ -5,8 +5,8 @@
 <header th:replace="~{themes/modern/fragments/header :: header(siteName=${siteName}, active='about')}"></header>
 
 <article class="container section">
-    <h1 th:text="${pageTitle}">About</h1>
-    <div class="rich-text" th:utext="${content} ?: ''">
+    <h1 th:text="#{about.title}">About</h1>
+    <div class="rich-text" th:utext="#{about.body}">
         About content goes here.
     </div>
 </article>

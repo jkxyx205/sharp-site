@@ -1,8 +1,5 @@
 package com.rick.site.web;
 
-import com.rick.site.page.entity.SitePage;
-import com.rick.site.page.entity.SitePageI18n;
-import com.rick.site.page.service.SitePageService;
 import com.rick.site.tenant.context.TenantContext;
 import com.rick.site.tenant.entity.Tenant;
 import com.rick.site.tenant.service.TenantDomainService;
@@ -23,8 +20,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * TASK-0402 验收测试:页面前台路由 + i18n + 主题渲染。
  *
- * <p>TenantFilter 从 Host=localhost 解析租户,LocaleFilter 解析语言;
- * 默认语言 {@code /about} 与 {@code /zh-cn/about} 均渲染 modern 主题模板。
+ * <p>页面(about/contact)由前端模板维护,清单见 theme.json 的 pages;正文文案由
+ * {@code messages.json} 文案键提供(无 site_page 表)。TenantFilter 从 Host=localhost
+ * 解析租户,LocaleFilter 解析语言;默认语言 {@code /about} 与 {@code /zh-cn/about}
+ * 均渲染 modern 主题模板。
  */
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -40,9 +39,6 @@ class SitePageControllerTest {
     @Autowired
     private TenantDomainService domainService;
 
-    @Autowired
-    private SitePageService pageService;
-
     private Tenant tenant;
 
     @BeforeEach
@@ -51,14 +47,6 @@ class SitePageControllerTest {
                 .code("web-ctrl").name("Web Ctrl").themeId("modern").build());
         TenantContext.set(tenant);
         domainService.add("localhost", true);
-
-        SitePage about = pageService.savePage(SitePage.builder()
-                .pageKey("about").path("/about").template("themes/modern/about").status((short) 1).build());
-        pageService.saveI18n(about.getId(), SitePageI18n.builder()
-                .language("en-US").title("About Us").content("<p>We are great</p>").build());
-        pageService.saveI18n(about.getId(), SitePageI18n.builder()
-                .language("zh-CN").title("关于我们").content("<p>我们很棒</p>").build());
-
         TenantContext.clear();
     }
 
@@ -72,7 +60,7 @@ class SitePageControllerTest {
         mockMvc.perform(get("/about"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("About Us")))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("We are great")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("trading company")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("<style")));
     }
 
@@ -81,7 +69,7 @@ class SitePageControllerTest {
         mockMvc.perform(get("/zh-cn/about"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("关于我们")))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("我们很棒")));
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("贸易公司")));
     }
 
     @Test

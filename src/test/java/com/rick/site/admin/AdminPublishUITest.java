@@ -1,9 +1,6 @@
 package com.rick.site.admin;
 
 import com.rick.site.admin.service.AdminUserService;
-import com.rick.site.home.entity.HomeSection;
-import com.rick.site.home.entity.HomeSectionI18n;
-import com.rick.site.home.service.HomeSectionService;
 import com.rick.site.tenant.context.TenantContext;
 import com.rick.site.tenant.entity.Tenant;
 import com.rick.site.tenant.service.TenantDomainService;
@@ -58,8 +55,6 @@ class AdminPublishUITest {
     private TenantDomainService domainService;
     @Autowired
     private AdminUserService adminUserService;
-    @Autowired
-    private HomeSectionService homeSectionService;
 
     private MockHttpSession session;
 
@@ -69,11 +64,6 @@ class AdminPublishUITest {
                 .code("pubui").name("PubUI Co").themeId("modern").build());
         TenantContext.set(tenant);
         domainService.add("localhost", true);
-
-        HomeSection hero = homeSectionService.saveSection(HomeSection.builder()
-                .sectionKey("hero").sort(0).enabled((short) 1).build());
-        homeSectionService.saveI18n(hero.getId(), HomeSectionI18n.builder()
-                .language("en-US").title("Welcome").subtitle("We build").build());
 
         adminUserService.create("pubui-admin", PWD);
         TenantContext.clear();

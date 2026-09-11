@@ -1,14 +1,11 @@
 package com.rick.site.publish.service;
 
-import com.rick.site.home.service.HomeSectionService;
-import com.rick.site.home.service.HomeSectionService.ResolvedSection;
 import com.rick.site.i18n.context.LocaleContext;
 import com.rick.site.i18n.model.LanguageOption;
 import com.rick.site.i18n.model.LocaleResolution;
 import com.rick.site.news.dto.ArticleView;
 import com.rick.site.news.service.ArticleService;
 import com.rick.site.news.service.ArticleService.ResolvedArticle;
-import com.rick.site.page.service.SitePageService;
 import com.rick.site.product.dto.ProductView;
 import com.rick.site.product.service.ProductService;
 import com.rick.site.product.service.ProductService.ResolvedProduct;
@@ -21,6 +18,7 @@ import com.rick.site.tenant.entity.TenantDomain;
 import com.rick.site.tenant.service.TenantConfigService;
 import com.rick.site.tenant.service.TenantDomainService;
 import com.rick.site.theme.model.ThemeManifest;
+import com.rick.site.theme.model.ThemeManifest.ThemePage;
 import com.rick.site.theme.service.ThemeManifestResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,8 +33,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.function.Function;
 
 /**
  * 静态站点生成器(TASK-1201..1206,ARCHITECTURE §9)。
@@ -84,8 +80,6 @@ public class StaticSiteGenerator {
     private static final int HOME_PRODUCT_LIMIT = 8;
 
     private final TemplateEngine templateEngine;
-    private final HomeSectionService homeSectionService;
-    private final SitePageService pageService;
     private final ProductService productService;
     private final ArticleService articleService;
     private final SeoConfigService seoService;
@@ -94,8 +88,6 @@ public class StaticSiteGenerator {
     private final ThemeManifestResolver manifestResolver;
 
     public StaticSiteGenerator(TemplateEngine templateEngine,
-                              HomeSectionService homeSectionService,
-                              SitePageService pageService,
                               ProductService productService,
                               ArticleService articleService,
                               SeoConfigService seoService,
@@ -103,8 +95,6 @@ public class StaticSiteGenerator {
                               TenantDomainService domainService,
                               ThemeManifestResolver manifestResolver) {
         this.templateEngine = templateEngine;
-        this.homeSectionService = homeSectionService;
-        this.pageService = pageService;
         this.productService = productService;
         this.articleService = articleService;
         this.seoService = seoService;
@@ -161,54 +151,42 @@ public class StaticSiteGenerator {
         generateNews(tenant, locale, defaultLocale, localePrefix, baseUrl, outputDir, releaseDir);
     }
 
-    /** TASK-1202:首页 → {@code index.html}。 */
+    /** TASK-1202:首页 → {@code index.html}。hero/cta 文案由模板 messages 键提供。 */
     public void generateHome(Tenant tenant, String locale, String defaultLocale, String localePrefix,
                              String baseUrl, Path outputDir) throws IOException {
         LocaleContext.set(new LocaleResolution(locale, "/"));
         OfflineWebContext ctx = newContext(locale);
-        Map<String, ResolvedSection> sections = homeSectionService.resolveForDisplay(locale, defaultLocale);
-        ResolvedSection hero = sections.get("hero");
-        ResolvedSection company = sections.get("company");
-        ResolvedSection cta = sections.get("cta");
-
-        ctx.setVariable("tagline", text(hero, StaticSiteGenerator::i18nTitle));
-        ctx.setVariable("intro", text(hero, StaticSiteGenerator::i18nSubtitle));
-        ctx.setVariable("aboutTeaser", text(company, StaticSiteGenerator::i18nContent));
-        ctx.setVariable("ctaTitle", text(cta, StaticSiteGenerator::i18nTitle));
         ctx.setVariable("products", productService.listForDisplay(locale, defaultLocale).stream()
                 .limit(HOME_PRODUCT_LIMIT).map(ProductView::from).toList());
         ctx.setVariable("news", articleService.listForDisplay(locale, defaultLocale).stream()
                 .limit(HOME_NEWS_LIMIT).map(ArticleView::from).toList());
-        seoService.resolveView(SeoConfigService.HOME, null, locale, defaultLocale,
-                new SeoFallback(text(hero, StaticSiteGenerator::i18nTitle),
-                        text(company, StaticSiteGenerator::i18nSubtitle),
-                        "", baseUrl + localePrefix + "/")).applyTo(ctxToModel(ctx));
+        seoService.resolveView("/", null, locale, defaultLocale,
+                new SeoFallback("", "", "", baseUrl + localePrefix + "/")).applyTo(ctxToModel(ctx));
         applyCommon(ctx, tenant, locale, localePrefix);
         write(outputDir, "index.html", templateEngine.process("themes/modern/index", ctx));
     }
 
-    /** TASK-1203:普通页面 → {@code {path}/index.html}(仅 status=1 的页面)。 */
+    /**
+     * TASK-1203:静态页面 → {@code {path}/index.html}。遍历主题清单 {@link ThemeManifest#pages()},
+     * 跳过动态页 {@code path ∈ {"/","/products","/news"}}(由 generateHome/generateProducts/generateNews
+     * 专用生成器处理并注入 DB 列表数据,无法泛化渲染);仅渲染其余静态页(about/contact)。
+     */
     public void generatePages(Tenant tenant, String locale, String defaultLocale, String localePrefix,
                                String baseUrl, Path outputDir) throws IOException {
-        for (SitePageService.ResolvedPage resolved : pageService.listByTenant().stream()
-                .filter(p -> p.getStatus() != null && p.getStatus() == 1)
-                .map(p -> pageService.resolveForDisplay(p.getPath(), locale, defaultLocale))
-                .toList()) {
-            String path = resolved.page().getPath(); // 如 /about
+        for (ThemePage page : manifestResolver.resolve(tenant).pages()) {
+            String path = page.path();
+            if (path.equals("/") || path.equals("/products") || path.equals("/news")) {
+                continue; // 动态页,由专用生成器处理
+            }
             LocaleContext.set(new LocaleResolution(locale, path));
             OfflineWebContext ctx = newContext(locale);
-            ctx.setVariable("page", resolved.page());
-            ctx.setVariable("content", resolved.i18n() != null ? resolved.i18n().getContent() : "");
-            String fbTitle = resolved.i18n() != null && resolved.i18n().getTitle() != null
-                    ? resolved.i18n().getTitle() : resolved.page().getPageKey();
-            String fbImage = resolved.i18n() != null ? resolved.i18n().getCover() : "";
-            seoService.resolveView(SeoConfigService.PAGE, resolved.page().getId(), locale,
-                    defaultLocale,
-                    new SeoFallback(fbTitle, "", fbImage, baseUrl + localePrefix + path)).applyTo(ctxToModel(ctx));
+            ctx.setVariable("page", page);
+            seoService.resolveView(path, null, locale, defaultLocale,
+                    new SeoFallback(page.label(), "", "", baseUrl + localePrefix + path))
+                    .applyTo(ctxToModel(ctx));
             applyCommon(ctx, tenant, locale, localePrefix);
             String rel = path.startsWith("/") ? path.substring(1) : path;
-            write(outputDir, rel + "/index.html",
-                    templateEngine.process(resolved.page().getTemplate(), ctx));
+            write(outputDir, rel + "/index.html", templateEngine.process(page.template(), ctx));
         }
     }
 
@@ -232,7 +210,7 @@ public class StaticSiteGenerator {
             OfflineWebContext ctx = newContext(locale);
             ctx.setVariable("products", slice);
             applyPagination(ctx, n, pages, localePrefix, "/products/page/");
-            seoService.resolveView(SeoConfigService.PRODUCTS_LIST, null, locale, defaultLocale,
+            seoService.resolveView("/products", null, locale, defaultLocale,
                     new SeoFallback("Products", "", "", baseUrl + localePrefix + pagePath))
                     .applyTo(ctxToModel(ctx));
             applyCommon(ctx, tenant, locale, localePrefix);
@@ -279,7 +257,7 @@ public class StaticSiteGenerator {
             OfflineWebContext ctx = newContext(locale);
             ctx.setVariable("news", slice);
             applyPagination(ctx, n, pages, localePrefix, "/news/page/");
-            seoService.resolveView(SeoConfigService.NEWS_LIST, null, locale, defaultLocale,
+            seoService.resolveView("/news", null, locale, defaultLocale,
                     new SeoFallback("News", "", "", baseUrl + localePrefix + pagePath))
                     .applyTo(ctxToModel(ctx));
             applyCommon(ctx, tenant, locale, localePrefix);
@@ -315,10 +293,10 @@ public class StaticSiteGenerator {
         sb.append("<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n");
         for (String locale : manifest.locales()) {
             String prefix = locale.equals(defaultLocale) ? "" : "/" + locale.toLowerCase(Locale.ROOT);
-            appendUrl(sb, baseUrl + prefix + "/");
-            pageService.listByTenant().stream()
-                    .filter(p -> p.getStatus() != null && p.getStatus() == 1)
-                    .forEach(p -> appendUrl(sb, baseUrl + prefix + p.getPath() + "/"));
+            for (ThemePage page : manifest.pages()) {
+                String path = page.path();
+                appendUrl(sb, baseUrl + prefix + (path.equals("/") ? "/" : path + "/"));
+            }
             List<ResolvedProduct> products = productService.listForDisplay(locale, defaultLocale);
             int productPages = pageCount(products.size());
             for (int n = 1; n <= productPages; n++) {
@@ -480,21 +458,5 @@ public class StaticSiteGenerator {
             return "";
         }
         return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
-    }
-
-    private String text(ResolvedSection section, Function<ResolvedSection, String> getter) {
-        return section != null ? getter.apply(section) : "";
-    }
-
-    private static String i18nTitle(ResolvedSection s) {
-        return s.i18n() != null ? s.i18n().getTitle() : "";
-    }
-
-    private static String i18nSubtitle(ResolvedSection s) {
-        return s.i18n() != null ? s.i18n().getSubtitle() : "";
-    }
-
-    private static String i18nContent(ResolvedSection s) {
-        return s.i18n() != null ? s.i18n().getContent() : "";
     }
 }

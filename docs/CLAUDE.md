@@ -220,11 +220,9 @@ product_i18n
 
 article
 article_i18n
-
-site_page
-site_page_i18n
 ```
 
+页面与首页区块由主题模板 + `messages.json` 文案键维护,不占数据表。
 不要复制整个模板目录来实现语言。
 
 默认语言：

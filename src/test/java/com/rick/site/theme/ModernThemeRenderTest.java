@@ -29,7 +29,8 @@ class ModernThemeRenderTest {
     @Autowired
     private TemplateEngine templateEngine;
 
-    record SampleProduct(String slug, String name, String subtitle, String cover, String content) {
+    record SampleProduct(String slug, String name, String subtitle, String cover,
+                          String content, String specificationJson) {
     }
 
     record SampleArticle(String slug, String title, String summary, String content, LocalDateTime publishTime) {
@@ -47,13 +48,9 @@ class ModernThemeRenderTest {
         ctx.setVariable("pageKeywords", "export,manufacturing");
         ctx.setVariable("canonical", "https://acme.example.com/");
         ctx.setVariable("robots", "index, follow");
-        ctx.setVariable("tagline", "Quality You Can Trust");
-        ctx.setVariable("intro", "We make great things.");
-        ctx.setVariable("aboutTeaser", "Founded in 2010.");
-        ctx.setVariable("ctaTitle", "Let's talk");
         ctx.setVariable("products", List.of(
-                new SampleProduct("widget-a", "Widget A", "Pro", "/img/a.jpg", null),
-                new SampleProduct("widget-b", "Widget B", null, null, null)));
+                new SampleProduct("widget-a", "Widget A", "Pro", "/img/a.jpg", null, null),
+                new SampleProduct("widget-b", "Widget B", null, null, null, null)));
         ctx.setVariable("news", List.of(
                 new SampleArticle("n1", "We exhibited at Canton Fair", null, null, null)));
         ctx.setVariable("config", sampleConfig());
@@ -101,7 +98,7 @@ class ModernThemeRenderTest {
                 "news", "news-detail", "contact")) {
             WebContext ctx = sampleContext();
             if ("product-detail".equals(page)) {
-                ctx.setVariable("product", new SampleProduct("widget-a", "Widget A", "Pro", "/img/a.jpg", "<p>Detail</p>"));
+                ctx.setVariable("product", new SampleProduct("widget-a", "Widget A", "Pro", "/img/a.jpg", "<p>Detail</p>", null));
             } else if ("news-detail".equals(page)) {
                 ctx.setVariable("article", new SampleArticle("n1", "Canton Fair", "We exhibited", "<p>News body</p>", null));
             }

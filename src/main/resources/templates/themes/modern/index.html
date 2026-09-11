@@ -6,15 +6,15 @@
 
 <section class="hero">
     <div class="container">
-        <h1 th:text="${tagline} ?: ${siteName}">Welcome</h1>
-        <p class="hero-sub" th:text="${intro} ?: ''">We are a foreign-trade company.</p>
+        <h1 th:text="#{home.hero.title}">Welcome</h1>
+        <p class="hero-sub" th:text="#{home.hero.subtitle}">We are a foreign-trade company.</p>
         <a class="btn" th:href="@{${localePrefix + '/products'}}" th:text="#{home.products.btn}">View Products</a>
     </div>
 </section>
 
 <section class="container section">
     <h2 th:text="#{home.about.title}">About Us</h2>
-    <p th:text="${aboutTeaser} ?: ''">Brief company intro.</p>
+    <p th:text="#{home.about.teaser}">Brief company intro.</p>
     <a th:href="@{${localePrefix + '/about'}}" th:text="#{home.about.readmore}">Read more →</a>
 </section>
 
@@ -45,7 +45,7 @@
 
 <section class="cta">
     <div class="container">
-        <h2 th:text="${ctaTitle} ?: #{home.cta.title}">Ready to work with us?</h2>
+        <h2 th:text="#{home.cta.title}">Ready to work with us?</h2>
         <a class="btn btn-primary" th:href="@{${localePrefix + '/contact'}}" th:text="#{home.cta.btn}">Contact Us</a>
     </div>
 </section>

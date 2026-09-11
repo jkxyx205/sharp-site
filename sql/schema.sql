@@ -63,69 +63,10 @@ CREATE TABLE tenant_config (
 );
 CREATE UNIQUE INDEX uk_tenant_config ON tenant_config (tenant_id) WHERE is_deleted = false;
 
--- TASK-0401: site_page(DATABASE.md §4)
-CREATE TABLE IF NOT EXISTS site_page (
-    id BIGINT PRIMARY KEY,
-    tenant_id BIGINT NOT NULL,
-    page_key VARCHAR(100) NOT NULL,
-    path VARCHAR(500) NOT NULL,
-    template VARCHAR(200) NOT NULL,
-    status SMALLINT NOT NULL DEFAULT 1,
-    create_by BIGINT,
-    create_time TIMESTAMP NOT NULL,
-    update_by BIGINT,
-    update_time TIMESTAMP NOT NULL,
-    is_deleted BOOLEAN NOT NULL DEFAULT FALSE
-);
-CREATE UNIQUE INDEX IF NOT EXISTS uk_tenant_page_key ON site_page (tenant_id, page_key) WHERE is_deleted = false;
-CREATE UNIQUE INDEX IF NOT EXISTS uk_tenant_page_path ON site_page (tenant_id, path) WHERE is_deleted = false;
-
--- TASK-0401: site_page_i18n(DATABASE.md §5)— 无 tenant_id,经 page_id 关联租户
-CREATE TABLE IF NOT EXISTS site_page_i18n (
-    id BIGINT PRIMARY KEY,
-    page_id BIGINT NOT NULL,
-    language VARCHAR(20) NOT NULL,
-    title VARCHAR(500),
-    content TEXT,
-    cover VARCHAR(1000),
-    create_by BIGINT,
-    create_time TIMESTAMP NOT NULL,
-    update_by BIGINT,
-    update_time TIMESTAMP NOT NULL,
-    is_deleted BOOLEAN NOT NULL DEFAULT FALSE
-);
-CREATE UNIQUE INDEX IF NOT EXISTS uk_page_language ON site_page_i18n (page_id, language) WHERE is_deleted = false;
-
--- TASK-0501: home_section(DATABASE.md §6)
-CREATE TABLE IF NOT EXISTS home_section (
-    id BIGINT PRIMARY KEY,
-    tenant_id BIGINT NOT NULL,
-    section_key VARCHAR(100) NOT NULL,
-    sort INT NOT NULL DEFAULT 0,
-    enabled SMALLINT NOT NULL DEFAULT 1,
-    create_by BIGINT,
-    create_time TIMESTAMP NOT NULL,
-    update_by BIGINT,
-    update_time TIMESTAMP NOT NULL,
-    is_deleted BOOLEAN NOT NULL DEFAULT FALSE
-);
-CREATE UNIQUE INDEX IF NOT EXISTS uk_tenant_section ON home_section (tenant_id, section_key) WHERE is_deleted = false;
-
--- TASK-0501: home_section_i18n(DATABASE.md §7)
-CREATE TABLE IF NOT EXISTS home_section_i18n (
-    id BIGINT PRIMARY KEY,
-    section_id BIGINT NOT NULL,
-    language VARCHAR(20) NOT NULL,
-    title VARCHAR(500),
-    subtitle VARCHAR(1000),
-    content TEXT,
-    create_by BIGINT,
-    create_time TIMESTAMP NOT NULL,
-    update_by BIGINT,
-    update_time TIMESTAMP NOT NULL,
-    is_deleted BOOLEAN NOT NULL DEFAULT FALSE
-);
-CREATE UNIQUE INDEX IF NOT EXISTS uk_section_language ON home_section_i18n (section_id, language) WHERE is_deleted = false;
+-- 站点静态页面(about/contact 等)与首页区块(hero/cta 等)均改由前端模板维护,
+-- 清单见 themes/{themeId}/meta/theme.json 的 pages,文案见 messages.json;
+-- 不再有 site_page / site_page_i18n / home_section / home_section_i18n 表。
+-- TASK-0401 / TASK-0501 表已移除。
 
 -- TASK-0601: category(DATABASE.md §8)— PRODUCT / NEWS 共用,支持 parent_id 层级
 CREATE TABLE IF NOT EXISTS category (

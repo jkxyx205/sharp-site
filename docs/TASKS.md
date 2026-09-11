@@ -203,20 +203,20 @@ modern/
 
 ## TASK-0401 Page
 
-实现：
-
-- site_page
-- site_page_i18n
-- CRUD
+页面(about/contact 等)由前端模板维护,清单见 `themes/{themeId}/meta/theme.json` 的
+`pages`;正文文案由模板 + `messages.json` 文案键提供。后端只渲染,不再有
+`site_page` / `site_page_i18n` 表。
 
 ## TASK-0402 Page 前台
 
-实现：
+实现:
 
 ```text
 /about
 /contact
 ```
+
+按 `theme.json.pages` 路由与渲染。
 
 ## TASK-0403 富文本
 
@@ -234,10 +234,8 @@ modern/
 
 ## TASK-0501 Home Section
 
-实现：
-
-- home_section
-- home_section_i18n
+首页区块(hero/company/cta 等)由前端模板 + `messages.json` 文案键维护,
+后端只渲染,不再有 `home_section` / `home_section_i18n` 表。
 
 ## TASK-0502 首页
 
@@ -252,7 +250,7 @@ News
 Contact
 ```
 
-后台可以编辑区块内容。
+文案来自模板 `#{}` 文案键;产品/新闻列表由 DB 注入。
 
 ---
 

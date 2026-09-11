@@ -1,9 +1,11 @@
 package com.rick.site.seo.web;
 
 import com.rick.site.news.service.ArticleService;
-import com.rick.site.page.service.SitePageService;
 import com.rick.site.product.service.ProductService;
 import com.rick.site.tenant.context.TenantContext;
+import com.rick.site.tenant.entity.Tenant;
+import com.rick.site.theme.model.ThemeManifest.ThemePage;
+import com.rick.site.theme.service.ThemeManifestResolver;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -13,8 +15,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 /**
  * SEO 站点级端点(TASK-1003 / 1004):sitemap.xml 与 robots.txt。
  *
- * <p>均按当前 Host 解析的租户作用域:列出租户首页、启用页面、上架产品、已发布新闻,
+ * <p>均按当前 Host 解析的租户作用域:列出租户首页、主题清单页面、上架产品、已发布新闻,
  * 用请求 scheme + Host 构造绝对 URL。未解析到租户时拒绝(BizException,与前台一致)。
+ *
+ * <p>页面清单取自主题 {@code theme.json} 的 {@code pages}(前端模板维护,无 site_page 表)。
  *
  * @author Rick.Xu
  */
@@ -23,27 +27,27 @@ public class SeoController {
 
     private final ProductService productService;
     private final ArticleService articleService;
-    private final SitePageService pageService;
+    private final ThemeManifestResolver manifestResolver;
 
     public SeoController(ProductService productService, ArticleService articleService,
-                        SitePageService pageService) {
+                        ThemeManifestResolver manifestResolver) {
         this.productService = productService;
         this.articleService = articleService;
-        this.pageService = pageService;
+        this.manifestResolver = manifestResolver;
     }
 
     @GetMapping(value = "/sitemap.xml", produces = MediaType.APPLICATION_XML_VALUE)
     @ResponseBody
     public String sitemap(HttpServletRequest request) {
-        TenantContext.require();
+        Tenant tenant = TenantContext.require();
         String base = baseUrl(request);
         StringBuilder sb = new StringBuilder(512);
         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
         sb.append("<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n");
-        appendUrl(sb, base + "/");
-        pageService.listByTenant().stream()
-                .filter(p -> p.getStatus() != null && p.getStatus() == 1)
-                .forEach(p -> appendUrl(sb, base + p.getPath()));
+        for (ThemePage page : manifestResolver.resolve(tenant).pages()) {
+            String path = page.path();
+            appendUrl(sb, base + (path.equals("/") ? "/" : path));
+        }
         productService.listEnabled().forEach(p ->
                 appendUrl(sb, base + "/products/" + esc(p.getSlug())));
         articleService.listPublished().forEach(a ->

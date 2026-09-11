@@ -54,7 +54,7 @@ public class ProductController {
                         loc.language(), dl).stream()
                 .map(ProductView::from).toList();
         model.addAttribute("products", products);
-        seoService.resolveView(SeoConfigService.PRODUCTS_LIST, null, loc.language(), dl,
+        seoService.resolveView("/products", null, loc.language(), dl,
                 new SeoFallback("Products", "", "", request.getRequestURL().toString())).applyTo(model);
         return "themes/modern/products";
     }

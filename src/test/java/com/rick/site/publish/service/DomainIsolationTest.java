@@ -1,11 +1,5 @@
 package com.rick.site.publish.service;
 
-import com.rick.site.home.entity.HomeSection;
-import com.rick.site.home.entity.HomeSectionI18n;
-import com.rick.site.home.service.HomeSectionService;
-import com.rick.site.page.entity.SitePage;
-import com.rick.site.page.entity.SitePageI18n;
-import com.rick.site.page.service.SitePageService;
 import com.rick.site.product.entity.Product;
 import com.rick.site.product.entity.ProductI18n;
 import com.rick.site.product.service.ProductService;
@@ -62,10 +56,6 @@ class DomainIsolationTest {
     @Autowired
     private TenantDomainService domainService;
     @Autowired
-    private HomeSectionService homeSectionService;
-    @Autowired
-    private SitePageService pageService;
-    @Autowired
     private ProductService productService;
 
     private Tenant tenantA;
@@ -92,16 +82,6 @@ class DomainIsolationTest {
     }
 
     private void seedContent() {
-        HomeSection hero = homeSectionService.saveSection(HomeSection.builder()
-                .sectionKey("hero").sort(0).enabled((short) 1).build());
-        homeSectionService.saveI18n(hero.getId(), HomeSectionI18n.builder()
-                .language("en-US").title("Welcome").subtitle("We build").build());
-
-        SitePage about = pageService.savePage(SitePage.builder()
-                .pageKey("about").path("/about").template("themes/modern/about").status((short) 1).build());
-        pageService.saveI18n(about.getId(), SitePageI18n.builder()
-                .language("en-US").title("About").content("<p>about</p>").build());
-
         Product p = productService.saveProduct(Product.builder()
                 .slug("widget").status((short) 1).sort(0).build());
         productService.saveI18n(p.getId(), ProductI18n.builder()

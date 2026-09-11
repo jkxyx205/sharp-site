@@ -1,15 +1,9 @@
 package com.rick.site.preview.web;
 
 import com.rick.site.admin.service.AdminUserService;
-import com.rick.site.home.entity.HomeSection;
-import com.rick.site.home.entity.HomeSectionI18n;
-import com.rick.site.home.service.HomeSectionService;
 import com.rick.site.news.entity.Article;
 import com.rick.site.news.entity.ArticleI18n;
 import com.rick.site.news.service.ArticleService;
-import com.rick.site.page.entity.SitePage;
-import com.rick.site.page.entity.SitePageI18n;
-import com.rick.site.page.service.SitePageService;
 import com.rick.site.product.entity.Product;
 import com.rick.site.product.entity.ProductI18n;
 import com.rick.site.product.service.ProductService;
@@ -38,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * TASK-1101 验收测试:预览需认证、按认证管理员租户作用域、多语言 ?lang、noindex。
+ * 首页/静态页文案由模板 + messages.json 提供(无 home_section / site_page 表)。
  */
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -55,10 +50,6 @@ class PreviewControllerTest {
     @Autowired
     private AdminUserService adminUserService;
     @Autowired
-    private HomeSectionService homeSectionService;
-    @Autowired
-    private SitePageService pageService;
-    @Autowired
     private ProductService productService;
     @Autowired
     private ArticleService articleService;
@@ -72,21 +63,6 @@ class PreviewControllerTest {
         TenantContext.set(tenant);
         domainService.add("localhost", true);
 
-        HomeSection hero = homeSectionService.saveSection(HomeSection.builder()
-                .sectionKey("hero").sort(0).enabled((short) 1).build());
-        homeSectionService.saveI18n(hero.getId(), HomeSectionI18n.builder()
-                .language("en-US").title("Welcome Home").subtitle("We build great things").build());
-        HomeSection company = homeSectionService.saveSection(HomeSection.builder()
-                .sectionKey("company").sort(1).enabled((short) 1).build());
-        homeSectionService.saveI18n(company.getId(), HomeSectionI18n.builder()
-                .language("en-US").title("About Us").content("<p>Founded in 2010</p>").build());
-
-        SitePage about = pageService.savePage(SitePage.builder()
-                .pageKey("about").path("/about").template("themes/modern/about").status((short) 1).build());
-        pageService.saveI18n(about.getId(), SitePageI18n.builder()
-                .language("en-US").title("About Us").content("<p>We are great</p>").build());
-        pageService.saveI18n(about.getId(), SitePageI18n.builder()
-                .language("zh-CN").title("关于我们").content("<p>我们很棒</p>").build());
         Product p = productService.saveProduct(Product.builder()
                 .slug("widget-a").status((short) 1).sort(0).build());
         productService.saveI18n(p.getId(), ProductI18n.builder()
@@ -134,7 +110,7 @@ class PreviewControllerTest {
     void authenticatedHomePreviewRenders() throws Exception {
         mockMvc.perform(get("/preview/").with(host("localhost")).session(session))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("Welcome Home")))
+                .andExpect(content().string(containsString("Welcome to Our Site")))
                 .andExpect(content().string(containsString("noindex, nofollow")));
     }
 
@@ -157,7 +133,7 @@ class PreviewControllerTest {
         mockMvc.perform(get("/preview/about").with(host("localhost")).session(session))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("About Us")))
-                .andExpect(content().string(containsString("We are great")));
+                .andExpect(content().string(containsString("trading company")));
     }
 
     @Test

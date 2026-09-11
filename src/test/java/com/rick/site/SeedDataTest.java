@@ -4,15 +4,9 @@ import com.rick.site.admin.service.AdminUserService;
 import com.rick.site.catalog.entity.Category;
 import com.rick.site.catalog.entity.CategoryI18n;
 import com.rick.site.catalog.service.CategoryService;
-import com.rick.site.home.entity.HomeSection;
-import com.rick.site.home.entity.HomeSectionI18n;
-import com.rick.site.home.service.HomeSectionService;
 import com.rick.site.news.entity.Article;
 import com.rick.site.news.entity.ArticleI18n;
 import com.rick.site.news.service.ArticleService;
-import com.rick.site.page.entity.SitePage;
-import com.rick.site.page.entity.SitePageI18n;
-import com.rick.site.page.service.SitePageService;
 import com.rick.site.product.entity.Product;
 import com.rick.site.product.entity.ProductI18n;
 import com.rick.site.product.service.ProductService;
@@ -39,9 +33,10 @@ import org.springframework.boot.test.context.SpringBootTest;
  * 内容均按唯一键 upsert 或预检跳过。
  *
  * <p>创建:demo 租户(modern 主题)+ demo.localhost 主域名 + 管理员 admin/111111
- * + 示例内容(en-US + zh-CN)。域名用 demo.localhost(自动解析到 127.0.0.1),
- * 不占用测试使用的 localhost / *.example.com,保持构建绿色。
- * §20:不日志输出密码。
+ * + 示例内容(en-US + zh-CN)。页面(about/contact)与首页区块(hero/cta)文案由
+ * 主题模板 + {@code messages.json} 维护,不再播种 site_page / home_section。
+ * 域名用 demo.localhost(自动解析到 127.0.0.1),不占用测试使用的 localhost /
+ * *.example.com,保持构建绿色。§20:不日志输出密码。
  *
  * @author Rick.Xu
  */
@@ -62,10 +57,6 @@ class SeedDataTest {
     private TenantDomainService domainService;
     @Autowired
     private AdminUserService adminUserService;
-    @Autowired
-    private HomeSectionService homeSectionService;
-    @Autowired
-    private SitePageService pageService;
     @Autowired
     private CategoryService categoryService;
     @Autowired
@@ -108,40 +99,6 @@ class SeedDataTest {
     private void seedContent() {
         // 幂等:各服务按唯一键 upsert(同语言 i18n 二次保存走 UPDATE)。
         // jsonb 列 UPDATE 已由 sql/schema.sql 的 varchar→jsonb 赋值转换修复。
-        // 首页 hero 区块(en + zh)
-        HomeSection hero = homeSectionService.saveSection(HomeSection.builder()
-                .sectionKey("hero").sort(0).enabled((short) 1).build());
-        homeSectionService.saveI18n(hero.getId(), HomeSectionI18n.builder()
-                .language("en-US").title("Welcome to Demo")
-                .subtitle("Premium products for global trade")
-                .content("<p>We supply quality goods to partners worldwide.</p>").build());
-        homeSectionService.saveI18n(hero.getId(), HomeSectionI18n.builder()
-                .language("zh-CN").title("欢迎来到 Demo")
-                .subtitle("优质产品 · 全球贸易")
-                .content("<p>我们向全球合作伙伴供应优质商品。</p>").build());
-
-        // 关于页面
-        SitePage about = pageService.savePage(SitePage.builder()
-                .pageKey("about").path("/about").template("themes/modern/about")
-                .status((short) 1).build());
-        pageService.saveI18n(about.getId(), SitePageI18n.builder()
-                .language("en-US").title("About Us")
-                .content("<p>Demo is a trading company connecting manufacturers and buyers globally.</p>").build());
-        pageService.saveI18n(about.getId(), SitePageI18n.builder()
-                .language("zh-CN").title("关于我们")
-                .content("<p>Demo 是一家连接制造商与全球采购商的贸易公司。</p>").build());
-
-        // 联系页面(header 导航链接 /contact,contact 模板用 active='contact')
-        SitePage contact = pageService.savePage(SitePage.builder()
-                .pageKey("contact").path("/contact").template("themes/modern/contact")
-                .status((short) 1).build());
-        pageService.saveI18n(contact.getId(), SitePageI18n.builder()
-                .language("en-US").title("Contact")
-                .content("<p>Get in touch with our team.</p>").build());
-        pageService.saveI18n(contact.getId(), SitePageI18n.builder()
-                .language("zh-CN").title("联系我们")
-                .content("<p>欢迎与我们联系。</p>").build());
-
         // 分类 + 产品
         Category electronics = categoryService.saveCategory(Category.builder()
                 .type("PRODUCT").slug("electronics").sort(0).status((short) 1).build());

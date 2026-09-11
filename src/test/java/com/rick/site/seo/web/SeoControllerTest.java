@@ -2,8 +2,6 @@ package com.rick.site.seo.web;
 
 import com.rick.site.news.entity.Article;
 import com.rick.site.news.service.ArticleService;
-import com.rick.site.page.entity.SitePage;
-import com.rick.site.page.service.SitePageService;
 import com.rick.site.product.entity.Product;
 import com.rick.site.product.service.ProductService;
 import com.rick.site.tenant.context.TenantContext;
@@ -28,8 +26,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * TASK-1003/1004 验收测试:/sitemap.xml 列出租户首页/页面/产品/新闻;
- * /robots.txt 含 Allow 与 Sitemap 引用。
+ * TASK-1003/1004 验收测试:/sitemap.xml 列出租户主题清单页面、上架产品、已发布新闻;
+ * /robots.txt 含 Allow 与 Sitemap 引用。页面清单取自 theme.json pages(无 site_page 表)。
  */
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -42,8 +40,6 @@ class SeoControllerTest {
     private TenantService tenantService;
     @Autowired
     private TenantDomainService domainService;
-    @Autowired
-    private SitePageService pageService;
     @Autowired
     private ProductService productService;
     @Autowired
@@ -58,8 +54,6 @@ class SeoControllerTest {
         TenantContext.set(tenant);
         domainService.add("localhost", true);
 
-        pageService.savePage(SitePage.builder()
-                .pageKey("about").path("/about").template("themes/modern/about").status((short) 1).build());
         productService.saveProduct(Product.builder()
                 .slug("widget-a").status((short) 1).sort(0).build());
         articleService.saveArticle(Article.builder()

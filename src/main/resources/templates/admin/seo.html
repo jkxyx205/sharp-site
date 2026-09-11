@@ -11,27 +11,22 @@
             <form class="filter" th:action="@{/admin/seo/edit}" method="get">
                 <label>新建 / 编辑 SEO
                     <select name="pageType" onchange="this.form.submit()">
-                        <option value="home" selected>首页(home)</option>
-                        <option value="products_list">产品列表(products_list)</option>
-                        <option value="news_list">新闻列表(news_list)</option>
-                        <option value="page">单页(page)</option>
-                        <option value="product">产品(product)</option>
-                        <option value="article">新闻(article)</option>
+                        <option value="">— 选择页面 —</option>
+                        <option th:each="p : ${pages}" th:value="${p.path}" th:text="${p.label}">page</option>
                     </select></label>
             </form>
             <div class="card">
                 <table>
                     <thead>
-                    <tr><th>页类型</th><th>页面ID</th><th>语种</th><th>标题</th><th>操作</th></tr>
+                    <tr><th>页面</th><th>语种</th><th>标题</th><th>操作</th></tr>
                     </thead>
                     <tbody>
                     <tr th:each="c : ${configs}">
                         <td th:text="${c.pageType}">type</td>
-                        <td th:text="${c.pageId != null ? c.pageId : '—'}">—</td>
                         <td th:text="${c.language}">lang</td>
                         <td th:text="${c.title}">title</td>
                         <td>
-                            <a th:href="@{/admin/seo/edit(pageType=${c.pageType},pageId=${c.pageId},lang=${c.language})}">编辑</a>
+                            <a th:href="@{/admin/seo/edit(pageType=${c.pageType},lang=${c.language})}">编辑</a>
                         </td>
                     </tr>
                     </tbody>

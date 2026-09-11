@@ -11,34 +11,12 @@
                 <h1>SEO 编辑</h1>
                 <nav class="subnav"><a class="btn" th:href="@{/admin/seo}">← 返回列表</a></nav>
 
-                <!-- 导航 GET 表单:选 pageType / pageId / 语种,切换后重新加载该 (pageType,pageId,lang) 行 -->
+                <!-- 导航 GET 表单:选 pageType / 语种,切换后重新加载该 (pageType,lang) 行 -->
                 <form th:action="@{/admin/seo/edit}" method="get">
-                    <label>页类型
+                    <label>页面
                         <select name="pageType" onchange="this.form.submit()">
-                            <option value="home" th:selected="${config.pageType == 'home'}">首页(home)</option>
-                            <option value="products_list" th:selected="${config.pageType == 'products_list'}">产品列表(products_list)</option>
-                            <option value="news_list" th:selected="${config.pageType == 'news_list'}">新闻列表(news_list)</option>
-                            <option value="page" th:selected="${config.pageType == 'page'}">单页(page)</option>
-                            <option value="product" th:selected="${config.pageType == 'product'}">产品(product)</option>
-                            <option value="article" th:selected="${config.pageType == 'article'}">新闻(article)</option>
-                        </select></label>
-                    <label th:if="${config.pageType == 'page'}">页面
-                        <select name="pageId" onchange="this.form.submit()">
-                            <option th:each="p : ${pages}" th:value="${p.id}"
-                                    th:selected="${config.pageId != null && config.pageId == p.id}"
-                                    th:text="${p.pageKey + ' (' + p.path + ')'}">page</option>
-                        </select></label>
-                    <label th:if="${config.pageType == 'product'}">产品
-                        <select name="pageId" onchange="this.form.submit()">
-                            <option th:each="p : ${products}" th:value="${p.id}"
-                                    th:selected="${config.pageId != null && config.pageId == p.id}"
-                                    th:text="${p.slug}">product</option>
-                        </select></label>
-                    <label th:if="${config.pageType == 'article'}">新闻
-                        <select name="pageId" onchange="this.form.submit()">
-                            <option th:each="a : ${articles}" th:value="${a.id}"
-                                    th:selected="${config.pageId != null && config.pageId == a.id}"
-                                    th:text="${a.slug}">article</option>
+                            <option th:each="p : ${pages}" th:value="${p.path}"
+                                    th:selected="${config.pageType == p.path}" th:text="${p.label}">page</option>
                         </select></label>
                     <label>语种
                         <select name="lang" onchange="this.form.submit()">
@@ -48,10 +26,9 @@
                         </select></label>
                 </form>
 
-                <!-- 保存 POST 表单:仅写当前 (pageType,pageId,language) 一行 -->
+                <!-- 保存 POST 表单:仅写当前 (pageType,language) 一行;页面 SEO 恒无 page_id -->
                 <form th:action="@{/admin/seo/save}" method="post">
                     <input type="hidden" name="pageType" th:value="${config.pageType}" />
-                    <input type="hidden" name="pageId" th:value="${config.pageId}" />
                     <input type="hidden" name="language" th:value="${currentLang}" />
                     <fieldset>
                         <legend><span th:text="${config.pageType} + ' · ' + ${currentLang}">type · lang</span></legend>

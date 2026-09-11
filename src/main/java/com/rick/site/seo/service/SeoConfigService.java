@@ -30,13 +30,10 @@ import java.util.Optional;
 @Validated
 public class SeoConfigService extends BaseServiceImpl<SeoConfigDAO, SeoConfig, Long> {
 
-    // page_type 取值约定(无枚举,避免过度设计;新增类型在此追加即可)
-    public static final String HOME = "home";
-    public static final String PAGE = "page";
+    // page_type 取值约定:站点页面(首页/列表页/静态页)取其路径("/", "/products"、
+    // "/news"、"/about"、"/contact"),page_id 恒为空;仅产品/新闻详情用下列常量 + page_id。
     public static final String PRODUCT = "product";
     public static final String ARTICLE = "article";
-    public static final String PRODUCTS_LIST = "products_list";
-    public static final String NEWS_LIST = "news_list";
 
     private static final String DEFAULT_ROBOTS = "index, follow";
 

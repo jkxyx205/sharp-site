@@ -59,10 +59,10 @@ class SeoConfigServiceTest {
     void upsertUpdatesSameRow() {
         createTenant("seo-b");
         seoService.save(SeoConfig.builder()
-                .pageType(SeoConfigService.PAGE).pageId(1L).language("en-US").title("Old").build());
+                .pageType("/about").pageId(1L).language("en-US").title("Old").build());
         seoService.save(SeoConfig.builder()
-                .pageType(SeoConfigService.PAGE).pageId(1L).language("en-US").title("New").build());
-        assertThat(seoService.find(SeoConfigService.PAGE, 1L, "en-US").orElseThrow().getTitle())
+                .pageType("/about").pageId(1L).language("en-US").title("New").build());
+        assertThat(seoService.find("/about", 1L, "en-US").orElseThrow().getTitle())
                 .isEqualTo("New");
     }
 
@@ -118,8 +118,8 @@ class SeoConfigServiceTest {
     void nullPageIdForHome() {
         createTenant("seo-f");
         seoService.save(SeoConfig.builder()
-                .pageType(SeoConfigService.HOME).language("en-US").title("Home SEO").build());
-        SeoConfig found = seoService.find(SeoConfigService.HOME, null, "en-US").orElseThrow();
+                .pageType("/").language("en-US").title("Home SEO").build());
+        SeoConfig found = seoService.find("/", null, "en-US").orElseThrow();
         assertThat(found.getTitle()).isEqualTo("Home SEO");
     }
 
@@ -127,15 +127,15 @@ class SeoConfigServiceTest {
     void isolatedPerTenant() {
         Tenant a = createTenant("seo-g");
         seoService.save(SeoConfig.builder()
-                .pageType(SeoConfigService.PAGE).pageId(1L).language("en-US").title("A SEO").build());
+                .pageType("/about").pageId(1L).language("en-US").title("A SEO").build());
         Tenant b = createTenant("seo-h");
         seoService.save(SeoConfig.builder()
-                .pageType(SeoConfigService.PAGE).pageId(1L).language("en-US").title("B SEO").build());
+                .pageType("/about").pageId(1L).language("en-US").title("B SEO").build());
         TenantContext.set(a);
-        assertThat(seoService.find(SeoConfigService.PAGE, 1L, "en-US").orElseThrow().getTitle())
+        assertThat(seoService.find("/about", 1L, "en-US").orElseThrow().getTitle())
                 .isEqualTo("A SEO");
         TenantContext.set(b);
-        assertThat(seoService.find(SeoConfigService.PAGE, 1L, "en-US").orElseThrow().getTitle())
+        assertThat(seoService.find("/about", 1L, "en-US").orElseThrow().getTitle())
                 .isEqualTo("B SEO");
     }
 }

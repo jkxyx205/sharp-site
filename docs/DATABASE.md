@@ -106,87 +106,15 @@ CREATE TABLE tenant_config (
 CREATE UNIQUE INDEX uk_tenant_config ON tenant_config (tenant_id) WHERE is_deleted = false;
 ```
 
-## 4. site_page
+## 4. 页面与首页区块(前端模板维护)
 
-```sql
-CREATE TABLE site_page (
-    id BIGINT PRIMARY KEY,
-    tenant_id BIGINT NOT NULL,
-    page_key VARCHAR(100) NOT NULL,
-    path VARCHAR(500) NOT NULL,
-    template VARCHAR(200) NOT NULL,
-    status SMALLINT NOT NULL DEFAULT 1,
-    create_by BIGINT,
-    create_time TIMESTAMP NOT NULL,
-    update_by BIGINT,
-    update_time TIMESTAMP NOT NULL,
-    is_deleted BOOLEAN NOT NULL DEFAULT FALSE
-);
+页面(about/contact 等)与首页区块(hero/company/cta 等)均由前端主题模板维护,
+后端只渲染,不再有 `site_page` / `site_page_i18n` / `home_section` / `home_section_i18n` 表。
 
-CREATE UNIQUE INDEX uk_tenant_page_key ON site_page (tenant_id, page_key) WHERE is_deleted = false;
-CREATE UNIQUE INDEX uk_tenant_page_path ON site_page (tenant_id, path) WHERE is_deleted = false;
-```
-
-## 5. site_page_i18n
-
-```sql
-CREATE TABLE site_page_i18n (
-    id BIGINT PRIMARY KEY,
-    page_id BIGINT NOT NULL,
-    language VARCHAR(20) NOT NULL,
-    title VARCHAR(500),
-    content TEXT,
-    cover VARCHAR(1000),
-    create_by BIGINT,
-    create_time TIMESTAMP NOT NULL,
-    update_by BIGINT,
-    update_time TIMESTAMP NOT NULL,
-    is_deleted BOOLEAN NOT NULL DEFAULT FALSE
-);
-
-CREATE UNIQUE INDEX uk_page_language ON site_page_i18n (page_id, language) WHERE is_deleted = false;
-```
-
-## 6. home_section
-
-```sql
-CREATE TABLE home_section (
-    id BIGINT PRIMARY KEY,
-    tenant_id BIGINT NOT NULL,
-    section_key VARCHAR(100) NOT NULL,
-    sort INT NOT NULL DEFAULT 0,
-    enabled SMALLINT NOT NULL DEFAULT 1,
-    create_by BIGINT,
-    create_time TIMESTAMP NOT NULL,
-    update_by BIGINT,
-    update_time TIMESTAMP NOT NULL,
-    is_deleted BOOLEAN NOT NULL DEFAULT FALSE
-);
-
-CREATE UNIQUE INDEX uk_tenant_section ON home_section (tenant_id, section_key) WHERE is_deleted = false;
-```
-
-## 7. home_section_i18n
-
-```sql
-CREATE TABLE home_section_i18n (
-    id BIGINT PRIMARY KEY,
-    section_id BIGINT NOT NULL,
-    language VARCHAR(20) NOT NULL,
-    title VARCHAR(500),
-    subtitle VARCHAR(1000),
-    content TEXT,
-    create_by BIGINT,
-    create_time TIMESTAMP NOT NULL,
-    update_by BIGINT,
-    update_time TIMESTAMP NOT NULL,
-    is_deleted BOOLEAN NOT NULL DEFAULT FALSE
-);
-
-CREATE UNIQUE INDEX uk_section_language ON home_section_i18n (section_id, language) WHERE is_deleted = false;
-```
-
-如区块字段差异较大，可增加结构化 JSONB 字段；但 JSONB 不应成为整个 CMS 的唯一数据模型。
+- 页面路径→模板清单见 `themes/{themeId}/meta/theme.json` 的 `pages`(首页/产品列表/新闻列表/关于/联系等)。
+- 正文文案由模板 + `themes/{themeId}/meta/messages.json` 文案键提供(与现有 contact 一致)。
+- 后台 SEO 编辑的页面清单直接取自 `pages`;单页/列表页 SEO 的 `page_type` = 页面路径(`/`、`/products`、`/news`、`/about`、`/contact`),`page_id` 恒为空。
+- 产品/新闻列表仍由 `product` / `article` 表注入,详情页 SEO 用 `page_type=product/article` + `page_id`。
 
 ## 8. category
 

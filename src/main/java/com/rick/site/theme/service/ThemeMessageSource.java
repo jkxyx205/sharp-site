@@ -2,6 +2,7 @@ package com.rick.site.theme.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rick.site.i18n.context.LocaleContext;
 import com.rick.site.tenant.context.TenantContext;
 import com.rick.site.tenant.entity.Tenant;
 import org.slf4j.Logger;
@@ -31,9 +32,11 @@ import java.util.concurrent.ConcurrentMap;
  * <p>解析顺序:当前主题文案 {@code [code][locale]} → {@code [code][defaultLocale]} → 返回 null
  * (交由调用方/Thymeleaf 默认 {@code ??code??} 处理,不抛异常以保证发布不中断)。
  *
- * <p>主题来源:动态请求由 {@link LocaleContextHolder} + {@link TenantContext};离线渲染由
- * {@code PublishService} 设置的 {@link TenantContext}。locale 由 Thymeleaf 上下文传入
- * (动态请求为 {@link LocaleContextHolder},离线为 {@code OfflineWebContext(locale)})。
+ * <p>主题来源:动态请求由 {@link LocaleContext} + {@link TenantContext};离线渲染由
+ * {@code PublishService} 设置的 {@link TenantContext}。语种来源:动态请求取 {@link LocaleContext}
+ * (LocaleFilter 依 URL 写入,DispatcherServlet 的 AcceptHeaderLocaleResolver 会覆盖
+ * {@link LocaleContextHolder},故不以后者为凭);离线渲染取 Thymeleaf 上下文 locale
+ * ({@code OfflineWebContext(locale)}),此时无 LocaleContext。
  *
  * @author Rick.Xu
  */
@@ -110,7 +113,13 @@ public class ThemeMessageSource implements MessageSource {
         if (entry == null) {
             return null;
         }
-        String text = entry.get(localeToTag(locale));
+        // 动态请求:LocaleFilter 依据 URL 写入 LocaleContext,这是语种的权威来源
+        // (DispatcherServlet 的 AcceptHeaderLocaleResolver 会覆盖 LocaleContextHolder,
+        // 故不能依赖 Thymeleaf 传入的 locale)。离线渲染无 LocaleContext,回退传入 locale。
+        String lookupTag = LocaleContext.get()
+                .map(res -> res.language())
+                .orElse(localeToTag(locale));
+        String text = entry.get(lookupTag);
         if (text == null) {
             String defaultLocale = manifestResolver.resolveByThemeId(themeId).defaultLocale();
             text = entry.get(defaultLocale);
