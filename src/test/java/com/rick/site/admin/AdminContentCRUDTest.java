@@ -197,6 +197,20 @@ class AdminContentCRUDTest {
     }
 
     @Test
+    void newArticleFormDefaultsPublishTimeToNow() throws Exception {
+        // 新建新闻:发布时间默认当前时间(可在表单修改),非空且符合 datetime-local 格式
+        String html = mockMvc.perform(get("/admin/news/new")
+                        .with(host("crud-a.example.com")).session(sessionA))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        // value="yyyy-MM-ddTHH:mm" 形如 value="2026-09-11T19:20"
+        java.util.regex.Matcher m = java.util.regex.Pattern
+                .compile("name=\"publishTime\"[^>]*value=\"(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2})\"")
+                .matcher(html);
+        assertThat(m.find()).as("publishTime 输入框应预填当前时间").isTrue();
+    }
+
+    @Test
     void crossTenantWriteRejected() {
         // 租户 B 的产品
         Tenant tenantB = tenantService.save(Tenant.builder()

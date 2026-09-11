@@ -12,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
@@ -55,6 +56,7 @@ public class AdminArticleController {
             article = new Article();
             article.setStatus((short) 1);
             article.setSort(0);
+            article.setPublishTime(LocalDateTime.now().withSecond(0).withNano(0)); // 新建默认当前时间(分精度,与表单 datetime-local 一致),可改
             i18nMap = Map.of();
         } else {
             article = articleService.selectById(id).orElse(null);

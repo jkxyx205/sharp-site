@@ -32,7 +32,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -245,9 +244,7 @@ public class StaticSiteGenerator {
     public void generateNews(Tenant tenant, String locale, String defaultLocale, String localePrefix,
                              String baseUrl, Path outputDir, Path releaseDir) throws IOException {
         List<ResolvedArticle> resolved = articleService.listForDisplay(locale, defaultLocale);
-        List<ArticleView> views = new ArrayList<>(resolved.stream().map(ArticleView::from).toList());
-        // 新闻列表倒序:最新在前(页面端;后端排序保持不变)。分页基于倒序后的列表,page 1 = 最新。
-        Collections.reverse(views);
+        List<ArticleView> views = resolved.stream().map(ArticleView::from).toList();
         int pages = pageCount(views.size());
 
         writeRedirect(outputDir, "news/index.html",

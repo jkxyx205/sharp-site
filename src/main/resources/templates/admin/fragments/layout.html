@@ -13,20 +13,20 @@
     </div>
     <div class="nav-group">
         <div class="nav-label">基本信息</div>
-        <a th:href="@{/admin/company}" th:classappend="${active == 'company'} ? 'active' : ''">tenant 信息</a>
-        <a th:href="@{/admin/seo}" th:classappend="${active == 'seo'} ? 'active' : ''">SEO 信息</a>
+        <a th:href="@{/admin/company}" th:classappend="${active == 'company'} ? 'active' : ''">公司信息</a>
+        <a th:href="@{/admin/seo}" th:classappend="${active == 'seo'} ? 'active' : ''">SEO信息</a>
         <a th:href="@{/admin/domains}" th:classappend="${active == 'domains'} ? 'active' : ''">域名管理</a>
     </div>
     <div class="nav-group">
         <div class="nav-label">内容维护</div>
         <a th:href="@{/admin/media}" th:classappend="${active == 'media'} ? 'active' : ''">素材管理</a>
         <a th:href="@{/admin/categories}" th:classappend="${active == 'categories'} ? 'active' : ''">分类管理</a>
-        <a th:href="@{/admin/news}" th:classappend="${active == 'news'} ? 'active' : ''">新闻</a>
-        <a th:href="@{/admin/products}" th:classappend="${active == 'products'} ? 'active' : ''">产品</a>
+        <a th:href="@{/admin/news}" th:classappend="${active == 'news'} ? 'active' : ''">新闻中心</a>
+        <a th:href="@{/admin/products}" th:classappend="${active == 'products'} ? 'active' : ''">产品管理</a>
     </div>
     <div class="nav-group">
         <div class="nav-label">网站发布</div>
-        <a th:href="@{/admin/publish}" th:classappend="${active == 'media'} ? 'active' : ''">版本</a>
+        <a th:href="@{/admin/publish}" th:classappend="${active == 'media'} ? 'active' : ''">版本管理</a>
     </div>
     <div class="spacer" style="flex:1"></div>
     <div class="foot">
