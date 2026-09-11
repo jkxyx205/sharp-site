@@ -182,6 +182,12 @@ public class StaticSiteGenerator {
             LocaleContext.set(new LocaleResolution(locale, path));
             OfflineWebContext ctx = newContext(locale);
             ctx.setVariable("page", page);
+            // 与 PreviewController.page 对齐:为通用页面(如 /info)注入全量产品/新闻列表,
+            // 使模板内按 categorySlug 过滤的板块在线上/预览/静态三路渲染一致。
+            ctx.setVariable("products", productService.listForDisplay(locale, defaultLocale).stream()
+                    .map(ProductView::from).toList());
+            ctx.setVariable("news", articleService.listForDisplay(locale, defaultLocale).stream()
+                    .map(ArticleView::from).toList());
             seoService.resolveView(path, null, locale, defaultLocale,
                     new SeoFallback(page.label(), "", "", baseUrl + localePrefix + path))
                     .applyTo(ctxToModel(ctx));

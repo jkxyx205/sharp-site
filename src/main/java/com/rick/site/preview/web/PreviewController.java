@@ -99,6 +99,7 @@ public class PreviewController {
         List<ProductView> products = productService.listForDisplay(language, dl)
                 .stream().map(ProductView::from).toList();
         model.addAttribute("products", products);
+        model.addAttribute("allProducts", products);
         model.addAttribute("categories", productService.listCategoryViews(language, dl));
         applyPreviewPagination(model, products, page, "/preview/products");
         seoService.resolveView("/products", null, language, dl,
@@ -141,6 +142,7 @@ public class PreviewController {
         List<ArticleView> news = articleService.listForDisplay(language, dl)
                 .stream().map(ArticleView::from).toList();
         model.addAttribute("news", news);
+        model.addAttribute("allNews", news);
         model.addAttribute("categories", articleService.listCategoryViews(language, dl));
         applyPreviewPagination(model, news, page, "/preview/news");
         seoService.resolveView("/news", null, language, dl,

@@ -3,6 +3,10 @@ package com.rick.site.web;
 import com.rick.common.http.exception.BizException;
 import com.rick.site.i18n.context.LocaleContext;
 import com.rick.site.i18n.model.LocaleResolution;
+import com.rick.site.news.dto.ArticleView;
+import com.rick.site.news.service.ArticleService;
+import com.rick.site.product.dto.ProductView;
+import com.rick.site.product.service.ProductService;
 import com.rick.site.seo.dto.SeoFallback;
 import com.rick.site.seo.service.SeoConfigService;
 import com.rick.site.tenant.context.TenantContext;
@@ -41,10 +45,15 @@ public class SitePageController {
 
     private final SeoConfigService seoService;
     private final ThemeManifestResolver manifestResolver;
+    private final ProductService productService;
+    private final ArticleService articleService;
 
-    public SitePageController(SeoConfigService seoService, ThemeManifestResolver manifestResolver) {
+    public SitePageController(SeoConfigService seoService, ThemeManifestResolver manifestResolver,
+                             ProductService productService, ArticleService articleService) {
         this.seoService = seoService;
         this.manifestResolver = manifestResolver;
+        this.productService = productService;
+        this.articleService = articleService;
     }
 
     @GetMapping(
@@ -64,6 +73,12 @@ public class SitePageController {
                 .findFirst()
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "页面不存在: " + pagePath));
         model.addAttribute("page", page);
+        // 与 PreviewController.page 对齐:为通用页面(如 /info)注入全量产品/新闻列表,
+        // 使模板内按 categorySlug 过滤的板块在线上/预览/静态三路渲染一致。
+        model.addAttribute("products", productService.listForDisplay(loc.language(), dl).stream()
+                .map(ProductView::from).toList());
+        model.addAttribute("news", articleService.listForDisplay(loc.language(), dl).stream()
+                .map(ArticleView::from).toList());
         // 单页 SEO:page_type = 页面路径(如 /about),page_id 恒为空
         seoService.resolveView(page.path(), null, loc.language(), dl,
                 new SeoFallback(page.label(), "", "", request.getRequestURL().toString())).applyTo(model);
