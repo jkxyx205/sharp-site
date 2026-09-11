@@ -20,12 +20,24 @@
     </nav>
 </section>
 
-<th:block th:if="${categories != null and allNews != null}">
-    <th:block th:each="cat : ${categories}" th:with="items=${allNews.?[categorySlug == cat.slug]}">
-        <section class="container section" th:if="${!items.isEmpty()}">
+<th:block th:if="${allNews != null}" th:with="cnews=${allNews.?[categorySlug == 'c-news']}">
+    <section class="container section" th:if="${!cnews.isEmpty()}">
+        <h2 th:text="${cnews[0].categoryName}">c-news</h2>
+        <ul class="news-list">
+            <li th:each="a : ${cnews}">
+                <a th:href="@{${localePrefix + '/news/' + a.slug}}" th:text="${a.title}">News title</a>
+                <span th:if="${a.publishTime != null}" th:text="${#temporals.format(a.publishTime, 'yyyy-MM-dd')}"></span>
+            </li>
+        </ul>
+    </section>
+</th:block>
+
+<th:block th:if="${categories != null and allNews != null}" th:with="slugs=${allNews.![categorySlug]}">
+    <th:block th:each="cat : ${categories}">
+        <section class="container section" th:if="${#lists.contains(slugs, cat.slug)}">
             <h2 th:text="${cat.name}">Category</h2>
             <ul class="news-list">
-                <li th:each="a : ${items}">
+                <li th:each="a : ${allNews}" th:if="${a.categorySlug == cat.slug}">
                     <a th:href="@{${localePrefix + '/news/' + a.slug}}" th:text="${a.title}">News title</a>
                     <span th:if="${a.publishTime != null}" th:text="${#temporals.format(a.publishTime, 'yyyy-MM-dd')}"></span>
                 </li>
