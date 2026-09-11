@@ -196,10 +196,17 @@ public class PreviewController {
         return manifestResolver.defaultLocale(tenant);
     }
 
-    /** 预览统一收尾:覆盖 currentLanguage、localePrefix(预览链接留根,不镜像)、强制 noindex。 */
+    /**
+     * 预览统一收尾:覆盖 currentLanguage、localePrefix、强制 noindex。
+     *
+     * <p>localePrefix 置为 {@code /preview}:模板中所有基于 localePrefix 的链接(nav 菜单、
+     * 列表/详情、表单 action)均带上 /preview 前缀,使预览内点击导航不跳出预览模式
+     * (对应路由 /preview、/preview/{path}、/preview/products、/preview/news 等)。语种切换
+     * 仍走 ?lang= 参数(language 切换片段在预览不渲染),无 locale 路径镜像。
+     */
     private String finish(String view, String language, Model model) {
         model.addAttribute("currentLanguage", language);
-        model.addAttribute("localePrefix", "");
+        model.addAttribute("localePrefix", "/preview");
         model.addAttribute("robots", NOINDEX_ROBOTS);
         return view;
     }
