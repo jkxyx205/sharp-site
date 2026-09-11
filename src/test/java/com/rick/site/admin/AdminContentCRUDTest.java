@@ -116,6 +116,24 @@ class AdminContentCRUDTest {
         TenantContext.clear();
     }
 
+    /**
+     * 回显验收(Request F):编辑产品时,按当前语种把 product_i18n 回显到表单。
+     */
+    @Test
+    void getEditFormEchoesSavedProductI18n() throws Exception {
+        MvcResult r = mockMvc.perform(post("/admin/products/save").with(host("crud-a.example.com")).session(sessionA).with(csrf())
+                        .param("slug", "echo-prod").param("status", "1").param("sort", "0")
+                        .param("language", "zh-CN").param("name", "小工具").param("content", "<p>中</p>"))
+                .andExpect(status().is3xxRedirection()).andReturn();
+        Long id = Long.valueOf(r.getResponse().getRedirectedUrl().replaceAll(".*/(\\d+)/edit.*", "$1"));
+
+        String zhHtml = mockMvc.perform(get("/admin/products/" + id + "/edit").param("lang", "zh-CN")
+                        .with(host("crud-a.example.com")).session(sessionA))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        assertThat(zhHtml).contains("小工具");
+    }
+
     @Test
     void saveArticleWritesBothLanguages() throws Exception {
         // 文章(单语种表单):分两次保存 en-US / zh-CN
@@ -139,6 +157,43 @@ class AdminContentCRUDTest {
         var article = articleService.findBySlug("launch-crud").orElseThrow();
         assertThat(articleService.loadI18nMap(article.getId())).containsKeys("en-US", "zh-CN");
         TenantContext.clear();
+    }
+
+    /**
+     * 回显验收(Request F):编辑新闻时,按当前语种查询 article_i18n 并把内容回显到表单。
+     * 复现用户报告"编辑内容,多语言区域的内容是空,没有回显"。
+     */
+    @Test
+    void getEditFormEchoesSavedI18nContent() throws Exception {
+        // 1) 保存 zh-CN + en-US 两行 i18n
+        MvcResult r = mockMvc.perform(post("/admin/news/save").with(host("crud-a.example.com")).session(sessionA).with(csrf())
+                        .param("slug", "echo-crud").param("status", "1").param("sort", "0")
+                        .param("language", "en-US").param("title", "Launched").param("content", "<p>en</p>"))
+                .andExpect(status().is3xxRedirection())
+                .andReturn();
+        Long articleId = Long.valueOf(r.getResponse().getRedirectedUrl()
+                .replaceAll(".*/(\\d+)/edit.*", "$1"));
+        mockMvc.perform(post("/admin/news/save").with(host("crud-a.example.com")).session(sessionA).with(csrf())
+                        .param("id", String.valueOf(articleId))
+                        .param("slug", "echo-crud").param("status", "1").param("sort", "0")
+                        .param("language", "zh-CN").param("title", "上线").param("content", "<p>中</p>"))
+                .andExpect(status().is3xxRedirection());
+
+        // 2) GET 编辑表单 ?lang=zh-CN → zh-CN 内容应回显到 input/textarea
+        String zhHtml = mockMvc.perform(get("/admin/news/" + articleId + "/edit")
+                        .param("lang", "zh-CN")
+                        .with(host("crud-a.example.com")).session(sessionA))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        assertThat(zhHtml).contains("上线");
+
+        // 3) GET 编辑表单 ?lang=en-US → en-US 内容应回显
+        String enHtml = mockMvc.perform(get("/admin/news/" + articleId + "/edit")
+                        .param("lang", "en-US")
+                        .with(host("crud-a.example.com")).session(sessionA))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        assertThat(enHtml).contains("Launched");
     }
 
     @Test

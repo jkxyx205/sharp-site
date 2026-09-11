@@ -47,10 +47,10 @@
                             <span class="lang-tag" th:if="${currentLang == defaultLanguage}">· 默认语言</span></legend>
                         <label>Name <span class="hint">必填,空则不保存该语种</span>
                             <input type="text" name="name"
-                                   th:value="${i18nMap[currentLang] != null ? i18nMap[currentLang].name : ''}" /></label>
+                                   th:value="${i18nMap['__${currentLang}__'] != null ? i18nMap['__${currentLang}__'].name : ''}" /></label>
                         <label>Description
                             <textarea name="description" style="min-height:60px"
-                                      th:text="${i18nMap[currentLang] != null ? i18nMap[currentLang].description : ''}"></textarea></label>
+                                      th:text="${i18nMap['__${currentLang}__'] != null ? i18nMap['__${currentLang}__'].description : ''}"></textarea></label>
                     </fieldset>
 
                     <div class="actions">

@@ -49,26 +49,26 @@
                             <span class="lang-tag" th:if="${currentLang == defaultLanguage}">· 默认语言</span></legend>
                         <label>Name <span class="hint">必填,空则不保存该语种</span>
                             <input type="text" name="name"
-                                   th:value="${i18nMap[currentLang] != null ? i18nMap[currentLang].name : ''}" /></label>
+                                   th:value="${i18nMap['__${currentLang}__'] != null ? i18nMap['__${currentLang}__'].name : ''}" /></label>
                         <label>Subtitle
                             <input type="text" name="subtitle"
-                                   th:value="${i18nMap[currentLang] != null ? i18nMap[currentLang].subtitle : ''}" /></label>
+                                   th:value="${i18nMap['__${currentLang}__'] != null ? i18nMap['__${currentLang}__'].subtitle : ''}" /></label>
                         <label>Description
                             <textarea name="description" style="min-height:60px"
-                                      th:text="${i18nMap[currentLang] != null ? i18nMap[currentLang].description : ''}"></textarea></label>
+                                      th:text="${i18nMap['__${currentLang}__'] != null ? i18nMap['__${currentLang}__'].description : ''}"></textarea></label>
                         <label>Content <span class="hint">富文本 HTML</span>
                             <textarea name="content"
-                                      th:text="${i18nMap[currentLang] != null ? i18nMap[currentLang].content : ''}"></textarea></label>
+                                      th:text="${i18nMap['__${currentLang}__'] != null ? i18nMap['__${currentLang}__'].content : ''}"></textarea></label>
                         <label>Specification JSON <span class="hint">须为合法 JSON,空则存 {}</span>
                             <textarea id="specificationJson" name="specificationJson" style="min-height:80px"
-                                      th:text="${i18nMap[currentLang] != null ? i18nMap[currentLang].specificationJson : ''}"
+                                      th:text="${i18nMap['__${currentLang}__'] != null ? i18nMap['__${currentLang}__'].specificationJson : ''}"
                                       placeholder='{"weight":"0.5kg","color":"black"}'></textarea></label>
                         <label>SEO Title
                             <input type="text" name="seoTitle"
-                                   th:value="${i18nMap[currentLang] != null ? i18nMap[currentLang].seoTitle : ''}" /></label>
+                                   th:value="${i18nMap['__${currentLang}__'] != null ? i18nMap['__${currentLang}__'].seoTitle : ''}" /></label>
                         <label>SEO Description
                             <input type="text" name="seoDescription"
-                                   th:value="${i18nMap[currentLang] != null ? i18nMap[currentLang].seoDescription : ''}" /></label>
+                                   th:value="${i18nMap['__${currentLang}__'] != null ? i18nMap['__${currentLang}__'].seoDescription : ''}" /></label>
                     </fieldset>
 
                     <div class="actions">

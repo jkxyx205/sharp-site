@@ -52,16 +52,16 @@
                             <span class="lang-tag" th:if="${currentLang == defaultLanguage}">· 默认语言</span></legend>
                         <label>公司名称 <span class="hint">必填,空则不保存该语种</span>
                             <input type="text" name="companyName"
-                                   th:value="${i18nMap[currentLang] != null ? i18nMap[currentLang].companyName : ''}" /></label>
+                                   th:value="${i18nMap['__${currentLang}__'] != null ? i18nMap['__${currentLang}__'].companyName : ''}" /></label>
                         <label>公司简称
                             <input type="text" name="companyNameShort"
-                                   th:value="${i18nMap[currentLang] != null ? i18nMap[currentLang].companyNameShort : ''}" /></label>
+                                   th:value="${i18nMap['__${currentLang}__'] != null ? i18nMap['__${currentLang}__'].companyNameShort : ''}" /></label>
                         <label>地址
                             <input type="text" name="address"
-                                   th:value="${i18nMap[currentLang] != null ? i18nMap[currentLang].address : ''}" /></label>
+                                   th:value="${i18nMap['__${currentLang}__'] != null ? i18nMap['__${currentLang}__'].address : ''}" /></label>
                         <label>版权信息
                             <input type="text" name="copyright"
-                                   th:value="${i18nMap[currentLang] != null ? i18nMap[currentLang].copyright : ''}" /></label>
+                                   th:value="${i18nMap['__${currentLang}__'] != null ? i18nMap['__${currentLang}__'].copyright : ''}" /></label>
                     </fieldset>
 
                     <div class="actions">
