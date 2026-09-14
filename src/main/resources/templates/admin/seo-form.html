@@ -32,22 +32,31 @@
                     <input type="hidden" name="language" th:value="${currentLang}" />
                     <fieldset>
                         <legend><span th:text="${config.pageType} + ' · ' + ${currentLang}">type · lang</span></legend>
+                        <p class="hint" th:if="${defaultSeo != null}">输入框占位符为 theme.json 默认值;留空即沿用该默认,保存后覆盖。</p>
                         <label>SEO 标题
-                            <input type="text" name="title" th:value="${config.title}" /></label>
+                            <input type="text" name="title" th:value="${config.title}"
+                                   th:placeholder="${defaultSeo != null ? defaultSeo.title() : ''}" /></label>
                         <label>SEO 描述
-                            <textarea name="description" style="min-height:60px" th:text="${config.description}"></textarea></label>
+                            <textarea name="description" style="min-height:60px" th:text="${config.description}"
+                                  th:placeholder="${defaultSeo != null ? defaultSeo.description() : ''}"></textarea></label>
                         <label>SEO 关键词
-                            <textarea name="keywords" style="min-height:60px" th:text="${config.keywords}"></textarea></label>
+                            <textarea name="keywords" style="min-height:60px" th:text="${config.keywords}"
+                                  th:placeholder="${defaultSeo != null ? defaultSeo.keywords() : ''}"></textarea></label>
                         <label>Canonical 链接
-                            <input type="text" name="canonical" th:value="${config.canonical}" /></label>
+                            <input type="text" name="canonical" th:value="${config.canonical}"
+                                   th:placeholder="${defaultSeo != null ? defaultSeo.canonical() : ''}" /></label>
                         <label>robots 指令 <span class="hint">如 index, follow</span>
-                            <input type="text" name="robots" th:value="${config.robots}" placeholder="index, follow" /></label>
+                            <input type="text" name="robots" th:value="${config.robots}"
+                                   th:placeholder="${defaultSeo != null ? defaultSeo.robots() : 'index, follow'}" /></label>
                         <label>OG 标题
-                            <input type="text" name="ogTitle" th:value="${config.ogTitle}" /></label>
+                            <input type="text" name="ogTitle" th:value="${config.ogTitle}"
+                                   th:placeholder="${defaultSeo != null ? defaultSeo.ogTitle() : ''}" /></label>
                         <label>OG 描述
-                            <textarea name="ogDescription" style="min-height:60px" th:text="${config.ogDescription}"></textarea></label>
+                            <textarea name="ogDescription" style="min-height:60px" th:text="${config.ogDescription}"
+                                  th:placeholder="${defaultSeo != null ? defaultSeo.ogDescription() : ''}"></textarea></label>
                         <label>OG 图片 URL
-                            <input type="url" name="ogImage" th:value="${config.ogImage}" /></label>
+                            <input type="url" name="ogImage" th:value="${config.ogImage}"
+                                   th:placeholder="${defaultSeo != null ? defaultSeo.ogImage() : ''}" /></label>
                     </fieldset>
                     <div class="actions">
                         <button type="submit" class="btn btn-primary">保存</button>

@@ -2,11 +2,35 @@
   "locales": ["en-US", "zh-CN", "ar-SA", "fr-FR", "ru-RU", "es-ES"],
   "defaultLocale": "en-US",
   "pages": [
-    { "path": "/",         "template": "themes/modern/index",    "label": "首页" },
-    { "path": "/products",  "template": "themes/modern/products", "label": "产品列表" },
-    { "path": "/news",      "template": "themes/modern/news",     "label": "新闻列表" },
-    { "path": "/about",     "template": "themes/modern/about",    "label": "关于我们" },
-    { "path": "/contact",   "template": "themes/modern/contact",   "label": "联系我们" },
-    { "path": "/info",   "template": "themes/modern/info",   "label": "信息" }
+    { "path": "/", "template": "themes/modern/index", "label": "首页",
+      "seo_config": {
+        "en-US": { "title": "Welcome to Our Site", "description": "Premium products for global trade. We supply quality goods to partners worldwide.", "keywords": "global trade, premium products, trading company, quality goods", "canonical": "", "robots": "index, follow", "ogTitle": "Welcome to Our Site", "ogDescription": "Premium products for global trade. We supply quality goods to partners worldwide.", "ogImage": "" },
+        "zh-CN": { "title": "欢迎来到我们的网站", "description": "优质产品·全球贸易。我们向全球合作伙伴供应优质商品。", "keywords": "全球贸易,优质产品,贸易公司,优质商品", "canonical": "", "robots": "index, follow", "ogTitle": "欢迎来到我们的网站", "ogDescription": "优质产品·全球贸易。我们向全球合作伙伴供应优质商品。", "ogImage": "" }
+      } },
+    { "path": "/products", "template": "themes/modern/products", "label": "产品列表",
+      "seo_config": {
+        "en-US": { "title": "Products", "description": "Browse our premium products for global trade and procurement.", "keywords": "products, catalog, premium goods, global trade", "canonical": "", "robots": "index, follow", "ogTitle": "Products", "ogDescription": "Browse our premium products for global trade and procurement.", "ogImage": "" },
+        "zh-CN": { "title": "产品", "description": "浏览我们面向全球贸易与采购的优质产品。", "keywords": "产品,目录,优质商品,全球贸易", "canonical": "", "robots": "index, follow", "ogTitle": "产品", "ogDescription": "浏览我们面向全球贸易与采购的优质产品。", "ogImage": "" }
+      } },
+    { "path": "/news", "template": "themes/modern/news", "label": "新闻列表",
+      "seo_config": {
+        "en-US": { "title": "News", "description": "Latest news and updates from our trading company.", "keywords": "news, updates, trading company, announcements", "canonical": "", "robots": "index, follow", "ogTitle": "News", "ogDescription": "Latest news and updates from our trading company.", "ogImage": "" },
+        "zh-CN": { "title": "新闻", "description": "贸易公司最新动态与资讯。", "keywords": "新闻,动态,贸易公司,资讯", "canonical": "", "robots": "index, follow", "ogTitle": "新闻", "ogDescription": "贸易公司最新动态与资讯。", "ogImage": "" }
+      } },
+    { "path": "/about", "template": "themes/modern/about", "label": "关于我们",
+      "seo_config": {
+        "en-US": { "title": "About Us", "description": "A trading company connecting manufacturers and buyers globally, committed to quality goods and reliable service.", "keywords": "about us, trading company, global trade, manufacturer", "canonical": "", "robots": "index, follow", "ogTitle": "About Us", "ogDescription": "A trading company connecting manufacturers and buyers globally, committed to quality goods and reliable service.", "ogImage": "" },
+        "zh-CN": { "title": "关于我们", "description": "我们是一家连接制造商与全球采购商的贸易公司,致力于提供优质商品与可靠服务。", "keywords": "关于我们,贸易公司,全球贸易,制造商", "canonical": "", "robots": "index, follow", "ogTitle": "关于我们", "ogDescription": "我们是一家连接制造商与全球采购商的贸易公司,致力于提供优质商品与可靠服务。", "ogImage": "" }
+      } },
+    { "path": "/contact", "template": "themes/modern/contact", "label": "联系我们",
+      "seo_config": {
+        "en-US": { "title": "Contact", "description": "Get in touch with our trading company for partnerships and inquiries.", "keywords": "contact, contact us, trading company, inquiry", "canonical": "", "robots": "index, follow", "ogTitle": "Contact", "ogDescription": "Get in touch with our trading company for partnerships and inquiries.", "ogImage": "" },
+        "zh-CN": { "title": "联系我们", "description": "联系我们,洽谈合作与咨询。", "keywords": "联系我们,合作,咨询,贸易公司", "canonical": "", "robots": "index, follow", "ogTitle": "联系我们", "ogDescription": "联系我们,洽谈合作与咨询。", "ogImage": "" }
+      } },
+    { "path": "/info", "template": "themes/modern/info", "label": "信息",
+      "seo_config": {
+        "en-US": { "title": "Info", "description": "Company information and updates from our trading team.", "keywords": "info, company information, trading company", "canonical": "", "robots": "index, follow", "ogTitle": "Info", "ogDescription": "Company information and updates from our trading team.", "ogImage": "" },
+        "zh-CN": { "title": "信息", "description": "贸易团队的公司信息与资讯。", "keywords": "信息,公司资讯,贸易公司", "canonical": "", "robots": "index, follow", "ogTitle": "信息", "ogDescription": "贸易团队的公司信息与资讯。", "ogImage": "" }
+      } }
   ]
 }

@@ -114,6 +114,73 @@ class SeoConfigServiceTest {
         assertThat(view.ogTitle()).isEqualTo("FB Title");
     }
 
+    /**
+     * 站点页(/about)无 DB 行时,默认从 theme.json 的 seo_config 取:en-US 取 en-US 套,
+     * 未声明语种(ar-SA)回退默认语种 en-US;keywords 也来自主题(内容回退无 keywords)。
+     */
+    @Test
+    void resolveViewFallsBackToThemeDefault() {
+        createTenant("seo-i");
+        SeoView en = seoService.resolveView("/about", null, "en-US", "en-US",
+                new SeoFallback("FB Title", "FB Desc", "/img/fb.jpg", "https://x/p"));
+        assertThat(en.title()).isEqualTo("About Us");
+        assertThat(en.description()).startsWith("A trading company");
+        assertThat(en.keywords()).startsWith("about us");
+        // canonical/ogImage 仍来自内容回退(主题不含这两项)
+        assertThat(en.canonical()).isEqualTo("https://x/p");
+        assertThat(en.ogImage()).isEqualTo("/img/fb.jpg");
+        // ogTitle 级联到解析出的 title
+        assertThat(en.ogTitle()).isEqualTo("About Us");
+
+        // zh-CN 取 zh-CN 套
+        SeoView zh = seoService.resolveView("/about", null, "zh-CN", "en-US",
+                new SeoFallback("FB", "FB", "", "https://x/p"));
+        assertThat(zh.title()).isEqualTo("关于我们");
+
+        // 未声明语种回退默认语种 en-US
+        SeoView ar = seoService.resolveView("/about", null, "ar-SA", "en-US",
+                new SeoFallback("FB", "FB", "", "https://x/p"));
+        assertThat(ar.title()).isEqualTo("About Us");
+    }
+
+    /** DB 有行时覆盖 theme.json 默认(仅覆盖已填字段,未填字段仍回退主题)。 */
+    @Test
+    void resolveViewDbOverridesTheme() {
+        createTenant("seo-j");
+        seoService.save(SeoConfig.builder()
+                .pageType("/about").language("en-US").title("Custom About").build());
+        SeoView view = seoService.resolveView("/about", null, "en-US", "en-US",
+                new SeoFallback("FB", "FB", "/img/fb.jpg", "https://x/p"));
+        assertThat(view.title()).isEqualTo("Custom About"); // DB 覆盖
+        assertThat(view.description()).startsWith("A trading company"); // DB 未填 → 主题
+    }
+
+    /** 全字段主题回退:canonical/robots/ogTitle/ogDescription/ogImage 亦取自 theme.json(留空则回退内容)。 */
+    @Test
+    void resolveViewThemeAllFields() {
+        createTenant("seo-k");
+        SeoView view = seoService.resolveView("/about", null, "en-US", "en-US",
+                new SeoFallback("FB Title", "FB Desc", "/img/fb.jpg", "https://fallback/p"));
+        // theme.json ogTitle=ogDescription=主题 title/description;robots=index, follow
+        assertThat(view.ogTitle()).isEqualTo("About Us");
+        assertThat(view.ogDescription()).startsWith("A trading company");
+        assertThat(view.robots()).isEqualTo("index, follow");
+        // canonical/ogImage 在 theme.json 留空 → 回退内容回退
+        assertThat(view.canonical()).isEqualTo("https://fallback/p");
+        assertThat(view.ogImage()).isEqualTo("/img/fb.jpg");
+
+        // DB 覆盖 robots 与 ogImage,其余仍回退主题
+        seoService.save(SeoConfig.builder()
+                .pageType("/about").language("en-US")
+                .robots("noindex, follow").ogImage("/img/db.jpg").build());
+        SeoView over = seoService.resolveView("/about", null, "en-US", "en-US",
+                new SeoFallback("FB", "FB", "", "https://x/p"));
+        assertThat(over.robots()).isEqualTo("noindex, follow");
+        assertThat(over.ogImage()).isEqualTo("/img/db.jpg");
+        // ogTitle 未在 DB 填 → 主题 ogTitle(About Us)
+        assertThat(over.ogTitle()).isEqualTo("About Us");
+    }
+
     @Test
     void nullPageIdForHome() {
         createTenant("seo-f");

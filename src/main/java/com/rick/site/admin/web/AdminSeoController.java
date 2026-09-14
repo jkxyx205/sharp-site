@@ -5,6 +5,7 @@ import com.rick.site.seo.entity.SeoConfig;
 import com.rick.site.seo.service.SeoConfigService;
 import com.rick.site.tenant.context.TenantContext;
 import com.rick.site.theme.model.ThemeManifest.ThemePage;
+import com.rick.site.theme.model.ThemeManifest.ThemePageSeo;
 import com.rick.site.theme.service.ThemeManifestResolver;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -74,11 +75,19 @@ public class AdminSeoController {
             c.setLanguage(language);
             return c;
         });
+        // 主题清单该页该语种的 SEO 默认值(缺失回退默认语种):作为输入框 placeholder,
+        // 让管理员看到未填写时将从 theme.json 加载的默认;后台保存即覆盖它。
+        ThemePageSeo defaultSeo = pages().stream()
+                .filter(p -> pageType.equals(p.path()))
+                .findFirst()
+                .flatMap(p -> p.seoFor(language, localeResolver.defaultLanguage()))
+                .orElse(null);
         model.addAttribute("config", config);
         model.addAttribute("currentLang", language);
         model.addAttribute("languages", localeResolver.supportedLanguages());
         model.addAttribute("defaultLanguage", localeResolver.defaultLanguage());
         model.addAttribute("pages", pages());
+        model.addAttribute("defaultSeo", defaultSeo);
         return "admin/seo-form";
     }
 
