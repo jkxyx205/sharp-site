@@ -1,5 +1,6 @@
 package com.rick.site.web;
 
+import com.rick.site.catalog.service.CategoryService;
 import com.rick.site.i18n.context.LocaleContext;
 import com.rick.site.i18n.model.LocaleResolution;
 import com.rick.site.news.dto.ArticleView;
@@ -15,6 +16,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+
+import java.util.List;
 
 /**
  * 首页 Controller(TASK-0502 / TASK-1002)。
@@ -38,13 +41,16 @@ public class SiteHomeController {
     private final ThemeManifestResolver manifestResolver;
     private final ProductService productService;
     private final ArticleService articleService;
+    private final CategoryService categoryService;
 
     public SiteHomeController(SeoConfigService seoService, ThemeManifestResolver manifestResolver,
-                             ProductService productService, ArticleService articleService) {
+                             ProductService productService, ArticleService articleService,
+                             CategoryService categoryService) {
         this.seoService = seoService;
         this.manifestResolver = manifestResolver;
         this.productService = productService;
         this.articleService = articleService;
+        this.categoryService = categoryService;
     }
 
     @GetMapping(value = {"/", "/{locale:[a-z]{2}-[a-z]{2}}", "/{locale:[a-z]{2}-[a-z]{2}}/"})
@@ -54,11 +60,17 @@ public class SiteHomeController {
         LocaleResolution loc = LocaleContext.get()
                 .orElseGet(() -> new LocaleResolution(defaultLanguage, "/"));
 
-        // 首页精选产品 + 最新文章(与静态发布 StaticSiteGenerator.generateHome 一致)
-        model.addAttribute("products", productService.listForDisplay(loc.language(), defaultLanguage).stream()
-                .limit(HOME_PRODUCT_LIMIT).map(ProductView::from).toList());
-        model.addAttribute("news", articleService.listForDisplay(loc.language(), defaultLanguage).stream()
-                .limit(HOME_NEWS_LIMIT).map(ArticleView::from).toList());
+        // 全量产品/新闻 + 分类(供模板按 categorySlug 过滤板块使用),与 SitePageController / Preview / 静态一致;
+        // products/news 为精选子集(Featured/Latest),allProducts/allNews 为全量。
+        List<ProductView> allProducts = productService.listForDisplay(loc.language(), defaultLanguage).stream()
+                .map(ProductView::from).toList();
+        List<ArticleView> allNews = articleService.listForDisplay(loc.language(), defaultLanguage).stream()
+                .map(ArticleView::from).toList();
+        model.addAttribute("allProducts", allProducts);
+        model.addAttribute("allNews", allNews);
+        model.addAttribute("products", allProducts.stream().limit(HOME_PRODUCT_LIMIT).toList());
+        model.addAttribute("news", allNews.stream().limit(HOME_NEWS_LIMIT).toList());
+        model.addAttribute("categories", categoryService.selectAll());
 
         seoService.resolveView("/", null, loc.language(), defaultLanguage,
                 new SeoFallback("", "", "", request.getRequestURL().toString())).applyTo(model);

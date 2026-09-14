@@ -78,10 +78,16 @@ public class PreviewController {
         String dl = defaultLocale(tenant);
         LocaleContext.set(new LocaleResolution(language, "/"));
 
-        model.addAttribute("products", productService.listForDisplay(language, dl).stream()
-                .limit(HOME_PRODUCT_LIMIT).map(ProductView::from).toList());
-        model.addAttribute("news", articleService.listForDisplay(language, dl).stream()
-                .limit(HOME_NEWS_LIMIT).map(ArticleView::from).toList());
+        // 与 SiteHomeController 一致:全量 allProducts/allNews + categories,products/news 为精选子集。
+        List<ProductView> allProducts = productService.listForDisplay(language, dl).stream()
+                .map(ProductView::from).toList();
+        List<ArticleView> allNews = articleService.listForDisplay(language, dl).stream()
+                .map(ArticleView::from).toList();
+        model.addAttribute("allProducts", allProducts);
+        model.addAttribute("allNews", allNews);
+        model.addAttribute("products", allProducts.stream().limit(HOME_PRODUCT_LIMIT).toList());
+        model.addAttribute("news", allNews.stream().limit(HOME_NEWS_LIMIT).toList());
+        model.addAttribute("categories", categoryService.selectAll());
 
         seoService.resolveView("/", null, language, dl,
                 new SeoFallback("", "", "", request.getRequestURL().toString())).applyTo(model);

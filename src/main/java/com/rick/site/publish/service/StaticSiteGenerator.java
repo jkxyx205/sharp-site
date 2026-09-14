@@ -1,5 +1,6 @@
 package com.rick.site.publish.service;
 
+import com.rick.site.catalog.service.CategoryService;
 import com.rick.site.i18n.SupportedLanguage;
 import com.rick.site.i18n.context.LocaleContext;
 import com.rick.site.i18n.model.LanguageOption;
@@ -88,13 +89,16 @@ public class StaticSiteGenerator {
     private final TenantDomainService domainService;
     private final ThemeManifestResolver manifestResolver;
 
+    private final CategoryService categoryService;
+
     public StaticSiteGenerator(TemplateEngine templateEngine,
                               ProductService productService,
                               ArticleService articleService,
                               SeoConfigService seoService,
                               TenantConfigService tenantConfigService,
                               TenantDomainService domainService,
-                              ThemeManifestResolver manifestResolver) {
+                              ThemeManifestResolver manifestResolver,
+                              CategoryService categoryService) {
         this.templateEngine = templateEngine;
         this.productService = productService;
         this.articleService = articleService;
@@ -102,6 +106,7 @@ public class StaticSiteGenerator {
         this.tenantConfigService = tenantConfigService;
         this.domainService = domainService;
         this.manifestResolver = manifestResolver;
+        this.categoryService = categoryService;
     }
 
     /**
@@ -157,10 +162,16 @@ public class StaticSiteGenerator {
                              String baseUrl, Path outputDir) throws IOException {
         LocaleContext.set(new LocaleResolution(locale, "/"));
         OfflineWebContext ctx = newContext(locale);
-        ctx.setVariable("products", productService.listForDisplay(locale, defaultLocale).stream()
-                .limit(HOME_PRODUCT_LIMIT).map(ProductView::from).toList());
-        ctx.setVariable("news", articleService.listForDisplay(locale, defaultLocale).stream()
-                .limit(HOME_NEWS_LIMIT).map(ArticleView::from).toList());
+        // 与 SiteHomeController 一致:全量 allProducts/allNews + categories,products/news 为精选子集。
+        List<ProductView> allProducts = productService.listForDisplay(locale, defaultLocale).stream()
+                .map(ProductView::from).toList();
+        List<ArticleView> allNews = articleService.listForDisplay(locale, defaultLocale).stream()
+                .map(ArticleView::from).toList();
+        ctx.setVariable("allProducts", allProducts);
+        ctx.setVariable("allNews", allNews);
+        ctx.setVariable("products", allProducts.stream().limit(HOME_PRODUCT_LIMIT).toList());
+        ctx.setVariable("news", allNews.stream().limit(HOME_NEWS_LIMIT).toList());
+        ctx.setVariable("categories", categoryService.selectAll());
         seoService.resolveView("/", null, locale, defaultLocale,
                 new SeoFallback("", "", "", baseUrl + localePrefix + "/")).applyTo(ctxToModel(ctx));
         applyCommon(ctx, tenant, locale, localePrefix);
@@ -188,6 +199,8 @@ public class StaticSiteGenerator {
                     .map(ProductView::from).toList());
             ctx.setVariable("news", articleService.listForDisplay(locale, defaultLocale).stream()
                     .map(ArticleView::from).toList());
+            ctx.setVariable("categories", categoryService.selectAll());
+
             seoService.resolveView(path, null, locale, defaultLocale,
                     new SeoFallback(page.label(), "", "", baseUrl + localePrefix + path))
                     .applyTo(ctxToModel(ctx));

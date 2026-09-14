@@ -1,6 +1,7 @@
 package com.rick.site.web;
 
 import com.rick.common.http.exception.BizException;
+import com.rick.site.catalog.service.CategoryService;
 import com.rick.site.i18n.context.LocaleContext;
 import com.rick.site.i18n.model.LocaleResolution;
 import com.rick.site.news.dto.ArticleView;
@@ -47,13 +48,15 @@ public class SitePageController {
     private final ThemeManifestResolver manifestResolver;
     private final ProductService productService;
     private final ArticleService articleService;
+    private final CategoryService categoryService;
 
     public SitePageController(SeoConfigService seoService, ThemeManifestResolver manifestResolver,
-                             ProductService productService, ArticleService articleService) {
+                             ProductService productService, ArticleService articleService, CategoryService categoryService) {
         this.seoService = seoService;
         this.manifestResolver = manifestResolver;
         this.productService = productService;
         this.articleService = articleService;
+        this.categoryService = categoryService;
     }
 
     @GetMapping(
@@ -79,6 +82,7 @@ public class SitePageController {
                 .map(ProductView::from).toList());
         model.addAttribute("news", articleService.listForDisplay(loc.language(), dl).stream()
                 .map(ArticleView::from).toList());
+        model.addAttribute("categories", categoryService.selectAll());
         // 单页 SEO:page_type = 页面路径(如 /about),page_id 恒为空
         seoService.resolveView(page.path(), null, loc.language(), dl,
                 new SeoFallback(page.label(), "", "", request.getRequestURL().toString())).applyTo(model);
