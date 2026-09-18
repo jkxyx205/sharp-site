@@ -6,13 +6,17 @@
 <section class="container section">
     <h1 th:text="#{video.title}">Videos</h1>
     <div class="product-grid" th:if="${videos != null and !videos.isEmpty()}">
-        <article class="product-card" th:each="p : ${videos}">
-            <a th:href="@{${localePrefix + '/videos/' + p.slug}}">
-                <img th:if="${p.cover != null}" th:src="${p.cover}" th:alt="${p.name}" src="" />
+        <figure class="product-card video-card" th:each="p : ${videos}">
+            <video th:if="${p.videoUrl != null}" controls preload="metadata" playsinline
+                   th:poster="${p.cover}" th:aria-label="${p.name}">
+                <source th:src="${p.videoUrl}" />
+            </video>
+            <img th:if="${p.videoUrl == null and p.cover != null}" th:src="${p.cover}" th:alt="${p.name}" />
+            <figcaption>
                 <h3 th:text="${p.name}">Product</h3>
                 <p th:if="${p.subtitle != null}" th:text="${p.subtitle}"></p>
-            </a>
-        </article>
+            </figcaption>
+        </figure>
     </div>
     <p th:if="${videos == null or videos.isEmpty()}" class="empty" th:text="#{product.empty}">No videos yet.</p>
     <nav class="pagination" th:if="${totalPages != null and totalPages > 1}">
@@ -27,10 +31,14 @@
         <section class="container section" th:if="${#lists.contains(slugs, cat.slug)}">
             <h2 th:text="${cat.name}">Category</h2>
             <div class="product-grid">
-                <a class="product-card" th:each="p : ${allVideos}" th:if="${p.categorySlug == cat.slug}" th:href="@{${localePrefix + '/videos/' + p.slug}}">
-                    <img th:if="${p.cover != null}" th:src="${p.cover}" th:alt="${p.name}" src="" loading="lazy" />
-                    <h3 th:text="${p.name}">Product</h3>
-                </a>
+                <figure class="product-card video-card" th:each="p : ${allVideos}" th:if="${p.categorySlug == cat.slug}">
+                    <video th:if="${p.videoUrl != null}" controls preload="metadata" playsinline
+                           th:poster="${p.cover}" th:aria-label="${p.name}">
+                        <source th:src="${p.videoUrl}" />
+                    </video>
+                    <img th:if="${p.videoUrl == null and p.cover != null}" th:src="${p.cover}" th:alt="${p.name}" loading="lazy" />
+                    <figcaption><h3 th:text="${p.name}">Product</h3></figcaption>
+                </figure>
             </div>
         </section>
     </th:block>
@@ -41,10 +49,14 @@
     <section class="container section" th:if="${!gallery.isEmpty()}">
         <h2 th:text="${gallery[0].categoryName}">Gallery</h2>
         <div class="product-grid">
-            <a class="product-card" th:each="p : ${gallery}" th:href="@{${localePrefix + '/videos/' + p.slug}}">
-                <img th:if="${p.cover != null}" th:src="${p.cover}" th:alt="${p.name}" src="" loading="lazy" />
-                <h3 th:text="${p.name}">Product</h3>
-            </a>
+            <figure class="product-card video-card" th:each="p : ${gallery}">
+                <video th:if="${p.videoUrl != null}" controls preload="metadata" playsinline
+                       th:poster="${p.cover}" th:aria-label="${p.name}">
+                    <source th:src="${p.videoUrl}" />
+                </video>
+                <img th:if="${p.videoUrl == null and p.cover != null}" th:src="${p.cover}" th:alt="${p.name}" loading="lazy" />
+                <figcaption><h3 th:text="${p.name}">Product</h3></figcaption>
+            </figure>
         </div>
     </section>
 </th:block>
