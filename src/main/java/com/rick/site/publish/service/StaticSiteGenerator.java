@@ -22,16 +22,21 @@ import com.rick.site.tenant.service.TenantDomainService;
 import com.rick.site.theme.model.ThemeManifest;
 import com.rick.site.theme.model.ThemeManifest.ThemePage;
 import com.rick.site.theme.service.ThemeManifestResolver;
+import com.rick.site.theme.service.ThemeResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -88,6 +93,8 @@ public class StaticSiteGenerator {
     private final TenantConfigService tenantConfigService;
     private final TenantDomainService domainService;
     private final ThemeManifestResolver manifestResolver;
+    private final ThemeResolver themeResolver;
+    private final ResourcePatternResolver resourcePatternResolver;
 
     private final CategoryService categoryService;
 
@@ -98,6 +105,8 @@ public class StaticSiteGenerator {
                               TenantConfigService tenantConfigService,
                               TenantDomainService domainService,
                               ThemeManifestResolver manifestResolver,
+                              ThemeResolver themeResolver,
+                              ResourcePatternResolver resourcePatternResolver,
                               CategoryService categoryService) {
         this.templateEngine = templateEngine;
         this.productService = productService;
@@ -106,6 +115,8 @@ public class StaticSiteGenerator {
         this.tenantConfigService = tenantConfigService;
         this.domainService = domainService;
         this.manifestResolver = manifestResolver;
+        this.themeResolver = themeResolver;
+        this.resourcePatternResolver = resourcePatternResolver;
         this.categoryService = categoryService;
     }
 
@@ -137,6 +148,7 @@ public class StaticSiteGenerator {
         }
         generateSitemap(tenant, manifest, baseUrl, releaseDir);
         generateRobots(tenant, baseUrl, releaseDir);
+        copyThemeImages(tenant, releaseDir);
         return releaseDir;
     }
 
@@ -370,6 +382,45 @@ public class StaticSiteGenerator {
 
     private Path releaseDir(Long tenantId, String version) {
         return Paths.get(wwwRoot).resolve(tenantId.toString()).resolve("releases").resolve(version);
+    }
+
+    /**
+     * 将主题 {@code images} 目录拷贝到 {@code releaseDir/themes-images/{themeId}/},
+     * 使离线静态站点的 {@code <img>} 引用({@code /themes-images/{themeId}/images/...})可达。
+     *
+     * <p>主题素材与 theme.json/messages.json/模板同置 {@code templates/themes/{themeId}/} 下;
+     * 静态发布仅渲染 HTML,二进制素材需单独拷贝。通过 classpath 模式匹配枚举
+     * (兼容 exploded 目录与打包 jar),无 images 目录则跳过。
+     */
+    private void copyThemeImages(Tenant tenant, Path releaseDir) throws IOException {
+        String themeId = themeResolver.resolveTheme(tenant);
+        Resource[] resources = resourcePatternResolver.getResources(
+                "classpath*:templates/themes/" + themeId + "/images/**");
+        for (Resource r : resources) {
+            if (!r.isReadable()) {
+                continue;
+            }
+            String url;
+            try {
+                url = r.getURL().toString();
+            } catch (IOException e) {
+                continue;
+            }
+            int idx = url.indexOf("/images/");
+            if (idx < 0) {
+                continue;
+            }
+            String rel = url.substring(idx + 1); // images/.../file
+            if (rel.endsWith("/")) {
+                continue; // 目录,跳过
+            }
+            Path target = releaseDir.resolve("themes-images").resolve(themeId).resolve(rel);
+            Files.createDirectories(target.getParent());
+            try (InputStream in = r.getInputStream()) {
+                Files.copy(in, target, StandardCopyOption.REPLACE_EXISTING);
+            }
+            log.debug("static copy theme image: {}", target);
+        }
     }
 
     /** 租户 base URL:取主域名,默认 https。 */
