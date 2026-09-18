@@ -188,6 +188,11 @@ com.rick.site
 		- SEO 友好
 		- 没有提供的数据，自己造数据显示。
 ```
+```
+SELECT * FROM public.tenant_domain;
+SELECT * FROM public.tenant;
+SELECT * from admin_user;
+```
 ## 更多
 
 - 设计需求:`docs/REQUIREMENTS.md`

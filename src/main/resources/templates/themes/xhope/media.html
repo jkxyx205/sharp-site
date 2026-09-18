@@ -167,6 +167,16 @@
                 </video>
                 <figcaption class="tile-name">mov_bbb</figcaption>
             </figure>
+
+            <!-- 分类为 video 的视频(数据驱动:来自 videoService.listForDisplay) -->
+            <figure class="video-tile" data-reveal
+                    th:each="v : ${videos}" th:if="${v.categorySlug == 'video'}">
+                <video controls preload="metadata" playsinline
+                       th:poster="${v.cover}" th:aria-label="${v.name}">
+                    <source th:src="${v.videoUrl}" />
+                </video>
+                <figcaption class="tile-name" th:text="${v.name}">Video</figcaption>
+            </figure>
         </div>
     </div>
 </section>
