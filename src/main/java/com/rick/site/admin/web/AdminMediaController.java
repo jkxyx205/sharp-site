@@ -34,12 +34,15 @@ public class AdminMediaController {
     }
 
     @PostMapping("/upload")
-    public String upload(@RequestParam("file") MultipartFile file,
+    public String upload(@RequestParam("files") MultipartFile[] files,
                          @RequestParam(required = false) String title,
                          @RequestParam(required = false) String altText,
+                         @RequestParam(required = false) String path,
                          RedirectAttributes ra) {
         try {
-            mediaService.upload(file, title, altText);
+            for (MultipartFile file : files) {
+                mediaService.upload(file, path, title, altText);
+            }
         } catch (BizException e) {
             ra.addFlashAttribute("error", e.getMessage());
         } catch (Exception e) {

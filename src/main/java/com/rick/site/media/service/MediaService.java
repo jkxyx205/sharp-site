@@ -8,10 +8,12 @@ import com.rick.site.media.dao.MediaDAO;
 import com.rick.site.media.entity.Media;
 import com.rick.site.tenant.context.TenantContext;
 import com.rick.site.tenant.entity.Tenant;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
@@ -61,13 +63,14 @@ public class MediaService extends BaseServiceImpl<MediaDAO, Media, Long> {
      * @param altText 替代文本(可空)
      */
     @Transactional(rollbackFor = Exception.class)
-    public Media upload(MultipartFile file, String title, String altText) throws IOException {
+    public Media upload(MultipartFile file, String path, String title, String altText) throws IOException {
         validate(file);
         Tenant tenant = TenantContext.require();
         Long tenantId = tenant.getId();
         // 目录按租户 code 划分:/{tenant_code}/{文件名};与 media.url 一并暴露给前台
         String groupName = tenant.getCode();
-        List<? extends FileMeta> metas = fileStore.upload(List.of(file), groupName);
+
+        List<? extends FileMeta> metas = fileStore.upload(List.of(file), groupName + (StringUtils.isBlank(path) ? "" : ((path.startsWith(File.separator) ? "" : (File.separator)) + path)));
         if (metas == null || metas.isEmpty()) {
             throw new BizException("文件上传失败");
         }
@@ -81,6 +84,7 @@ public class MediaService extends BaseServiceImpl<MediaDAO, Media, Long> {
                 .size(meta.getSize())
                 .title(title)
                 .altText(altText)
+                .path(path)
                 .build();
         return baseDAO.insert(media);
     }

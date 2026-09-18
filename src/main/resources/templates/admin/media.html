@@ -14,15 +14,16 @@
             <form class="card upload" method="post" enctype="multipart/form-data"
                   th:action="@{/admin/media/upload}">
                 <label>选择文件 <span class="hint">图片/文档/压缩包,≤20MB</span>
-                    <input type="file" name="file" required /></label>
+                    <input type="file" name="files" multiple required /></label>
                 <label>标题 <input type="text" name="title" placeholder="可选" /></label>
                 <label>替代文本 <input type="text" name="altText" placeholder="图片描述(可选)" /></label>
+                <label>路径 <input type="text" name="path" placeholder="上传的文件路径，products/v1(可选)" /></label>
                 <button type="submit" class="btn btn-primary">上传</button>
             </form>
 
             <table>
                 <thead>
-                <tr><th>预览</th><th>文件名</th><th>类型</th><th>大小</th><th>链接</th><th>操作</th></tr>
+                <tr><th>预览</th><th>文件名</th><th>类型</th><th>大小</th><th>路径</th><th>链接</th><th>操作</th></tr>
                 </thead>
                 <tbody>
                 <tr th:each="m : ${medias}">
@@ -37,6 +38,7 @@
                     <td th:text="${m.filename != null ? m.filename : '—'}">file.png</td>
                     <td th:text="${m.mimeType != null ? m.mimeType : '—'}">image/png</td>
                     <td th:text="${m.size != null ? T(java.lang.Math).round(m.size / 1024.0 * 10) / 10.0 + ' KB' : '—'}">0 KB</td>
+                    <td th:text="${m.path}"></td>
                     <td>
                         <input type="text" readonly th:value="${m.url}"
                                th:id="'url-' + ${m.id}"

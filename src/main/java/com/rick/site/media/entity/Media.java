@@ -55,4 +55,8 @@ public class Media extends TenantBaseEntity<Long> {
     @Length(max = 500)
     @Column(comment = "标题")
     String title;
+
+    @Length(max = 500)
+    @Column(comment = "路径")
+    String path;
 }
