@@ -11,6 +11,7 @@ import com.rick.site.tenant.entity.Tenant;
 import com.rick.site.tenant.service.TenantConfigService;
 import com.rick.site.theme.model.ThemeManifest;
 import com.rick.site.theme.service.ThemeManifestResolver;
+import com.rick.site.theme.service.ThemeResolver;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -24,9 +25,11 @@ import java.util.Optional;
 /**
  * 前台公共模型属性(CLAUDE.md §15 / §6 数据与模板分离)。
  *
- * <p>为所有前台 Controller 注入 siteName / config / currentLanguage / languages(切换链接),
+ * <p>为所有前台 Controller 注入 siteName / config / currentLanguage / themeId / languages(切换链接),
  * 避免每个 Controller 重复装配。无租户上下文时(未解析到租户的请求)跳过,
  * 由各 Controller 决定 404/引导策略。languages 仅前台页面装配(admin/preview 各自处理)。
+ * {@code themeId} 供模板片段引用(如 {@code ~{themes/__${themeId}__/fragments/header :: ...}})
+ * 以替代硬编码主题名,使复制主题目录后内部引用零改动;live/preview 均注入(admin 提前 return 前)。
  *
  * @author Rick.Xu
  */
@@ -36,12 +39,14 @@ public class SiteCommonAttributes {
     private final TenantConfigService tenantConfigService;
     private final DefaultLocaleResolver localeResolver;
     private final ThemeManifestResolver manifestResolver;
+    private final ThemeResolver themeResolver;
 
     public SiteCommonAttributes(TenantConfigService tenantConfigService, DefaultLocaleResolver localeResolver,
-                               ThemeManifestResolver manifestResolver) {
+                               ThemeManifestResolver manifestResolver, ThemeResolver themeResolver) {
         this.tenantConfigService = tenantConfigService;
         this.localeResolver = localeResolver;
         this.manifestResolver = manifestResolver;
+        this.themeResolver = themeResolver;
     }
 
     @ModelAttribute
@@ -73,6 +78,9 @@ public class SiteCommonAttributes {
         model.addAttribute("siteName", siteName);
         model.addAttribute("config", config);
         model.addAttribute("currentLanguage", currentLanguage);
+        // themeId 供模板片段引用 ~{themes/__${themeId}__/fragments/...},替代硬编码主题名,
+        // 使复制主题目录后内部 th:replace 引用零改动;live/preview 均注入(admin 路径提前 return 前)。
+        model.addAttribute("themeId", themeResolver.resolveTheme(tenant));
 
         // 语言切换链接仅装配前台页面;admin(自带 languages List<String>)与 preview(?lang= 参数)各自处理
         String uri = request.getRequestURI();

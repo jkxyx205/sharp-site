@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html th:lang="${currentLanguage}" th:dir="${currentLanguage == 'ar-SA' ? 'rtl' : 'ltr'}" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{themes/modern/fragments/head :: head(pageTitle=${pageTitle}, pageDescription=${pageDescription}, pageKeywords=${pageKeywords}, canonical=${canonical}, robots=${robots}, siteName=${siteName})}"></head>
+<head th:replace="~{themes/__${themeId}__/fragments/head :: head(pageTitle=${pageTitle}, pageDescription=${pageDescription}, pageKeywords=${pageKeywords}, canonical=${canonical}, robots=${robots}, siteName=${siteName})}"></head>
 <body>
-<header th:replace="~{themes/modern/fragments/header :: header(siteName=${siteName}, active='about')}"></header>
+<header th:replace="~{themes/__${themeId}__/fragments/header :: header(siteName=${siteName}, active='about')}"></header>
 
 <article class="container section">
     <h1 th:text="#{about.title}">About</h1>
@@ -11,6 +11,6 @@
     </div>
 </article>
 
-<footer th:replace="~{themes/modern/fragments/footer :: footer(siteName=${siteName}, config=${config})}"></footer>
+<footer th:replace="~{themes/__${themeId}__/fragments/footer :: footer(siteName=${siteName}, config=${config})}"></footer>
 </body>
 </html>

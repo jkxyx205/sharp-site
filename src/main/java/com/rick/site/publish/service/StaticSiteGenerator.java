@@ -234,7 +234,7 @@ public class StaticSiteGenerator {
                     .applyTo(ctxToModel(ctx));
             applyCommon(ctx, tenant, locale, localePrefix);
             String rel = path.startsWith("/") ? path.substring(1) : path;
-            write(outputDir, rel + "/index.html", templateEngine.process(page.template(), ctx));
+            write(outputDir, rel + "/index.html", templateEngine.process(manifestResolver.template(tenant, page.template()), ctx));
         }
     }
 
@@ -455,7 +455,7 @@ public class StaticSiteGenerator {
         return new OfflineWebContext(Locale.forLanguageTag(locale));
     }
 
-    /** 注入 siteName / config / currentLanguage / localePrefix / languages(等同 SiteCommonAttributes)。 */
+    /** 注入 siteName / config / currentLanguage / themeId / localePrefix / languages(等同 SiteCommonAttributes)。 */
     private void applyCommon(OfflineWebContext ctx, Tenant tenant, String locale, String localePrefix) {
         String defaultLocale = defaultLocaleOf(tenant);
         TenantConfigView config = tenantConfigService.resolveForDisplay(locale, defaultLocale).orElse(null);
@@ -464,6 +464,8 @@ public class StaticSiteGenerator {
         ctx.setVariable("siteName", siteName);
         ctx.setVariable("config", config);
         ctx.setVariable("currentLanguage", locale);
+        // themeId 供模板片段引用 ~{themes/__${themeId}__/fragments/...},与 SiteCommonAttributes 一致。
+        ctx.setVariable("themeId", themeResolver.resolveTheme(tenant));
         ctx.setVariable("localePrefix", localePrefix);
         ctx.setVariable("languages", buildLanguageOptions(tenant, locale, localePrefix));
     }

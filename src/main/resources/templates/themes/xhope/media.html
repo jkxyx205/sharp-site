@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html th:lang="${currentLanguage}" th:dir="${currentLanguage == 'ar-SA' ? 'rtl' : 'ltr'}" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{themes/xhope/fragments/head :: head(pageTitle=${pageTitle}, pageDescription=${pageDescription}, pageKeywords=${pageKeywords}, canonical=${canonical}, robots=${robots}, siteName=${siteName})}"></head>
+<head th:replace="~{themes/__${themeId}__/fragments/head :: head(pageTitle=${pageTitle}, pageDescription=${pageDescription}, pageKeywords=${pageKeywords}, canonical=${canonical}, robots=${robots}, siteName=${siteName})}"></head>
 <body>
-<header th:replace="~{themes/xhope/fragments/header :: header(siteName=${siteName}, active='media')}"></header>
+<header th:replace="~{themes/__${themeId}__/fragments/header :: header(siteName=${siteName}, active='media')}"></header>
 
 <style>
     /* 媒体中心页:图片网格 + 灯箱 + 视频。黑白灰、直角,沿用 design tokens。 */
@@ -243,6 +243,6 @@
     })();
 </script>
 
-<footer th:replace="~{themes/xhope/fragments/footer :: footer(siteName=${siteName}, config=${config})}"></footer>
+<footer th:replace="~{themes/__${themeId}__/fragments/footer :: footer(siteName=${siteName}, config=${config})}"></footer>
 </body>
 </html>

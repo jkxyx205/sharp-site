@@ -47,7 +47,8 @@ public record ThemeManifest(String defaultLocale, List<String> locales, List<The
     }
 
     /**
-     * 主题站点页:path(如 /about)、template(如 themes/modern/about)、展示名,
+     * 主题站点页:path(如 /about)、template 逻辑名(如 about,渲染时由
+     * {@code ThemeManifestResolver#template} 拼成 themes/{themeId}/about)、展示名,
      * 以及可选的 {@code seo_config}(按语种的 SEO 默认值,后台可覆盖)。
      */
     public record ThemePage(String path, String template, String label,

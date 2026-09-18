@@ -270,7 +270,8 @@ public class PreviewController {
         // 单页 SEO:page_type = 页面路径(如 /about),page_id 恒为空
         seoService.resolveView(page.path(), null, language, dl,
                 new SeoFallback(page.label(), "", "", request.getRequestURL().toString())).applyTo(model);
-        return finish(page.template(), language, model);
+        // theme.json 的 template 现存逻辑名(如 "about"),经 manifestResolver 拼成 themes/{themeId}/about。
+        return finish(manifestResolver.template(tenant, page.template()), language, model);
     }
 
     /** 解析预览语言:空则取主题默认语种(theme.json.defaultLocale)。 */

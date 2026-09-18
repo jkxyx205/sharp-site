@@ -94,6 +94,7 @@ public class SitePageController {
         // 单页 SEO:page_type = 页面路径(如 /about),page_id 恒为空
         seoService.resolveView(page.path(), null, loc.language(), dl,
                 new SeoFallback(page.label(), "", "", request.getRequestURL().toString())).applyTo(model);
-        return page.template();
+        // theme.json 的 template 现存逻辑名(如 "about"),经 manifestResolver 拼成 themes/{themeId}/about。
+        return manifestResolver.template(tenant, page.template());
     }
 }

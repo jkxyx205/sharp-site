@@ -59,7 +59,7 @@
             <a th:href="@{${localePrefix + '/news'}}" th:text="#{nav.news}" th:classappend="${active == 'news'} ? 'active' : ''">News</a>
             <a th:href="@{${localePrefix + '/media'}}" th:text="#{nav.media}" th:classappend="${active == 'media'} ? 'active' : ''">Media Center</a>
             <a th:href="@{${localePrefix + '/contact'}}" th:text="#{nav.contact}" th:classappend="${active == 'contact'} ? 'active' : ''">Contact</a>
-            <th:block th:replace="~{themes/xhope/fragments/language :: language(current=${currentLanguage}, languages=${languages})}"></th:block>
+            <th:block th:replace="~{themes/__${themeId}__/fragments/language :: language(current=${currentLanguage}, languages=${languages})}"></th:block>
             <a class="btn btn-accent nav-cta" th:href="@{${localePrefix + '/contact'}}" th:text="#{home.cta.btn}">Contact</a>
         </nav>
     </div>

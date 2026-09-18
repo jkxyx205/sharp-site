@@ -8,6 +8,7 @@
 - **三路渲染一致**：同一套主题模板被三条路径复用——前台 Controller（`/`、`/products`…）、预览（`/preview/…`）、静态发布（`StaticSiteGenerator`）。三者注入的上下文变量名**必须一致**，主题模板不要依赖某一路径才有的变量（分页变量除外，见 §7）。
 - **语种唯一来源是 `theme.json`**：`locales` / `defaultLocale` 决定支持哪些语言；租户选用某主题即等于选定语种集合。
 - **URL 约定**：默认语种无前缀（`/products`），其它语种带小写前缀（`/zh-cn/products`）。所有站内链接都要拼接 `localePrefix`（见 §5）。
+- **主题可移植（不含主题名）**：主题目录内部不自持任何主题名——`theme.json` 的 `template` 用逻辑名（`index`/`products`…），片段引用用 `~{themes/__${themeId}__/fragments/...}` 预处理表达式。`themeId` 是唯一的"身份变量"，由租户配置决定并注入上下文（§6）；**复制主题目录后无需改动任何内部引用**，只把租户 `themeId` 指向新目录即可生效。
 
 ## 2. 主题目录结构
 
@@ -32,7 +33,7 @@ themes/{themeId}/
 └── about.html / contact.html / info.html / …  # 主题声明的任意静态页
 ```
 
-模板路径在 `theme.json` 的 `pages[].template` 中声明（值为 `themes/{themeId}/xxx`，**含 `themes/{themeId}/` 前缀，不带 `.html`**）。
+模板路径在 `theme.json` 的 `pages[].template` 中声明（值为**逻辑名**，如 `index`/`products`/`about`，**不带 `themes/{themeId}/` 前缀、不带 `.html`**）；运行时由 `ThemeManifestResolver#template(tenant, page)` 拼成 `themes/{tenant.themeId}/{page}`。
 
 ## 3. `meta/theme.json`
 
@@ -43,9 +44,9 @@ themes/{themeId}/
   "defaultLocale": "en-US",
   "pages": [
     {
-      "path": "/",                       // 站点页路径；同时是 SEO 的 page_type
-      "template": "themes/modern/index", // 渲染模板（themes/{id}/名，无 .html）
-      "label": "首页",                    // 展示名；也是 SEO 兜底标题来源
+      "path": "/",                // 站点页路径；同时是 SEO 的 page_type
+      "template": "index",        // 渲染模板逻辑名；运行时拼成 themes/{themeId}/index（无 .html）
+      "label": "首页",             // 展示名；也是 SEO 兜底标题来源
       "seo_config": {                    // 可选：每页每语种 SEO 默认值（后台可覆盖）
         "en-US": {
           "title": "Welcome to Our Site",
@@ -60,11 +61,11 @@ themes/{themeId}/
         "zh-CN": { /* … */ }
       }
     },
-    { "path": "/products", "template": "themes/modern/products", "label": "产品列表" },
-    { "path": "/news",     "template": "themes/modern/news",     "label": "新闻列表" },
-    { "path": "/about",    "template": "themes/modern/about",    "label": "关于我们" },
-    { "path": "/contact",  "template": "themes/modern/contact",  "label": "联系我们" },
-    { "path": "/info",     "template": "themes/modern/info",     "label": "信息" }
+    { "path": "/products", "template": "products", "label": "产品列表" },
+    { "path": "/news",     "template": "news",     "label": "新闻列表" },
+    { "path": "/about",    "template": "about",    "label": "关于我们" },
+    { "path": "/contact",  "template": "contact",  "label": "联系我们" },
+    { "path": "/info",     "template": "info",     "label": "信息" }
   ]
 }
 ```
@@ -126,6 +127,7 @@ themes/{themeId}/
 | `siteName` | String | 站点名（`config.companyName`，缺失回退租户名） |
 | `config` | `TenantConfigView`? | 企业信息，**可能为 null**，见 §8 |
 | `currentLanguage` | String | 当前语种 |
+| `themeId` | String | 当前租户主题名（如 `xhope-cn`）；供片段引用 `${themeId}` 用（见 §10），由 `ThemeResolver` 解析 |
 | `localePrefix` | String | 链接前缀 |
 | `languages` | `List<LanguageOption>` | 语言切换项；单语言为空列表 |
 
@@ -205,7 +207,7 @@ record CategoryView(String slug, String name)                    // 列表页的
 // Category 实体（首页/静态页注入的原始分类）：
 class Category { String type; Long parentId; String slug; Integer sort; Short status; } // 注意：无 name
 
-record ThemePage(String path, String template, String label)     // 当前页信息（静态页可用）
+record ThemePage(String path, String template, String label)     // 当前页信息（静态页可用）；template 为逻辑名，运行时拼 themes/{themeId}/{template}
 ```
 
 **要点**
@@ -244,14 +246,14 @@ record ThemePage(String path, String template, String label)     // 当前页信
 调用示例：
 
 ```html
-<head th:replace="~{themes/{themeId}/fragments/head :: head(pageTitle=${pageTitle},
+<head th:replace="~{themes/__${themeId}__/fragments/head :: head(pageTitle=${pageTitle},
      pageDescription=${pageDescription}, pageKeywords=${pageKeywords},
      canonical=${canonical}, robots=${robots}, siteName=${siteName})}"></head>
-<header th:replace="~{themes/{themeId}/fragments/header :: header(siteName=${siteName}, active='about')}"></header>
-<footer th:replace="~{themes/{themeId}/fragments/footer :: footer(siteName=${siteName}, config=${config})}"></footer>
+<header th:replace="~{themes/__${themeId}__/fragments/header :: header(siteName=${siteName}, active='about')}"></header>
+<footer th:replace="~{themes/__${themeId}__/fragments/footer :: footer(siteName=${siteName}, config=${config})}"></footer>
 ```
 
-> 片段路径也要带 `themes/{themeId}/` 前缀。样式**内联**进 `head.html` 的 `<style>`，使静态发布产物自带样式、不依赖外部 CSS 路径。
+> 片段路径用 `themes/__${themeId}__/fragments/` 形式：`__${themeId}__` 是 Thymeleaf **预处理表达式**，解析前先把上下文变量 `themeId`（当前租户主题名，由 `ThemeResolver` 注入）求值文本替换进表达式，故片段路径与页面模板同目录、且不含硬编码主题名——**复制主题目录后片段引用零改动**。样式**内联**进 `head.html` 的 `<style>`，使静态发布产物自带样式、不依赖外部 CSS 路径。
 
 ## 11. 常用 Thymeleaf 技法（主题里频繁使用）
 
@@ -297,8 +299,8 @@ record ThemePage(String path, String template, String label)     // 当前页信
 
 ## 12. 生成新主题的检查清单
 
-1. 新建 `themes/{themeId}/`，复制 `meta/theme.json`、`meta/messages.json`，按目标站点改 `locales`/`defaultLocale`/`pages`/文案。
-2. 在 `theme.json` 的 `pages[].template` 与所有片段引用中把 `themes/modern/` 改成 `themes/{themeId}/`。
+1. 新建 `themes/{themeId}/`（如复制 `themes/xhope-cn/` → `themes/xhope-cn-v2/`），按目标站点改 `meta/theme.json` 的 `locales`/`defaultLocale`/`pages`/文案与 `meta/messages.json`。
+2. `theme.json` 的 `pages[].template` 写逻辑名（`index`/`products`/`about`…）；片段引用写 `~{themes/__${themeId}__/fragments/...}`——**两者都不含主题名，复制目录后无需改动任何内部引用**。租户 `themeId` 指向新目录是唯一的"身份"改动。
 3. 提供 `fragments/` 下 `head`/`seo`/`header`/`footer`/`language` 五个片段，保持 §10 签名。
 4. 为 `pages` 声明的每个 `path` 提供对应模板文件；`/`→`index`、`/products`→`products`、`/news`→`news`，详情页固定为 `product-detail`/`news-detail`（由 Controller 硬编码返回）。
 5. 每个页面的 `<head>` 用 `head` 片段并传入 §9 的 SEO 变量；`<html>` 设 `th:lang`/`th:dir`。

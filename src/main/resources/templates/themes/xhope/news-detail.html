@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html th:lang="${currentLanguage}" th:dir="${currentLanguage == 'ar-SA' ? 'rtl' : 'ltr'}" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{themes/xhope/fragments/head :: head(pageTitle=${article != null ? article.title : pageTitle}, pageDescription=${article != null and article.summary != null ? article.summary : pageDescription}, pageKeywords=${pageKeywords}, canonical=${canonical}, robots=${robots}, siteName=${siteName})}"></head>
+<head th:replace="~{themes/__${themeId}__/fragments/head :: head(pageTitle=${article != null ? article.title : pageTitle}, pageDescription=${article != null and article.summary != null ? article.summary : pageDescription}, pageKeywords=${pageKeywords}, canonical=${canonical}, robots=${robots}, siteName=${siteName})}"></head>
 <body>
-<header th:replace="~{themes/xhope/fragments/header :: header(siteName=${siteName}, active='news')}"></header>
+<header th:replace="~{themes/__${themeId}__/fragments/header :: header(siteName=${siteName}, active='news')}"></header>
 
 <article class="section section--light" style="padding-top:120px" th:if="${article != null}">
     <div class="container" style="max-width:860px">
@@ -26,6 +26,6 @@
     </div>
 </section>
 
-<footer th:replace="~{themes/xhope/fragments/footer :: footer(siteName=${siteName}, config=${config})}"></footer>
+<footer th:replace="~{themes/__${themeId}__/fragments/footer :: footer(siteName=${siteName}, config=${config})}"></footer>
 </body>
 </html>
