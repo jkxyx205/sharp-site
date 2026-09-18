@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- SEO meta: title / description / keywords / canonical / robots / OG，数据来自 SeoConfigService。 -->
+<th:block th:fragment="seo(title, description, keywords, canonical, robots, siteName)">
+    <title th:text="${title + ' | ' + siteName}">Page Title | Site Name</title>
+    <meta name="description" th:content="${description}" content="" />
+    <meta name="keywords" th:content="${keywords}" content="" />
+    <link rel="canonical" th:href="${canonical}" href="/" />
+    <meta name="robots" th:content="${robots}" content="index, follow" />
+    <meta name="theme-color" content="#ffffff" />
+    <meta property="og:title" th:content="${ogTitle != null ? ogTitle : title}" content="" />
+    <meta property="og:description" th:content="${ogDescription != null ? ogDescription : description}" content="" />
+    <meta property="og:image" th:if="${ogImage != null and !ogImage.isEmpty()}" th:content="${ogImage}" />
+    <meta property="og:site_name" th:content="${siteName}" content="" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+</th:block>
+</html>

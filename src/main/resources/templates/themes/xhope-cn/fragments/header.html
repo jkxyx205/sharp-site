@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- xhope 顶部导航:深色玻璃态。active 高亮当前页。News 为下拉(公司新闻 / 媒体中心)。 -->
+<header th:fragment="header(siteName, active)" class="site-header">
+    <style>
+        /* News 下拉:黑白灰、直角,与 lang-switch 一致的原生 details 模式。 */
+        .nav-dropdown { position: relative; }
+        .nav-dropdown > summary {
+            list-style: none; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 4px;
+        }
+        .nav-dropdown > summary::-webkit-details-marker { display: none; }
+        .nav-dropdown > summary svg { width: 14px; height: 14px; opacity: .6; transition: transform .2s; }
+        .nav-dropdown[open] > summary svg { transform: rotate(180deg); }
+        .nav-dropdown-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            min-width: 168px;
+            background: var(--x-white);
+            border: 1px solid var(--x-line-strong);
+            box-shadow: var(--x-shadow);
+            z-index: 60;
+            padding: 6px 0;
+        }
+        .nav-dropdown-menu a {
+            display: block;
+            padding: 10px 16px;
+            color: var(--x-ink-2);
+            font-size: 14px;
+        }
+        .nav-dropdown-menu a:hover { background: var(--x-tint); color: var(--x-ink); }
+        .nav-dropdown-menu a.active { color: var(--x-ink); font-weight: 600; }
+        @media (max-width: 1023px) {
+            /* 移动端导航内联展开:菜单不再绝对定位,随文档流。 */
+            .nav-dropdown-menu { position: static; box-shadow: none; border: 0; padding: 0 0 4px 12px; }
+        }
+    </style>
+    <div class="container header-inner">
+        <a class="brand" th:href="@{${localePrefix + '/'}}">
+<!--            <span class="dot"></span>-->
+            <span th:text="${siteName}">XHOPE</span>
+            <small th:text="'家清工程'">Home Cleaning Engineering</small>
+        </a>
+        <button class="nav-toggle" aria-label="Toggle menu"
+                onclick="this.parentElement.classList.toggle('open')">&#9776;</button>
+        <nav class="site-nav">
+            <a th:href="@{${localePrefix + '/'}}" th:text="'首页'" th:classappend="${active == 'index'} ? 'active' : ''">Home</a>
+            <details class="nav-dropdown" th:classappend="${active == 'news' or active == 'media'} ? 'active' : ''">
+                <summary>
+                    <span th:text="'产品中心'">Products</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+                </summary>
+                <div class="nav-dropdown-menu">
+                    <a th:href="@{${localePrefix + '/products'}}" th:text="'产品中心'" th:classappend="${active == 'products'} ? 'active' : ''">Products</a>
+                    <a th:href="@{${localePrefix + '/products'}}" th:text="'产品中心'" th:classappend="${active == 'products'} ? 'active' : ''">Products</a>
+                </div>
+            </details>
+            <a th:href="@{${localePrefix + '/news'}}" th:text="'公司新闻'" th:classappend="${active == 'news'} ? 'active' : ''">News</a>
+            <a th:href="@{${localePrefix + '/media'}}" th:text="'媒体中心'" th:classappend="${active == 'media'} ? 'active' : ''">Media Center</a>
+            <a th:href="@{${localePrefix + '/contact'}}" th:text="'联系我们'" th:classappend="${active == 'contact'} ? 'active' : ''">Contact</a>
+            <th:block th:replace="~{themes/__${themeId}__/fragments/language :: language(current=${currentLanguage}, languages=${languages})}"></th:block>
+            <a class="btn btn-accent nav-cta" th:href="@{${localePrefix + '/contact'}}" th:text="'联系我们'">Contact</a>
+        </nav>
+    </div>
+    <script>
+        // 点击外部 / Esc 关闭已展开的 News 下拉。
+        (function () {
+            document.addEventListener('click', function (e) {
+                document.querySelectorAll('details.nav-dropdown[open]').forEach(function (d) {
+                    if (!d.contains(e.target)) d.open = false;
+                });
+            });
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') {
+                    document.querySelectorAll('details.nav-dropdown[open]').forEach(function (d) { d.open = false; });
+                }
+            });
+        })();
+    </script>
+</header>

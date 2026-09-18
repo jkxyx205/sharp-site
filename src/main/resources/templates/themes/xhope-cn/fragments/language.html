@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- 语言切换(下拉菜单 + 地球图标)。languages 为空时不渲染。
+     使用原生 <details>:点击/键盘均可展开,无需依赖框架。 -->
+<details class="lang-switch" th:fragment="language(current, languages)"
+         th:if="${languages != null and !languages.isEmpty()}">
+    <summary class="lang-toggle" aria-label="Language">
+        <svg class="lang-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="9.2"/>
+            <path d="M3 12h18"/>
+            <path d="M12 3c2.5 2.6 2.5 15.4 0 18"/>
+            <path d="M12 3c-2.5 2.6-2.5 15.4 0 18"/>
+        </svg>
+        <span class="lang-current" th:each="l : ${languages}" th:if="${l.code == current}" th:text="${l.label}">EN</span>
+        <svg class="lang-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 9l6 6 6-6"/>
+        </svg>
+    </summary>
+    <div class="lang-menu">
+        <a th:each="l : ${languages}" th:href="@{${l.path}}" th:text="${l.label}"
+           th:classappend="${l.code == current} ? 'active' : ''">EN</a>
+    </div>
+</details>
+<script>
+    // 点击外部 / Esc 关闭已展开的语言下拉。
+    (function () {
+        document.addEventListener('click', function (e) {
+            document.querySelectorAll('details.lang-switch[open]').forEach(function (d) {
+                if (!d.contains(e.target)) d.open = false;
+            });
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('details.lang-switch[open]').forEach(function (d) { d.open = false; });
+            }
+        });
+    })();
+</script>

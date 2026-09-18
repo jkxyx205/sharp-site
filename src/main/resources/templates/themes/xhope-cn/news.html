@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html th:lang="${currentLanguage}" th:dir="${currentLanguage == 'ar-SA' ? 'rtl' : 'ltr'}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{themes/__${themeId}__/fragments/head :: head(pageTitle=${pageTitle}, pageDescription=${pageDescription}, pageKeywords=${pageKeywords}, canonical=${canonical}, robots=${robots}, siteName=${siteName})}"></head>
+<body>
+<header th:replace="~{themes/__${themeId}__/fragments/header :: header(siteName=${siteName}, active='news')}"></header>
+
+<!-- ===================== NEWS HERO ===================== -->
+<section class="section section--alt" style="padding-top:128px">
+    <div class="container section-head" data-reveal style="margin-bottom:0">
+        <p class="eyebrow" th:text="'新闻'">NEWS</p>
+        <h2 th:text="'公司新闻'">Company news</h2>
+        <p th:text="'XHOPE 团队的产品发布、工程笔记与公司动态。'">Product launches, engineering notes and company updates…</p>
+    </div>
+</section>
+
+<!-- ===================== STATIC NEWS GRID ===================== -->
+<section class="section section--light">
+    <div class="container">
+<!--        <div class="news-grid">-->
+<!--            <a class="news-card" th:href="${localePrefix + '/news/xhope-v9-cyclone-launched'}" data-reveal>-->
+<!--                <div class="meta"><span class="chip" th:text="'产品发布'">Product Launch</span><span th:text="'2026-03-12'">2026-03-12</span></div>-->
+<!--                <h3 th:text="'XHOPE V9 旋风正式发布'">Introducing the XHOPE V9 Cyclone</h3>-->
+<!--                <p th:text="'旗舰无线吸尘器——125,000 转数码马达输出 300 AW 吸力，整机仅 3.2 kg。'">…</p>-->
+<!--                <span class="more" th:text="'阅读 →'">Read →</span>-->
+<!--            </a>-->
+<!--            <a class="news-card" th:href="${localePrefix + '/news/inside-the-x9-digital-motor'}" data-reveal>-->
+<!--                <div class="meta"><span class="chip" th:text="'工程'">Engineering</span><span th:text="'2026-02-20'">2026-02-20</span></div>-->
+<!--                <h3 th:text="'拆解 X9 数码马达'">Inside the X9 digital motor</h3>-->
+<!--                <p th:text="'陶瓷轴承、机加工叶轮与声学隔层：我们如何实现 125,000 转且保持安静。'">…</p>-->
+<!--                <span class="more" th:text="'阅读 →'">Read →</span>-->
+<!--            </a>-->
+<!--            <a class="news-card" th:href="${localePrefix + '/news/xhope-motor-rd-center-opens'}" data-reveal>-->
+<!--                <div class="meta"><span class="chip" th:text="'公司'">Company</span><span th:text="'2026-01-08'">2026-01-08</span></div>-->
+<!--                <h3 th:text="'XHOPE 马达研发中心启用'">XHOPE opens new motor R&amp;D center</h3>-->
+<!--                <p th:text="'占地 8,000 平方米的新设施，专注数码马达研发与精密制造。'">…</p>-->
+<!--                <span class="more" th:text="'阅读 →'">Read →</span>-->
+<!--            </a>-->
+<!--            <a class="news-card" th:href="${localePrefix + '/news/s9-automap-wins-red-dot-2026'}" data-reveal>-->
+<!--                <div class="meta"><span class="chip" th:text="'奖项'">Awards</span><span th:text="'2025-11-15'">2025-11-15</span></div>-->
+<!--                <h3 th:text="'S9 自图斩获 2026 红点奖'">S9 AutoMap wins Red Dot 2026</h3>-->
+<!--                <p th:text="'S9 扫地机凭设计与工程获 2026 红点奖。'">…</p>-->
+<!--                <span class="more" th:text="'阅读 →'">Read →</span>-->
+<!--            </a>-->
+<!--        </div>-->
+
+        <!-- live/static pagination guard -->
+        <nav class="pagination" th:if="${totalPages != null and totalPages > 1}">
+            <a th:if="${prevLink != null}" th:href="${prevLink}" th:text="'‹ 上一页'">‹ Previous</a>
+            <span th:text="${page + ' / ' + totalPages}">1 / 1</span>
+            <a th:if="${nextLink != null}" th:href="${nextLink}" th:text="'下一页 ›'">Next ›</a>
+        </nav>
+
+        <!-- live DB-driven fallback list (三路渲染一致;无数据时隐藏) -->
+        <th:block th:if="${news != null and !news.isEmpty()}">
+            <div class="news-grid" style="margin-top:24px">
+                <a class="news-card" th:each="a : ${news}" th:href="@{${localePrefix + '/news/' + a.slug}}">
+                    <div class="meta"><span class="chip" th:if="${a.categoryName != null}" th:text="${a.categoryName}">Cat</span><span th:if="${a.publishTime != null}" th:text="${#temporals.format(a.publishTime, 'yyyy-MM-dd')}"></span></div>
+                    <h3 th:text="${a.title}">Title</h3>
+                    <p th:if="${a.summary != null}" th:text="${a.summary}"></p>
+                    <span class="more" th:text="'阅读 →'">Read →</span>
+                </a>
+            </div>
+        </th:block>
+    </div>
+</section>
+
+<footer th:replace="~{themes/__${themeId}__/fragments/footer :: footer(siteName=${siteName}, config=${config})}"></footer>
+</body>
+</html>

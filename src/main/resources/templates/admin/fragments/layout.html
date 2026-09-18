@@ -6,7 +6,7 @@
 
 <!-- 左侧菜单 -->
 <aside class="sidebar" th:fragment="sidebar(active)">
-    <div class="brand">Sharp 站点管理</div>
+    <div class="brand" th:text="${tenantName}">Sharp 站点管理</div>
     <div class="nav-group">
         <div class="nav-label">首页</div>
         <a th:href="@{/admin/}" th:classappend="${active == 'home'} ? 'active' : ''">首页</a>
@@ -29,6 +29,7 @@
         <div class="nav-label">网站发布</div>
         <a th:href="@{/admin/settings}" th:classappend="${active == 'settings'} ? 'active' : ''">网站设置</a>
         <a th:href="@{/admin/publish}" th:classappend="${active == 'publish'} ? 'active' : ''">版本管理</a>
+        <a th:href="@{/admin/sites}" th:classappend="${active == 'sites'} ? 'active' : ''">网站管理</a>
     </div>
     <div class="spacer" style="flex:1"></div>
     <div class="foot">

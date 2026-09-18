@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html th:lang="${currentLanguage}" th:dir="${currentLanguage == 'ar-SA' ? 'rtl' : 'ltr'}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{themes/__${themeId}__/fragments/head :: head(pageTitle=${pageTitle}, pageDescription=${pageDescription}, pageKeywords=${pageKeywords}, canonical=${canonical}, robots=${robots}, siteName=${siteName})}"></head>
+<body>
+<header th:replace="~{themes/__${themeId}__/fragments/header :: header(siteName=${siteName}, active='index')}"></header>
+
+<!-- ===================== HERO ===================== -->
+<section class="hero">
+    <div class="container">
+        <div>
+            <p class="eyebrow" th:text="'XHOPE · 精准清洁'">XHOPE — PRECISION CLEANING</p>
+            <h1 th:utext="'重新定义吸力。'">Suction, <span class="accent">Redefined.</span></h1>
+            <p class="hero-sub" th:text="'无线吸尘器、布艺清洗机与扫地机——围绕 125,000 转数码马达打造。为在意细节的人而生。'">Cordless vacuums…</p>
+            <div class="hero-actions">
+                <a class="btn btn-accent" th:href="@{${localePrefix + '/products'}}" th:text="'探索产品'">Explore Products</a>
+                <a class="btn btn-ghost" th:href="@{${localePrefix + '/contact'}}" th:text="'联系我们'">Contact Us</a>
+            </div>
+            <div class="hero-specs">
+                <div><div class="num" th:text="'125,000 转'">125,000 RPM</div><div class="lbl" th:text="'数码马达'">Digital Motor</div></div>
+                <div><div class="num" th:text="'300 AW'">300 AW</div><div class="lbl" th:text="'吸入功率'">Suction Power</div></div>
+                <div><div class="num" th:text="'60 分钟'">60 min</div><div class="lbl" th:text="'续航'">Runtime</div></div>
+            </div>
+        </div>
+        <div class="stage" data-reveal>
+<!--            <div class="halo"></div>-->
+<!--            <div class="ring"></div><div class="ring r2"></div>-->
+<!--            <svg th:replace="~{themes/__${themeId}__/fragments/device :: vacuum}"></svg>-->
+            <img th:src="@{/themes-images/xhope/images/products/v1/v4.png}" loading="lazy" />
+        </div>
+    </div>
+</section>
+
+<!-- ===================== TECH INTRO ===================== -->
+<section class="section section--light">
+    <div class="container section-head" data-reveal>
+        <p class="eyebrow" th:text="'家清工程'">Home Cleaning Engineering</p>
+        <h2 th:text="'精密到每一微米。'">Engineered down to the last micron.</h2>
+        <p th:text="'每一台 XHOPE 设备都从马达开始。自研数码马达、航空级合金与声学调校，在轻盈手感中释放强劲吸力。'">Every XHOPE machine starts with the motor…</p>
+    </div>
+</section>
+
+<!-- ===================== CATEGORIES ===================== -->
+<section class="section section--alt">
+    <div class="container">
+        <div class="section-head" data-reveal>
+            <p class="eyebrow" th:text="'产品'">PRODUCTS</p>
+            <h2 th:text="'产品阵列'">The lineup</h2>
+        </div>
+        <div class="cat-grid">
+            <a class="cat-card" th:href="${localePrefix + '/products#vacuum'}" data-reveal>
+                <div class="mini-stage"><img th:src="@{/themes-images/xhope/images/products/v1/tp.jpeg}" th:alt="'无线吸尘器'" loading="lazy" /></div>
+                <span class="tag" th:text="'无线吸尘器'">Cordless Vacuum</span>
+                <h3 th:text="'无线吸尘器'">Cordless Vacuums</h3>
+                <p th:text="'全屋深度清洁，无拘无束。'">Whole-home deep clean, untethered.</p>
+                <span class="link" th:text="'查看系列 →'">View range →</span>
+            </a>
+            <a class="cat-card" th:href="${localePrefix + '/products#fabric'}" data-reveal>
+<!--                <div class="mini-stage"><svg th:replace="~{themes/__${themeId}__/fragments/device :: fabric}"></svg></div>-->
+                <div class="mini-stage"><img th:src="@{/themes-images/xhope/images/products/v1/v4.png}" th:alt="'布艺清洗机'" loading="lazy" /></div>
+                <span class="tag" th:text="'布艺清洗机'">Fabric Cleaner</span>
+                <h3 th:text="'布艺清洗机'">Fabric Cleaners</h3>
+                <p th:text="'深入清洁沙发、床垫与地毯。'">Lift stains from sofas, mattresses &amp; rugs.</p>
+                <span class="link" th:text="'查看系列 →'">View range →</span>
+            </a>
+            <a class="cat-card" th:href="${localePrefix + '/products#sweeper'}" data-reveal>
+                <!--                <div class="mini-stage"><svg th:replace="~{themes/__${themeId}__/fragments/device :: sweeper}"></svg></div>-->
+                <div class="mini-stage"><img th:src="@{/themes-images/xhope/images/index/banner.png}" th:alt="'扫地机'" loading="lazy" /></div>
+                <span class="tag" th:text="'扫地机'">Robot Sweeper</span>
+                <h3 th:text="'扫地机'">Robot Sweepers</h3>
+                <p th:text="'自动集尘，激光建图自主清扫。'">Self-emptying, lidar-mapped autonomy.</p>
+                <span class="link" th:text="'查看系列 →'">View range →</span>
+            </a>
+            <a class="cat-card" th:href="${localePrefix + '/products#sweeper'}" data-reveal>
+<!--                <div class="mini-stage"><svg th:replace="~{themes/__${themeId}__/fragments/device :: sweeper}"></svg></div>-->
+                <div class="mini-stage"><img th:src="@{http://site.xhope.top/upload/xhope/1132387253964771328.jpg}" th:alt="'扫地机'" loading="lazy" /></div>
+                <span class="tag" th:text="'扫地机'">Robot Sweeper</span>
+                <h3 th:text="'扫地机'">Robot Sweepers</h3>
+                <p th:text="'自动集尘，激光建图自主清扫。'">Self-emptying, lidar-mapped autonomy.</p>
+                <span class="link" th:text="'查看系列 →'">View range →</span>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== MOTOR HIGHLIGHT ===================== -->
+<section class="section section--alt">
+    <div class="container motor-grid">
+        <div class="motor-vis" data-reveal>
+            <div class="ring a"></div><div class="ring b"></div>
+            <div class="core"></div>
+        </div>
+        <div data-reveal>
+            <p class="eyebrow" th:text="'核心'">THE CORE</p>
+            <h2 th:text="'125,000 转。无出其右。'">125,000 RPM. Nothing else comes close.</h2>
+            <p style="margin-top:18px;color:var(--x-muted)" th:text="'X9 数码马达每分钟 125,000 转——产生足以掀起地毯与软装深处积尘的吸力。陶瓷轴承、机加工叶轮与声学隔层，让它在运转时仍可轻声交谈。'">…</p>
+            <div class="stat-row">
+                <div class="stat"><div class="num" th:text="'125,000 转/分'">125,000 RPM</div><div class="lbl" th:text="'峰值转速'">Peak speed</div></div>
+                <div class="stat"><div class="num" th:text="'3.2 kg'">3.2 kg</div><div class="lbl" th:text="'整机重量'">Full-body weight</div></div>
+                <div class="stat"><div class="num" th:text="'5 年'">5-year</div><div class="lbl" th:text="'马达质保'">Motor warranty</div></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== NEWS TEASER ===================== -->
+<section class="section section--light">
+    <div class="container">
+        <div class="section-head" data-reveal>
+            <p class="eyebrow" th:text="'新闻'">NEWS</p>
+            <h2 th:text="'来自实验室'">From the lab</h2>
+        </div>
+        <div class="news-grid">
+            <a class="news-card" th:href="${localePrefix + '/news'}" data-reveal>
+                <div class="meta"><span class="chip" th:text="'产品发布'">Product Launch</span><span th:text="'2026-03-12'">2026-03-12</span></div>
+                <h3 th:text="'XHOPE V9 旋风正式发布'">Introducing the XHOPE V9 Cyclone</h3>
+                <p th:text="'旗舰无线吸尘器——125,000 转数码马达输出 300 AW 吸力，整机仅 3.2 kg。'">…</p>
+                <span class="more" th:text="'阅读 →'">Read →</span>
+            </a>
+            <a class="news-card" th:href="${localePrefix + '/news'}" data-reveal>
+                <div class="meta"><span class="chip" th:text="'工程'">Engineering</span><span th:text="'2026-02-20'">2026-02-20</span></div>
+                <h3 th:text="'拆解 X9 数码马达'">Inside the X9 digital motor</h3>
+                <p th:text="'陶瓷轴承、机加工叶轮与声学隔层：我们如何实现 125,000 转且保持安静。'">…</p>
+                <span class="more" th:text="'阅读 →'">Read →</span>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== CTA BAND ===================== -->
+<section class="cta-band">
+    <div class="container">
+        <div data-reveal>
+            <h2 th:text="'把 XHOPE 带回家？'">Ready to bring XHOPE home?</h2>
+            <p style="color:var(--x-muted);margin-top:10px" th:text="'与我们的团队聊聊销售、经销与购买渠道。'">…</p>
+        </div>
+        <a class="btn btn-accent" th:href="@{${localePrefix + '/contact'}}" th:text="'联系我们'" data-reveal>Contact Us</a>
+    </div>
+</section>
+
+<footer th:replace="~{themes/__${themeId}__/fragments/footer :: footer(siteName=${siteName}, config=${config})}"></footer>
+</body>
+</html>
