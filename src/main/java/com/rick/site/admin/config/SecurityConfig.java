@@ -37,6 +37,9 @@ public class SecurityConfig {
                 .requestMatchers("/admin/**").authenticated()
                 .requestMatchers("/preview/**").authenticated()
                 .anyRequest().permitAll())
+            // alwaysUse=false(默认):登录成功后优先回到登录前被拦截的受保护页面
+            // (SavedRequestAwareAuthenticationSuccessHandler 从 RequestCache 取回原 URL);
+            // 直接访问登录页则回退到 /admin/。
             .formLogin(form -> form
                 .loginPage("/admin/login")
                 .loginProcessingUrl("/admin/login")
