@@ -8,6 +8,22 @@
         <header th:replace="~{admin/fragments/layout :: topbar()}"></header>
         <main class="content">
             <h1>仪表盘</h1>
+            <div class="card">
+                <h1>当前租户</h1>
+                <table>
+                    <tr><th>租户名称</th><td th:text="${tenantName}">—</td></tr>
+                    <tr><th>主题</th><td th:text="${themeId}">—</td></tr>
+                    <tr><th>状态</th><td>
+                        <span class="tag" th:classappend="${tenantStatusTag}"
+                              th:text="${tenantStatusLabel}">—</span>
+                    </td></tr>
+                    <tr th:if="${tenantId != null}"><th>租户 ID</th><td th:text="${tenantId}">—</td></tr>
+                    <tr th:if="${tenantSiteUrl != null and !tenantSiteUrl.isEmpty()}">
+                        <th>线上站点</th>
+                        <td><a th:href="${tenantSiteUrl}" th:text="${tenantSiteUrl}" target="_blank" rel="noopener">—</a></td>
+                    </tr>
+                </table>
+            </div>
             <div class="stats">
                 <div class="stat">
                     <div class="num" th:text="${articleCount}">0</div>

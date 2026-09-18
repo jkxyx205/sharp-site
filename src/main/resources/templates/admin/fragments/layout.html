@@ -27,7 +27,8 @@
     </div>
     <div class="nav-group">
         <div class="nav-label">网站发布</div>
-        <a th:href="@{/admin/publish}" th:classappend="${active == 'media'} ? 'active' : ''">版本管理</a>
+        <a th:href="@{/admin/settings}" th:classappend="${active == 'settings'} ? 'active' : ''">网站设置</a>
+        <a th:href="@{/admin/publish}" th:classappend="${active == 'publish'} ? 'active' : ''">版本管理</a>
     </div>
     <div class="spacer" style="flex:1"></div>
     <div class="foot">

@@ -8,10 +8,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -74,6 +77,38 @@ public class ThemeManifestResolver {
     /** 租户主题的启用语种列表(取代平台固定列表,供后台/语言切换遍历)。 */
     public List<String> locales(Tenant tenant) {
         return resolve(tenant).locales();
+    }
+
+    /**
+     * 扫描 classpath 下所有主题目录名(拥有 {@code meta/theme.json} 的目录),
+     * 供后台「网站设置」主题下拉选择。按字母序返回;扫描失败返回空列表(不阻断渲染)。
+     *
+     * <p>用 classpath 通配符匹配每个主题清单文件 {@code themes/{themeId}/meta/theme.json},
+     * 再取 {@code themes/} 与 {@code /meta/theme.json} 之间的段作为 themeId——
+     * 既兼容文件系统与 jar,又能过滤掉无清单的残缺目录。
+     */
+    public List<String> listThemeIds() {
+        try {
+            Resource[] resources = new PathMatchingResourcePatternResolver(resourceLoader)
+                    .getResources("classpath*:templates/themes/*/meta/theme.json");
+            String prefix = "templates/themes/";
+            String suffix = "/meta/theme.json";
+            List<String> ids = new ArrayList<>();
+            for (Resource res : resources) {
+                String path = res.getURL().toString();
+                int start = path.indexOf(prefix);
+                int end = path.indexOf(suffix, start);
+                if (start < 0 || end < 0) {
+                    continue;
+                }
+                ids.add(path.substring(start + prefix.length(), end));
+            }
+            Collections.sort(ids);
+            return ids;
+        } catch (IOException e) {
+            log.warn("扫描主题目录失败", e);
+            return List.of();
+        }
     }
 
     private ThemeManifest load(String themeId) {

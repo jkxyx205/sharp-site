@@ -44,8 +44,14 @@ public class AdminAuthController {
             model.addAttribute("username", admin.getUsername());
             model.addAttribute("tenantId", admin.getTenantId());
         }
-        model.addAttribute("tenantName",
-                TenantContext.get().map(t -> t.getName()).orElse(""));
+        // 当前租户信息(仪表盘展示):name/themeId 全局顶栏已注入,这里补 themeId + 状态。
+        TenantContext.get().ifPresent(t -> {
+            model.addAttribute("tenantName", t.getName());
+            model.addAttribute("themeId", t.getThemeId());
+            boolean active = t.getStatus() != null && t.getStatus() == 1;
+            model.addAttribute("tenantStatusLabel", active ? "启用" : "停用");
+            model.addAttribute("tenantStatusTag", active ? "tag-primary" : "tag-secondary");
+        });
         model.addAttribute("articleCount", articleService.listPublished().size());
         model.addAttribute("productCount", productService.listEnabled().size());
         model.addAttribute("videoCount", videoService.listEnabled().size());
