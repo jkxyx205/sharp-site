@@ -12,6 +12,8 @@ import com.rick.site.seo.service.SeoConfigService;
 import com.rick.site.tenant.context.TenantContext;
 import com.rick.site.tenant.entity.Tenant;
 import com.rick.site.theme.service.ThemeManifestResolver;
+import com.rick.site.video.dto.VideoView;
+import com.rick.site.video.service.VideoService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -36,21 +38,25 @@ public class SiteHomeController {
     private static final int HOME_NEWS_LIMIT = 5;
     /** 首页「Featured Products」展示条数(取上架产品前 N)。 */
     private static final int HOME_PRODUCT_LIMIT = 8;
+    /** 首页「Featured Videos」展示条数(取上架视频前 N)。 */
+    private static final int HOME_VIDEO_LIMIT = 8;
 
     private final SeoConfigService seoService;
     private final ThemeManifestResolver manifestResolver;
     private final ProductService productService;
     private final ArticleService articleService;
     private final CategoryService categoryService;
+    private final VideoService videoService;
 
     public SiteHomeController(SeoConfigService seoService, ThemeManifestResolver manifestResolver,
                              ProductService productService, ArticleService articleService,
-                             CategoryService categoryService) {
+                             CategoryService categoryService, VideoService videoService) {
         this.seoService = seoService;
         this.manifestResolver = manifestResolver;
         this.productService = productService;
         this.articleService = articleService;
         this.categoryService = categoryService;
+        this.videoService = videoService;
     }
 
     @GetMapping(value = {"/", "/{locale:[a-z]{2}-[a-z]{2}}", "/{locale:[a-z]{2}-[a-z]{2}}/"})
@@ -71,6 +77,12 @@ public class SiteHomeController {
         model.addAttribute("products", allProducts.stream().limit(HOME_PRODUCT_LIMIT).toList());
         model.addAttribute("news", allNews.stream().limit(HOME_NEWS_LIMIT).toList());
         model.addAttribute("categories", categoryService.selectAll());
+
+        // 视频:与产品同构(allVideos 全量 + videos 精选子集),供首页 Featured Videos 板块使用。
+        List<VideoView> allVideos = videoService.listForDisplay(loc.language(), defaultLanguage).stream()
+                .map(VideoView::from).toList();
+        model.addAttribute("allVideos", allVideos);
+        model.addAttribute("videos", allVideos.stream().limit(HOME_VIDEO_LIMIT).toList());
 
         seoService.resolveView("/", null, loc.language(), defaultLanguage,
                 new SeoFallback("", "", "", request.getRequestURL().toString())).applyTo(model);

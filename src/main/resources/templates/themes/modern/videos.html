@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html th:lang="${currentLanguage}" th:dir="${currentLanguage == 'ar-SA' ? 'rtl' : 'ltr'}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{themes/modern/fragments/head :: head(pageTitle=${pageTitle}, pageDescription=${pageDescription}, pageKeywords=${pageKeywords}, canonical=${canonical}, robots=${robots}, siteName=${siteName})}"></head>
+<body>
+<header th:replace="~{themes/modern/fragments/header :: header(siteName=${siteName}, active='videos')}"></header>
+<section class="container section">
+    <h1 th:text="#{video.title}">Videos</h1>
+    <div class="product-grid" th:if="${videos != null and !videos.isEmpty()}">
+        <article class="product-card" th:each="p : ${videos}">
+            <a th:href="@{${localePrefix + '/videos/' + p.slug}}">
+                <img th:if="${p.cover != null}" th:src="${p.cover}" th:alt="${p.name}" src="" />
+                <h3 th:text="${p.name}">Product</h3>
+                <p th:if="${p.subtitle != null}" th:text="${p.subtitle}"></p>
+            </a>
+        </article>
+    </div>
+    <p th:if="${videos == null or videos.isEmpty()}" class="empty" th:text="#{product.empty}">No videos yet.</p>
+    <nav class="pagination" th:if="${totalPages != null and totalPages > 1}">
+        <a th:if="${prevLink != null}" th:href="${prevLink}" th:text="#{page.prev}">‹ Previous</a>
+        <span th:text="${page + ' / ' + totalPages}">1 / 1</span>
+        <a th:if="${nextLink != null}" th:href="${nextLink}" th:text="#{page.next}">Next ›</a>
+    </nav>
+</section>
+<h1>所有分类+ 视频</h1>
+<th:block th:if="${categories != null and allVideos != null}" th:with="slugs=${allVideos.![categorySlug]}">
+    <th:block th:each="cat : ${categories}">
+        <section class="container section" th:if="${#lists.contains(slugs, cat.slug)}">
+            <h2 th:text="${cat.name}">Category</h2>
+            <div class="product-grid">
+                <a class="product-card" th:each="p : ${allVideos}" th:if="${p.categorySlug == cat.slug}" th:href="@{${localePrefix + '/videos/' + p.slug}}">
+                    <img th:if="${p.cover != null}" th:src="${p.cover}" th:alt="${p.name}" src="" loading="lazy" />
+                    <h3 th:text="${p.name}">Product</h3>
+                </a>
+            </div>
+        </section>
+    </th:block>
+</th:block>
+
+<h1>video 分类+ 视频</h1>
+<th:block th:if="${allVideos != null}" th:with="gallery=${allVideos.?[categorySlug == 'video']}">
+    <section class="container section" th:if="${!gallery.isEmpty()}">
+        <h2 th:text="${gallery[0].categoryName}">Gallery</h2>
+        <div class="product-grid">
+            <a class="product-card" th:each="p : ${gallery}" th:href="@{${localePrefix + '/videos/' + p.slug}}">
+                <img th:if="${p.cover != null}" th:src="${p.cover}" th:alt="${p.name}" src="" loading="lazy" />
+                <h3 th:text="${p.name}">Product</h3>
+            </a>
+        </div>
+    </section>
+</th:block>
+
+<footer th:replace="~{themes/modern/fragments/footer :: footer(siteName=${siteName}, config=${config})}"></footer>
+</body>
+</html>

@@ -14,7 +14,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.Map;
 
 /**
- * 后台分类管理(Phase 17):列表 + CRUD + 多语言 i18n 编辑。PRODUCT / NEWS 共用,type 区分。
+ * 后台分类管理(Phase 17):列表 + CRUD + 多语言 i18n 编辑。PRODUCT / NEWS / VIDEO 共用,type 区分。
  *
  * <p>i18n 以 name 为必填主字段,空则跳过该语言。按 (type, slug) 幂等 upsert。
  *
@@ -36,18 +36,22 @@ public class AdminCategoryController {
     public String list(Model model) {
         model.addAttribute("categories", categoryService.listByType("PRODUCT"));
         model.addAttribute("newsCategories", categoryService.listByType("NEWS"));
+        model.addAttribute("videoCategories", categoryService.listByType("VIDEO"));
         return "admin/categories";
     }
 
     @GetMapping({"/new", "/{id}/edit"})
     public String form(@PathVariable(required = false) Long id,
-                       @RequestParam(required = false) String lang, Model model) {
+                       @RequestParam(required = false) String lang,
+                       @RequestParam(required = false) String type,
+                       Model model) {
         String language = (lang == null || lang.isBlank()) ? localeResolver.defaultLanguage() : lang;
         Category category;
         Map<String, CategoryI18n> i18nMap;
         if (id == null) {
             category = new Category();
-            category.setType("PRODUCT");
+            // 新建时按 ?type= 预选类型(缺省 PRODUCT);编辑时保留既有 type
+            category.setType(type != null && !type.isBlank() ? type : "PRODUCT");
             category.setStatus((short) 1);
             category.setSort(0);
             i18nMap = Map.of();

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/fragments/head :: head(title='视频')}"></head>
+<body>
+<div class="shell">
+    <aside th:replace="~{admin/fragments/layout :: sidebar(active='videos')}"></aside>
+    <div class="main">
+        <header th:replace="~{admin/fragments/layout :: topbar()}"></header>
+        <main class="content">
+            <h1>视频中心</h1>
+            <p class="error" th:if="${error}" th:text="${error}">错误</p>
+
+            <form class="filter" method="get">
+                <label>分类</label>
+                <select name="categoryId" onchange="this.form.submit()">
+                    <option value="">— 全部分类 —</option>
+                    <option th:each="c : ${categories}" th:value="${c.id}"
+                            th:selected="${selectedCategoryId != null && selectedCategoryId == c.id}"
+                            th:text="${c.slug}">category</option>
+                </select>
+                <a class="btn" th:href="@{/admin/videos/new}">+ 新建视频</a>
+            </form>
+
+            <table>
+                <thead>
+                <tr><th>Slug</th><th>视频链接</th><th>状态</th><th>排序</th><th>操作</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="v : ${videos}">
+                    <td th:text="${v.slug}">slug</td>
+                    <td th:text="${v.videoUrl != null ? v.videoUrl : '—'}">—</td>
+                    <td th:text="${v.status == 1 ? '上架' : '下架'}">—</td>
+                    <td th:text="${v.sort}">0</td>
+                    <td>
+                        <a th:href="@{/admin/videos/{id}/edit(id=${v.id})}">编辑</a>
+                        <form th:action="@{/admin/videos/{id}/delete(id=${v.id})}" method="post" style="display:inline"
+                              onsubmit="return confirm('删除该视频?');">
+                            <button type="submit" class="btn-link">删除</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <p class="empty" th:if="${videos == null or videos.isEmpty()}">暂无视频。</p>
+        </main>
+    </div>
+</div>
+</body>
+</html>

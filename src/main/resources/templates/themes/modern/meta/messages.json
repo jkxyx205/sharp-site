@@ -2,6 +2,7 @@
   "nav.home":     { "zh-CN": "首页",        "en-US": "Home",       "ar-SA": "الرئيسية",   "fr-FR": "Accueil",     "ru-RU": "Главная",    "es-ES": "Inicio" },
   "nav.about":    { "zh-CN": "关于我们",     "en-US": "About",      "ar-SA": "من نحن",      "fr-FR": "À propos",    "ru-RU": "О нас",       "es-ES": "Nosotros" },
   "nav.products": { "zh-CN": "产品",        "en-US": "Products",  "ar-SA": "المنتجات",    "fr-FR": "Produits",    "ru-RU": "Продукты",    "es-ES": "Productos" },
+  "nav.videos": { "zh-CN": "视频",        "en-US": "Video",  "ar-SA": "المنتجات",    "fr-FR": "Produits",    "ru-RU": "Продукты",    "es-ES": "Productos" },
   "nav.news":     { "zh-CN": "新闻",        "en-US": "News",       "ar-SA": "الأخبار",     "fr-FR": "Actualités",  "ru-RU": "Новости",     "es-ES": "Noticias" },
   "nav.contact":  { "zh-CN": "联系我们",     "en-US": "Contact",    "ar-SA": "اتصل بنا",    "fr-FR": "Contact",     "ru-RU": "Контакты",    "es-ES": "Contacto" },
   "nav.info":  { "zh-CN": "信息",     "en-US": "Info",    "ar-SA": "اتصل بنا",    "fr-FR": "Contact",     "ru-RU": "Контакты",    "es-ES": "Contacto" },
@@ -19,6 +20,10 @@
 
   "about.title":         { "zh-CN": "关于我们",           "en-US": "About Us",                "ar-SA": "من نحن",                  "fr-FR": "À propos",                "ru-RU": "О нас",                  "es-ES": "Nosotros" },
   "about.body":          { "zh-CN": "<p>我们是一家连接制造商与全球采购商的贸易公司,致力于提供优质商品与可靠服务。</p>", "en-US": "<p>We are a trading company connecting manufacturers and buyers globally, committed to quality goods and reliable service.</p>", "ar-SA": "<p>نحن شركة تجارية تربط المصنعين والمشترين حول العالم، ملتزمون بتقديم منتجات عالية الجودة وخدمة موثوقة.</p>", "fr-FR": "<p>Nous sommes une société de commerce reliant les fabricants et les acheteurs du monde entier, engagée dans des produits de qualité et un service fiable.</p>", "ru-RU": "<p>Мы — торговая компания, связывающая производителей и покупателей по всему миру, предоставляющая качественные товары и надёжный сервис.</p>", "es-ES": "<p>Somos una empresa comercial que conecta a fabricantes y compradores a nivel mundial, comprometidos con productos de calidad y un servicio confiable.</p>" },
+
+  "video.title":  { "zh-CN": "视频",      "en-US": "Video",      "ar-SA": "المنتجات",      "fr-FR": "Produits",      "ru-RU": "Продукты",      "es-ES": "Productos" },
+  "video.empty":   { "zh-CN": "暂无视频",   "en-US": "No videos yet.", "ar-SA": "لا توجد منتجات بعد.", "fr-FR": "Aucun produit pour le moment.", "ru-RU": "Пока нет продуктов.", "es-ES": "Aún no hay productos." },
+  "video.back":    { "zh-CN": "← 返回视频", "en-US": "← Back to videos", "ar-SA": "← العودة إلى المنتجات", "fr-FR": "← Retour aux produits", "ru-RU": "← Назад к продуктам", "es-ES": "← Volver a productos" },
 
   "product.title":  { "zh-CN": "产品",      "en-US": "Products",      "ar-SA": "المنتجات",      "fr-FR": "Produits",      "ru-RU": "Продукты",      "es-ES": "Productos" },
   "product.empty":   { "zh-CN": "暂无产品",   "en-US": "No products yet.", "ar-SA": "لا توجد منتجات بعد.", "fr-FR": "Aucun produit pour le moment.", "ru-RU": "Пока нет продуктов.", "es-ES": "Aún no hay productos." },

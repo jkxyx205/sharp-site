@@ -13,7 +13,7 @@ import lombok.experimental.SuperBuilder;
 import org.hibernate.validator.constraints.Length;
 
 /**
- * 分类(DATABASE.md §8 / TASK-0601),PRODUCT / NEWS 共用,type 区分。
+ * 分类(DATABASE.md §8 / TASK-0601),PRODUCT / NEWS / VIDEO 共用,type 区分。
  *
  * <p>每租户按 (type, slug) 唯一;parent_id 支持层级(可为空)。
  * 继承 {@link TenantBaseEntity}:tenant_id 框架注入,审计列自动填充,逻辑删除。
@@ -30,7 +30,7 @@ public class Category extends TenantBaseEntity<Long> {
 
     @NotBlank
     @Length(max = 50)
-    @Column(nullable = false, comment = "类型:PRODUCT / NEWS")
+    @Column(nullable = false, comment = "类型:PRODUCT / NEWS / VIDEO")
     String type;
 
     @Column(comment = "父分类ID,支持层级")

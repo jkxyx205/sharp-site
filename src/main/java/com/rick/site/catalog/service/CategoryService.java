@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * 分类服务(TASK-0601),PRODUCT / NEWS 共用,type 区分。
+ * 分类服务(TASK-0601),PRODUCT / NEWS / VIDEO 共用,type 区分。
  *
  * <p>租户隔离:查询显式带 tenant_id;按 (type, slug) 幂等 upsert,按 (category_id, language) 幂等 upsert i18n。
  *

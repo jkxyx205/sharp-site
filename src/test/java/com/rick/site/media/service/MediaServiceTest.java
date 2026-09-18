@@ -51,7 +51,7 @@ class MediaServiceTest {
     @Test
     void uploadStoresAndRecordsMedia() throws Exception {
         Tenant t = createTenant("media-1");
-        Media m = mediaService.upload(png("photo.png"), "Title", "alt");
+        Media m = mediaService.upload(png("photo.png"), null, "Title", "alt");
         assertThat(m.getId()).isNotNull();
         assertThat(m.getUrl()).isNotBlank();
         assertThat(m.getObjectKey()).isNotBlank();
@@ -66,10 +66,10 @@ class MediaServiceTest {
         // tenant_id 由 TenantContext 注入插入(防伪造,CLAUDE.md §4),故按租户交替创建+上传;
         // 显式 tenantId 读取/删除归属由 selectById 按上下文租户隔离判定。
         Tenant a = createTenant("media-isol-a");
-        Media ma = mediaService.upload(png("a.png"), null, null);
+        Media ma = mediaService.upload(png("a.png"), null, null, null);
 
         Tenant b = createTenant("media-isol-b");
-        Media mb = mediaService.upload(png("b.png"), null, null);
+        Media mb = mediaService.upload(png("b.png"), null, null, null);
 
         // b 不能删 a 的媒体(requireOwned 经上下文隔离:selectById 按 tenant_id 过滤)
         assertThatThrownBy(() -> mediaService.delete(ma.getId()))
@@ -87,7 +87,7 @@ class MediaServiceTest {
         Tenant t = createTenant("media-2");
         MultipartFile exe = new MockMultipartFile("file", "evil.exe", "application/octet-stream",
                 "x".getBytes(StandardCharsets.UTF_8));
-        assertThatThrownBy(() -> mediaService.upload(exe, null, null))
+        assertThatThrownBy(() -> mediaService.upload(exe, null, null, null))
                 .isInstanceOf(BizException.class).hasMessageContaining("不支持的文件类型");
     }
 
@@ -97,7 +97,7 @@ class MediaServiceTest {
         // 扩展名 png 但 MIME 不在白名单 → 拒绝
         MultipartFile bad = new MockMultipartFile("file", "x.png", "application/x-msdownload",
                 "x".getBytes(StandardCharsets.UTF_8));
-        assertThatThrownBy(() -> mediaService.upload(bad, null, null))
+        assertThatThrownBy(() -> mediaService.upload(bad, null, null, null))
                 .isInstanceOf(BizException.class).hasMessageContaining("MIME");
     }
 
@@ -112,7 +112,7 @@ class MediaServiceTest {
                 return 21L * 1024 * 1024;
             }
         };
-        assertThatThrownBy(() -> mediaService.upload(big, null, null))
+        assertThatThrownBy(() -> mediaService.upload(big, null, null, null))
                 .isInstanceOf(BizException.class).hasMessageContaining("大小");
     }
 
@@ -120,7 +120,7 @@ class MediaServiceTest {
     void rejectsEmptyFile() {
         Tenant t = createTenant("media-5");
         MockMultipartFile empty = new MockMultipartFile("file", "empty.png", "image/png", new byte[0]);
-        assertThatThrownBy(() -> mediaService.upload(empty, null, null))
+        assertThatThrownBy(() -> mediaService.upload(empty, null, null, null))
                 .isInstanceOf(BizException.class).hasMessageContaining("空");
     }
 }

@@ -29,14 +29,14 @@ import java.util.*;
 @Service
 public class MediaService extends BaseServiceImpl<MediaDAO, Media, Long> {
 
-    /** 允许的扩展名白名单(图片 + 文档 + 压缩包)。 */
+    /** 允许的扩展名白名单(图片 + 文档 + 压缩包 + 视频)。 */
     private static final Set<String> ALLOWED_EXTENSIONS = Set.of(
             "jpg", "jpeg", "png", "gif", "webp", "svg",
-            "pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "txt", "zip");
+            "pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "txt", "zip", "mp4");
 
     /** 允许的 MIME 前缀白名单。 */
     private static final Set<String> ALLOWED_MIME_PREFIXES = Set.of(
-            "image/", "application/pdf", "application/msword",
+            "image/", "video/", "application/pdf", "application/msword",
             "application/vnd.openxmlformats-officedocument",
             "application/vnd.ms-excel", "application/vnd.ms-powerpoint",
             "text/plain", "application/zip", "application/x-zip-compressed");

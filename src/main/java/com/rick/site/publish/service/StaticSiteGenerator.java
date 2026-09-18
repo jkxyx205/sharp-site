@@ -23,6 +23,8 @@ import com.rick.site.theme.model.ThemeManifest;
 import com.rick.site.theme.model.ThemeManifest.ThemePage;
 import com.rick.site.theme.service.ThemeManifestResolver;
 import com.rick.site.theme.service.ThemeResolver;
+import com.rick.site.video.dto.VideoView;
+import com.rick.site.video.service.VideoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -85,6 +87,8 @@ public class StaticSiteGenerator {
     private static final int HOME_NEWS_LIMIT = 5;
     /** 首页「Featured Products」展示条数(取上架产品前 N)。 */
     private static final int HOME_PRODUCT_LIMIT = 8;
+    /** 首页「Featured Videos」展示条数(取上架视频前 N)。 */
+    private static final int HOME_VIDEO_LIMIT = 8;
 
     private final TemplateEngine templateEngine;
     private final ProductService productService;
@@ -97,6 +101,7 @@ public class StaticSiteGenerator {
     private final ResourcePatternResolver resourcePatternResolver;
 
     private final CategoryService categoryService;
+    private final VideoService videoService;
 
     public StaticSiteGenerator(TemplateEngine templateEngine,
                               ProductService productService,
@@ -107,7 +112,8 @@ public class StaticSiteGenerator {
                               ThemeManifestResolver manifestResolver,
                               ThemeResolver themeResolver,
                               ResourcePatternResolver resourcePatternResolver,
-                              CategoryService categoryService) {
+                              CategoryService categoryService,
+                              VideoService videoService) {
         this.templateEngine = templateEngine;
         this.productService = productService;
         this.articleService = articleService;
@@ -118,6 +124,7 @@ public class StaticSiteGenerator {
         this.themeResolver = themeResolver;
         this.resourcePatternResolver = resourcePatternResolver;
         this.categoryService = categoryService;
+        this.videoService = videoService;
     }
 
     /**
@@ -184,6 +191,12 @@ public class StaticSiteGenerator {
         ctx.setVariable("products", allProducts.stream().limit(HOME_PRODUCT_LIMIT).toList());
         ctx.setVariable("news", allNews.stream().limit(HOME_NEWS_LIMIT).toList());
         ctx.setVariable("categories", categoryService.selectAll());
+
+        // 视频:与产品同构(allVideos 全量 + videos 精选子集)。
+        List<VideoView> allVideos = videoService.listForDisplay(locale, defaultLocale).stream()
+                .map(VideoView::from).toList();
+        ctx.setVariable("allVideos", allVideos);
+        ctx.setVariable("videos", allVideos.stream().limit(HOME_VIDEO_LIMIT).toList());
         seoService.resolveView("/", null, locale, defaultLocale,
                 new SeoFallback("", "", "", baseUrl + localePrefix + "/")).applyTo(ctxToModel(ctx));
         applyCommon(ctx, tenant, locale, localePrefix);
@@ -211,6 +224,9 @@ public class StaticSiteGenerator {
                     .map(ProductView::from).toList());
             ctx.setVariable("news", articleService.listForDisplay(locale, defaultLocale).stream()
                     .map(ArticleView::from).toList());
+            // 视频:与产品同构,为通用页面注入全量视频列表(线上/预览/静态三路一致)。
+            ctx.setVariable("videos", videoService.listForDisplay(locale, defaultLocale).stream()
+                    .map(VideoView::from).toList());
             ctx.setVariable("categories", categoryService.selectAll());
 
             seoService.resolveView(path, null, locale, defaultLocale,

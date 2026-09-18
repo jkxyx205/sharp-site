@@ -25,8 +25,8 @@ sharp:
 fileupload:
   tmp: /Users/rick/Space/tmp/site/tmp # 下载的临时目录
   local: # cd /Users/rick/Space/tmp/fileupload && http-server -p 7892
-    root-path: /Users/rick/Space/tmp/site/media
-    server-url: http://site.xhope.top/media/ # 映射到tmp目录
+    root-path: /Users/rick/Space/tmp/site/upload
+    server-url: http://site.xhope.top/upload/ # 映射到tmp目录
 
 logging:
   level:

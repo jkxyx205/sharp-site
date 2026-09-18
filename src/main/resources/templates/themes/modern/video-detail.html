@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html th:lang="${currentLanguage}" th:dir="${currentLanguage == 'ar-SA' ? 'rtl' : 'ltr'}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{themes/modern/fragments/head :: head(pageTitle=${video.name}, pageDescription=${video.subtitle}, pageKeywords=${pageKeywords}, canonical=${canonical}, robots=${robots}, siteName=${siteName})}"></head>
+<body>
+<header th:replace="~{themes/modern/fragments/header :: header(siteName=${siteName}, active='products')}"></header>
+
+<section class="container section video-detail" th:if="${video != null}">
+    <h1 th:text="${video.name}">Product Name</h1>
+    <p class="subtitle" th:if="${video.subtitle != null}" th:text="${video.subtitle}"></p>
+    <img th:if="${video.cover != null}" th:src="${video.cover}" th:alt="${video.name}" src="" class="cover" />
+    <div class="rich-text" th:utext="${video.content} ?: ''">Product detail content.</div>
+    <p class="back"><a th:href="@{${localePrefix + '/products'}}" th:text="#{video.back}">← Back to products</a></p>
+</section>
+
+<footer th:replace="~{themes/modern/fragments/footer :: footer(siteName=${siteName}, config=${config})}"></footer>
+</body>
+</html>

@@ -12,7 +12,8 @@
             <p class="error" th:if="${error}" th:text="${error}">错误</p>
 
             <div class="card">
-                <h1 style="font-size:15px;">产品分类</h1>
+                <h1 style="font-size:15px;">产品分类
+                    <a class="btn-link" th:href="@{/admin/categories/new(type='PRODUCT')}">+ 新建</a></h1>
                 <table>
                     <thead><tr><th>Slug</th><th>排序</th><th>状态</th><th>操作</th></tr></thead>
                     <tbody>
@@ -34,7 +35,8 @@
             </div>
 
             <div class="card">
-                <h1 style="font-size:15px;">新闻分类</h1>
+                <h1 style="font-size:15px;">新闻分类
+                    <a class="btn-link" th:href="@{/admin/categories/new(type='NEWS')}">+ 新建</a></h1>
                 <table>
                     <thead><tr><th>Slug</th><th>排序</th><th>状态</th><th>操作</th></tr></thead>
                     <tbody>
@@ -53,6 +55,29 @@
                     </tbody>
                 </table>
                 <p class="empty" th:if="${newsCategories == null or newsCategories.isEmpty()}">暂无新闻分类。</p>
+            </div>
+
+            <div class="card">
+                <h1 style="font-size:15px;">视频分类
+                    <a class="btn-link" th:href="@{/admin/categories/new(type='VIDEO')}">+ 新建</a></h1>
+                <table>
+                    <thead><tr><th>Slug</th><th>排序</th><th>状态</th><th>操作</th></tr></thead>
+                    <tbody>
+                    <tr th:each="c : ${videoCategories}">
+                        <td th:text="${c.slug}">slug</td>
+                        <td th:text="${c.sort}">0</td>
+                        <td th:text="${c.status == 1 ? '启用' : '停用'}">—</td>
+                        <td>
+                            <a th:href="@{/admin/categories/{id}/edit(id=${c.id})}">编辑</a>
+                            <form th:action="@{/admin/categories/{id}/delete(id=${c.id})}" method="post" style="display:inline"
+                                  onsubmit="return confirm('删除该分类?');">
+                                <button type="submit" class="btn-link">删除</button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <p class="empty" th:if="${videoCategories == null or videoCategories.isEmpty()}">暂无视频分类。</p>
             </div>
         </main>
     </div>

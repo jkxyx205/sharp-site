@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/fragments/head :: head(title='视频编辑')}"></head>
+<body>
+<div class="shell">
+    <aside th:replace="~{admin/fragments/layout :: sidebar(active='videos')}"></aside>
+    <div class="main">
+        <header th:replace="~{admin/fragments/layout :: topbar()}"></header>
+        <main class="content">
+            <div class="card">
+                <h1><span th:text="${video.id == null ? '新建视频' : '编辑视频'}">视频</span></h1>
+                <nav class="subnav"><a class="btn" th:href="@{/admin/videos}">← 返回列表</a></nav>
+                <p class="error" th:if="${error}" th:text="${error}">错误</p>
+
+                <!-- 语种切换(独立 GET 表单;新增/编辑均需先选语种) -->
+                <form th:action="${video.id == null ? '/admin/videos/new' : '/admin/videos/' + video.id + '/edit'}" method="get">
+                    <label>语种
+                        <select name="lang" onchange="this.form.submit()">
+                            <option th:each="l : ${languages}" th:value="${l}"
+                                    th:selected="${l == currentLang}"
+                                    th:text="${l + (l == defaultLanguage ? ' · 默认' : '')}">lang</option>
+                        </select></label>
+                </form>
+
+                <form th:action="@{/admin/videos/save}" method="post">
+                    <input type="hidden" name="id" th:value="${video.id}" />
+                    <input type="hidden" name="language" th:value="${currentLang}" />
+                    <label>Slug <span class="hint">租户内唯一 URL 标识</span>
+                        <input type="text" name="slug" th:value="${video.slug}" required placeholder="ocean-engineering" /></label>
+                    <label>分类 <span class="hint">必填</span>
+                        <select name="categoryId" required>
+                            <option value="">— 请选择 —</option>
+                            <option th:each="c : ${categories}" th:value="${c.id}"
+                                    th:selected="${video.categoryId != null && video.categoryId == c.id}"
+                                    th:text="${c.slug}">category</option>
+                        </select></label>
+                    <label>Cover URL
+                        <input type="url" name="cover" th:value="${video.cover}" placeholder="/img/widget.jpg" /></label>
+                    <label>视频地址链接 <span class="hint">mp4 / 外链</span>
+                        <input type="url" name="videoUrl" th:value="${video.videoUrl}" placeholder="/themes-images/xhope/images/media/ocean.mp4" /></label>
+                    <label>排序 <span class="hint">升序</span>
+                        <input type="number" name="sort" th:value="${video.sort}" /></label>
+                    <label>Status
+                        <select name="status">
+                            <option value="1" th:selected="${video.status == 1}">上架</option>
+                            <option value="0" th:selected="${video.status != 1}">下架</option>
+                        </select></label>
+
+                    <fieldset th:classappend="${currentLang == defaultLanguage ? 'default-lang' : ''}">
+                        <legend><span th:text="${currentLang}">语言</span>
+                            <span class="lang-tag" th:if="${currentLang == defaultLanguage}">· 默认语言</span></legend>
+                        <label>Name <span class="hint">必填,空则不保存该语种</span>
+                            <input type="text" name="name"
+                                   th:value="${i18nMap['__${currentLang}__'] != null ? i18nMap['__${currentLang}__'].name : ''}" /></label>
+                        <label>Subtitle
+                            <input type="text" name="subtitle"
+                                   th:value="${i18nMap['__${currentLang}__'] != null ? i18nMap['__${currentLang}__'].subtitle : ''}" /></label>
+                        <label>Description
+                            <textarea name="description" style="min-height:60px"
+                                      th:text="${i18nMap['__${currentLang}__'] != null ? i18nMap['__${currentLang}__'].description : ''}"></textarea></label>
+                        <label>Content <span class="hint">富文本 HTML</span>
+                            <textarea name="content"
+                                      th:text="${i18nMap['__${currentLang}__'] != null ? i18nMap['__${currentLang}__'].content : ''}"></textarea></label>
+                        <label>SEO Title
+                            <input type="text" name="seoTitle"
+                                   th:value="${i18nMap['__${currentLang}__'] != null ? i18nMap['__${currentLang}__'].seoTitle : ''}" /></label>
+                        <label>SEO Description
+                            <input type="text" name="seoDescription"
+                                   th:value="${i18nMap['__${currentLang}__'] != null ? i18nMap['__${currentLang}__'].seoDescription : ''}" /></label>
+                    </fieldset>
+
+                    <div class="actions">
+                        <button type="submit" class="btn btn-primary">保存</button>
+                        <a th:href="@{/admin/videos}" class="btn btn-secondary">取消</a>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+</div>
+</body>
+</html>

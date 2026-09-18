@@ -41,6 +41,7 @@ public class SeoConfigService extends BaseServiceImpl<SeoConfigDAO, SeoConfig, L
     // "/news"、"/about"、"/contact"),page_id 恒为空;仅产品/新闻详情用下列常量 + page_id。
     public static final String PRODUCT = "product";
     public static final String ARTICLE = "article";
+    public static final String VIDEO = "video";
 
     private static final String DEFAULT_ROBOTS = "index, follow";
 

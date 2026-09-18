@@ -16,6 +16,8 @@ import com.rick.site.tenant.context.TenantContext;
 import com.rick.site.tenant.entity.Tenant;
 import com.rick.site.theme.model.ThemeManifest.ThemePage;
 import com.rick.site.theme.service.ThemeManifestResolver;
+import com.rick.site.video.dto.VideoView;
+import com.rick.site.video.service.VideoService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -50,24 +52,29 @@ public class PreviewController {
     private static final int HOME_NEWS_LIMIT = 5;
     /** 首页「Featured Products」展示条数。 */
     private static final int HOME_PRODUCT_LIMIT = 8;
+    /** 首页「Featured Videos」展示条数。 */
+    private static final int HOME_VIDEO_LIMIT = 8;
 
     private final ProductService productService;
     private final ArticleService articleService;
     private final SeoConfigService seoService;
     private final ThemeManifestResolver manifestResolver;
     private final CategoryService categoryService;
+    private final VideoService videoService;
 
     /** 列表分页大小;与 StaticSiteGenerator 共用同一配置项,保证预览/线上一致。 */
     @org.springframework.beans.factory.annotation.Value("${sharp.site.page-size:12}")
     private int pageSize;
 
     public PreviewController(ProductService productService, ArticleService articleService,
-                            SeoConfigService seoService, ThemeManifestResolver manifestResolver, CategoryService categoryService) {
+                            SeoConfigService seoService, ThemeManifestResolver manifestResolver,
+                            CategoryService categoryService, VideoService videoService) {
         this.productService = productService;
         this.articleService = articleService;
         this.seoService = seoService;
         this.manifestResolver = manifestResolver;
         this.categoryService = categoryService;
+        this.videoService = videoService;
     }
 
     @GetMapping({"/preview", "/preview/"})
@@ -88,6 +95,12 @@ public class PreviewController {
         model.addAttribute("products", allProducts.stream().limit(HOME_PRODUCT_LIMIT).toList());
         model.addAttribute("news", allNews.stream().limit(HOME_NEWS_LIMIT).toList());
         model.addAttribute("categories", categoryService.selectAll());
+
+        // 视频:与产品同构(allVideos 全量 + videos 精选子集)。
+        List<VideoView> allVideos = videoService.listForDisplay(language, dl).stream()
+                .map(VideoView::from).toList();
+        model.addAttribute("allVideos", allVideos);
+        model.addAttribute("videos", allVideos.stream().limit(HOME_VIDEO_LIMIT).toList());
 
         seoService.resolveView("/", null, language, dl,
                 new SeoFallback("", "", "", request.getRequestURL().toString())).applyTo(model);
@@ -111,6 +124,50 @@ public class PreviewController {
         seoService.resolveView("/products", null, language, dl,
                 new SeoFallback("Products", "", "", request.getRequestURL().toString())).applyTo(model);
         return finish(manifestResolver.template(tenant, "products"), language, model);
+    }
+
+    @GetMapping("/preview/videos")
+    public String videoList(@RequestParam(name = "lang", required = false) String lang,
+                            @RequestParam(name = "page", defaultValue = "1") int page,
+                            HttpServletRequest request, Model model) {
+        Tenant tenant = TenantContext.require();
+        String language = language(tenant, lang);
+        String dl = defaultLocale(tenant);
+        LocaleContext.set(new LocaleResolution(language, "/videos/page/" + Math.max(1, page) + "/"));
+        List<VideoView> videos = videoService.listForDisplay(language, dl)
+                .stream().map(VideoView::from).toList();
+        model.addAttribute("videos", videos);
+        model.addAttribute("allVideos", videos);
+        model.addAttribute("categories", videoService.listCategoryViews(language, dl));
+        applyPreviewPagination(model, videos, page, "/preview/videos");
+        seoService.resolveView("/videos", null, language, dl,
+                new SeoFallback("Videos", "", "", request.getRequestURL().toString())).applyTo(model);
+        return finish(manifestResolver.template(tenant, "videos"), language, model);
+    }
+
+
+    @GetMapping("/preview/videos/{slug}")
+    public String videoDetail(@PathVariable String slug,
+                              @RequestParam(name = "lang", required = false) String lang,
+                              HttpServletRequest request, Model model) {
+        Tenant tenant = TenantContext.require();
+        String language = language(tenant, lang);
+        String dl = defaultLocale(tenant);
+        LocaleContext.set(new LocaleResolution(language, "/videos/" + slug));
+        VideoService.ResolvedVideo resolved;
+        try {
+            resolved = videoService.resolveForDisplay(slug, language, dl);
+        } catch (BizException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+        }
+        VideoView video = VideoView.from(resolved);
+        model.addAttribute("video", video);
+        String fbTitle = video.seoTitle() != null ? video.seoTitle() : video.name();
+        String fbDesc = video.seoDescription() != null ? video.seoDescription()
+                : (video.subtitle() != null ? video.subtitle() : "");
+        seoService.resolveView(SeoConfigService.VIDEO, resolved.video().getId(), language, dl,
+                new SeoFallback(fbTitle, fbDesc, video.cover(), request.getRequestURL().toString())).applyTo(model);
+        return finish(manifestResolver.template(tenant, "video-detail"), language, model);
     }
 
     @GetMapping("/preview/products/{slug}")
@@ -205,6 +262,9 @@ public class PreviewController {
                         language, dl).stream()
                 .map(ProductView::from).toList();
         model.addAttribute("products", products);
+        // 视频:与产品同构,为通用页面注入全量视频列表(线上/预览/静态三路一致)。
+        model.addAttribute("videos", videoService.listForDisplay(language, dl).stream()
+                .map(VideoView::from).toList());
         model.addAttribute("categories", categoryService.selectAll());
 
         // 单页 SEO:page_type = 页面路径(如 /about),page_id 恒为空
@@ -256,8 +316,14 @@ public class PreviewController {
         model.addAttribute("nextLink", p < totalPages ? base + "?page=" + (p + 1) : null);
     }
 
-    /** 预览列表分页切片绑定的模型键:products→"products",news→"news"。 */
+    /** 预览列表分页切片绑定的模型键:products→"products",videos→"videos",其余→"news"。 */
     private static String paginationSliceKey(String base) {
-        return base.endsWith("/products") ? "products" : "news";
+        if (base.endsWith("/products")) {
+            return "products";
+        }
+        if (base.endsWith("/videos")) {
+            return "videos";
+        }
+        return "news";
     }
 }

@@ -29,6 +29,7 @@
                         <select name="type">
                             <option value="PRODUCT" th:selected="${category.type == 'PRODUCT'}">产品分类(PRODUCT)</option>
                             <option value="NEWS" th:selected="${category.type == 'NEWS'}">新闻分类(NEWS)</option>
+                            <option value="VIDEO" th:selected="${category.type == 'VIDEO'}">视频分类(VIDEO)</option>
                         </select></label>
                     <label>Slug <span class="hint">同 type 内唯一</span>
                         <input type="text" name="slug" th:value="${category.slug}" required placeholder="electronics" /></label>

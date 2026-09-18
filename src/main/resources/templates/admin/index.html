@@ -17,16 +17,21 @@
                     <div class="num" th:text="${productCount}">0</div>
                     <div class="lbl">上架产品</div>
                 </div>
+                <div class="stat">
+                    <div class="num" th:text="${videoCount}">0</div>
+                    <div class="lbl">已发布视频</div>
+                </div>
             </div>
 
             <div class="card">
                 <h1>快捷入口</h1>
                 <div class="subnav">
-                    <a class="btn" th:href="@{/admin/products}">产品管理</a>
-                    <a class="btn" th:href="@{/admin/news}">新闻管理</a>
+                    <a class="btn" th:href="@{/admin/products}">产品中心</a>
+                    <a class="btn" th:href="@{/admin/videos}">视频中心</a>
+                    <a class="btn" th:href="@{/admin/news}">新闻中心</a>
                     <a class="btn" th:href="@{/admin/categories}">分类管理</a>
-                    <a class="btn" th:href="@{/admin/company}">企业信息</a>
-                    <a class="btn" th:href="@{/admin/seo}">SEO</a>
+                    <a class="btn" th:href="@{/admin/company}">公司信息</a>
+                    <a class="btn" th:href="@{/admin/seo}">SEO信息</a>
                 </div>
             </div>
         </main>

@@ -14,6 +14,8 @@ import com.rick.site.tenant.context.TenantContext;
 import com.rick.site.tenant.entity.Tenant;
 import com.rick.site.theme.model.ThemeManifest.ThemePage;
 import com.rick.site.theme.service.ThemeManifestResolver;
+import com.rick.site.video.dto.VideoView;
+import com.rick.site.video.service.VideoService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -49,14 +51,17 @@ public class SitePageController {
     private final ProductService productService;
     private final ArticleService articleService;
     private final CategoryService categoryService;
+    private final VideoService videoService;
 
     public SitePageController(SeoConfigService seoService, ThemeManifestResolver manifestResolver,
-                             ProductService productService, ArticleService articleService, CategoryService categoryService) {
+                             ProductService productService, ArticleService articleService,
+                             CategoryService categoryService, VideoService videoService) {
         this.seoService = seoService;
         this.manifestResolver = manifestResolver;
         this.productService = productService;
         this.articleService = articleService;
         this.categoryService = categoryService;
+        this.videoService = videoService;
     }
 
     @GetMapping(
@@ -82,6 +87,9 @@ public class SitePageController {
                 .map(ProductView::from).toList());
         model.addAttribute("news", articleService.listForDisplay(loc.language(), dl).stream()
                 .map(ArticleView::from).toList());
+        // 视频:与产品同构,为通用页面注入全量视频列表(线上/预览/静态三路一致)。
+        model.addAttribute("videos", videoService.listForDisplay(loc.language(), dl).stream()
+                .map(VideoView::from).toList());
         model.addAttribute("categories", categoryService.selectAll());
         // 单页 SEO:page_type = 页面路径(如 /about),page_id 恒为空
         seoService.resolveView(page.path(), null, loc.language(), dl,
