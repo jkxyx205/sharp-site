@@ -58,7 +58,7 @@ public class ProductController {
         model.addAttribute("categories", productService.listCategoryViews(loc.language(), dl));
         seoService.resolveView("/products", null, loc.language(), dl,
                 new SeoFallback("Products", "", "", request.getRequestURL().toString())).applyTo(model);
-        return "themes/modern/products";
+        return manifestResolver.template(tenant, "products");
     }
 
     @GetMapping(value = {"/products/{slug}", "/{locale:[a-z]{2}-[a-z]{2}}/products/{slug}"})
@@ -83,6 +83,6 @@ public class ProductController {
         seoService.resolveView(SeoConfigService.PRODUCT, resolved.product().getId(),
                 loc.language(), dl,
                 new SeoFallback(fbTitle, fbDesc, product.cover(), request.getRequestURL().toString())).applyTo(model);
-        return "themes/modern/product-detail";
+        return manifestResolver.template(tenant, "product-detail");
     }
 }

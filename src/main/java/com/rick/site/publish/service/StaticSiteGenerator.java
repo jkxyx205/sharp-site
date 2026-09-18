@@ -41,7 +41,7 @@ import java.util.Locale;
  *
  * <p>发布流程将 DB 中 Tenant/Theme/内容/SEO/i18n 经 Thymeleaf {@link TemplateEngine}
  * 离线渲染为静态 HTML,输出到 {@code {wwwRoot}/{tenantId}/releases/{version}/}。
- * 与前台 Controller 共用同一套 themes/modern 模板与视图装配逻辑,确保预览/线上一致。
+ * 与前台 Controller 共用同一套 themes/{themeId} 模板与视图装配逻辑,确保预览/线上一致。
  *
  * <p>租户隔离:调用方(Publish)已设置 {@link TenantContext};所有查询经 SiteDatabaseConfig
  * 自动按上下文租户过滤,生成器不另行传 tenantId(§4)。
@@ -175,7 +175,7 @@ public class StaticSiteGenerator {
         seoService.resolveView("/", null, locale, defaultLocale,
                 new SeoFallback("", "", "", baseUrl + localePrefix + "/")).applyTo(ctxToModel(ctx));
         applyCommon(ctx, tenant, locale, localePrefix);
-        write(outputDir, "index.html", templateEngine.process("themes/modern/index", ctx));
+        write(outputDir, "index.html", templateEngine.process(manifestResolver.template(tenant, "index"), ctx));
     }
 
     /**
@@ -239,7 +239,7 @@ public class StaticSiteGenerator {
                     .applyTo(ctxToModel(ctx));
             applyCommon(ctx, tenant, locale, localePrefix);
             write(outputDir, "products/page/" + n + "/index.html",
-                    templateEngine.process("themes/modern/products", ctx));
+                    templateEngine.process(manifestResolver.template(tenant, "products"), ctx));
         }
 
         // 详情:products/{slug}/index.html
@@ -259,7 +259,7 @@ public class StaticSiteGenerator {
                             baseUrl + localePrefix + detailPath)).applyTo(ctxToModel(ctx));
             applyCommon(ctx, tenant, locale, localePrefix);
             write(outputDir, "products/" + slug + "/index.html",
-                    templateEngine.process("themes/modern/product-detail", ctx));
+                    templateEngine.process(manifestResolver.template(tenant, "product-detail"), ctx));
         }
     }
 
@@ -290,7 +290,7 @@ public class StaticSiteGenerator {
                     .applyTo(ctxToModel(ctx));
             applyCommon(ctx, tenant, locale, localePrefix);
             write(outputDir, "news/page/" + n + "/index.html",
-                    templateEngine.process("themes/modern/news", ctx));
+                    templateEngine.process(manifestResolver.template(tenant, "news"), ctx));
         }
 
         for (ResolvedArticle ra : resolved) {
@@ -309,7 +309,7 @@ public class StaticSiteGenerator {
                             baseUrl + localePrefix + detailPath)).applyTo(ctxToModel(ctx));
             applyCommon(ctx, tenant, locale, localePrefix);
             write(outputDir, "news/" + slug + "/index.html",
-                    templateEngine.process("themes/modern/news-detail", ctx));
+                    templateEngine.process(manifestResolver.template(tenant, "news-detail"), ctx));
         }
     }
 

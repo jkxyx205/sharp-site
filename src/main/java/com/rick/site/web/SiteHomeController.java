@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * 首页 Controller(TASK-0502 / TASK-1002)。
  *
- * <p>渲染 modern 首页:hero/company/cta 文案由前端模板 + {@code messages.json} 文案键提供
+ * <p>渲染首页:hero/company/cta 文案由前端模板 + {@code messages.json} 文案键提供
  * (不再有 {@code home_section} 表);产品/新闻列表由 Phase 6/7 注入。
  * 语言来自 LocaleContext;默认语言 {@code /},其他语言 {@code /{locale}}。
  * SEO meta 由 {@link SeoConfigService} 解析(page_type="/",缺失回退请求 URL)。
@@ -74,6 +74,6 @@ public class SiteHomeController {
 
         seoService.resolveView("/", null, loc.language(), defaultLanguage,
                 new SeoFallback("", "", "", request.getRequestURL().toString())).applyTo(model);
-        return "themes/modern/index";
+        return manifestResolver.template(tenant, "index");
     }
 }

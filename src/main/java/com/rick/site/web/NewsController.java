@@ -58,7 +58,7 @@ public class NewsController {
         model.addAttribute("categories", articleService.listCategoryViews(loc.language(), dl));
         seoService.resolveView("/news", null, loc.language(), dl,
                 new SeoFallback("News", "", "", request.getRequestURL().toString())).applyTo(model);
-        return "themes/modern/news";
+        return manifestResolver.template(tenant, "news");
     }
 
     @GetMapping(value = {"/news/{slug}", "/{locale:[a-z]{2}-[a-z]{2}}/news/{slug}"})
@@ -83,6 +83,6 @@ public class NewsController {
         seoService.resolveView(SeoConfigService.ARTICLE, resolved.article().getId(),
                 loc.language(), dl,
                 new SeoFallback(fbTitle, fbDesc, article.cover(), request.getRequestURL().toString())).applyTo(model);
-        return "themes/modern/news-detail";
+        return manifestResolver.template(tenant, "news-detail");
     }
 }

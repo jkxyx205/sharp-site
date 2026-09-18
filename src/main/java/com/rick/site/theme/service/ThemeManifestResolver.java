@@ -59,6 +59,18 @@ public class ThemeManifestResolver {
         return resolve(tenant).defaultLocale();
     }
 
+    /**
+     * 拼接租户主题模板视图名 {@code themes/{themeId}/{page}}(无 {@code .html} 后缀)。
+     *
+     * <p>供前台动态 Controller、{@code PreviewController}、{@link
+     * com.rick.site.publish.service.StaticSiteGenerator} 共用,使首页/列表/详情等
+     * 动态页与静态页({@link ThemePage#template()})一样遵从租户 {@code themeId},
+     * 不再硬编码 {@code themes/modern/...}。
+     */
+    public String template(Tenant tenant, String page) {
+        return "themes/" + themeResolver.resolveTheme(tenant) + "/" + page;
+    }
+
     /** 租户主题的启用语种列表(取代平台固定列表,供后台/语言切换遍历)。 */
     public List<String> locales(Tenant tenant) {
         return resolve(tenant).locales();

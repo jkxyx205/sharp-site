@@ -91,7 +91,7 @@ public class PreviewController {
 
         seoService.resolveView("/", null, language, dl,
                 new SeoFallback("", "", "", request.getRequestURL().toString())).applyTo(model);
-        return finish("themes/modern/index", language, model);
+        return finish(manifestResolver.template(tenant, "index"), language, model);
     }
 
     @GetMapping("/preview/products")
@@ -110,7 +110,7 @@ public class PreviewController {
         applyPreviewPagination(model, products, page, "/preview/products");
         seoService.resolveView("/products", null, language, dl,
                 new SeoFallback("Products", "", "", request.getRequestURL().toString())).applyTo(model);
-        return finish("themes/modern/products", language, model);
+        return finish(manifestResolver.template(tenant, "products"), language, model);
     }
 
     @GetMapping("/preview/products/{slug}")
@@ -134,7 +134,7 @@ public class PreviewController {
                 : (product.subtitle() != null ? product.subtitle() : "");
         seoService.resolveView(SeoConfigService.PRODUCT, resolved.product().getId(), language, dl,
                 new SeoFallback(fbTitle, fbDesc, product.cover(), request.getRequestURL().toString())).applyTo(model);
-        return finish("themes/modern/product-detail", language, model);
+        return finish(manifestResolver.template(tenant, "product-detail"), language, model);
     }
 
     @GetMapping("/preview/news")
@@ -153,7 +153,7 @@ public class PreviewController {
         applyPreviewPagination(model, news, page, "/preview/news");
         seoService.resolveView("/news", null, language, dl,
                 new SeoFallback("News", "", "", request.getRequestURL().toString())).applyTo(model);
-        return finish("themes/modern/news", language, model);
+        return finish(manifestResolver.template(tenant, "news"), language, model);
     }
 
     @GetMapping("/preview/news/{slug}")
@@ -177,7 +177,7 @@ public class PreviewController {
                 : (article.summary() != null ? article.summary() : "");
         seoService.resolveView(SeoConfigService.ARTICLE, resolved.article().getId(), language, dl,
                 new SeoFallback(fbTitle, fbDesc, article.cover(), request.getRequestURL().toString())).applyTo(model);
-        return finish("themes/modern/news-detail", language, model);
+        return finish(manifestResolver.template(tenant, "news-detail"), language, model);
     }
 
     @GetMapping("/preview/{path}")
