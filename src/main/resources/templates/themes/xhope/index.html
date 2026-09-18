@@ -22,9 +22,10 @@
             </div>
         </div>
         <div class="stage" data-reveal>
-            <div class="halo"></div>
-            <div class="ring"></div><div class="ring r2"></div>
-            <svg th:replace="~{themes/xhope/fragments/device :: vacuum}"></svg>
+<!--            <div class="halo"></div>-->
+<!--            <div class="ring"></div><div class="ring r2"></div>-->
+<!--            <svg th:replace="~{themes/xhope/fragments/device :: vacuum}"></svg>-->
+            <img th:src="@{/themes-images/xhope/images/products/v1/v4.png}" loading="lazy" />
         </div>
     </div>
 </section>
@@ -59,6 +60,14 @@
                 <span class="tag" th:text="#{cat.fabric}">Fabric Cleaner</span>
                 <h3 th:text="#{home.cat.fabric.name}">Fabric Cleaners</h3>
                 <p th:text="#{home.cat.fabric.desc}">Lift stains from sofas, mattresses &amp; rugs.</p>
+                <span class="link" th:text="#{home.cat.view}">View range →</span>
+            </a>
+            <a class="cat-card" th:href="${localePrefix + '/products#sweeper'}" data-reveal>
+                <!--                <div class="mini-stage"><svg th:replace="~{themes/xhope/fragments/device :: sweeper}"></svg></div>-->
+                <div class="mini-stage"><img th:src="@{/themes-images/xhope/images/index/banner.png}" th:alt="#{home.cat.sweeper.name}" loading="lazy" /></div>
+                <span class="tag" th:text="#{cat.sweeper}">Robot Sweeper</span>
+                <h3 th:text="#{home.cat.sweeper.name}">Robot Sweepers</h3>
+                <p th:text="#{home.cat.sweeper.desc}">Self-emptying, lidar-mapped autonomy.</p>
                 <span class="link" th:text="#{home.cat.view}">View range →</span>
             </a>
             <a class="cat-card" th:href="${localePrefix + '/products#sweeper'}" data-reveal>

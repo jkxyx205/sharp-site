@@ -3,6 +3,15 @@
   "nav.products":     { "en-US": "Products",        "zh-CN": "产品中心" },
   "nav.news":         { "en-US": "News",             "zh-CN": "公司新闻" },
   "nav.contact":      { "en-US": "Contact",          "zh-CN": "联系我们" },
+  "nav.news.all":     { "en-US": "All News",         "zh-CN": "全部新闻" },
+  "nav.media":        { "en-US": "Media Center",     "zh-CN": "媒体中心" },
+
+  "media.eyebrow":    { "en-US": "MEDIA CENTER",     "zh-CN": "媒体中心" },
+  "media.title":      { "en-US": "Gallery & videos", "zh-CN": "图集与视频" },
+  "media.lead":       { "en-US": "Product imagery and cleaning technology in motion.", "zh-CN": "产品影像与清洁技术动态呈现。" },
+  "media.images":     { "en-US": "Image gallery",    "zh-CN": "图片图集" },
+  "media.videos":     { "en-US": "Video gallery",    "zh-CN": "视频" },
+  "media.empty":      { "en-US": "No media yet.",    "zh-CN": "暂无媒体内容。" },
 
   "brand.tagline":    { "en-US": "Home Cleaning Engineering", "zh-CN": "家清工程" },
 

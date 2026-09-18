@@ -16,32 +16,32 @@
 <!-- ===================== STATIC NEWS GRID ===================== -->
 <section class="section section--light">
     <div class="container">
-        <div class="news-grid">
-            <a class="news-card" th:href="${localePrefix + '/news/xhope-v9-cyclone-launched'}" data-reveal>
-                <div class="meta"><span class="chip" th:text="#{n1.tag}">Product Launch</span><span th:text="#{n1.date}">2026-03-12</span></div>
-                <h3 th:text="#{n1.title}">Introducing the XHOPE V9 Cyclone</h3>
-                <p th:text="#{n1.summary}">…</p>
-                <span class="more" th:text="#{news.read}">Read →</span>
-            </a>
-            <a class="news-card" th:href="${localePrefix + '/news/inside-the-x9-digital-motor'}" data-reveal>
-                <div class="meta"><span class="chip" th:text="#{n2.tag}">Engineering</span><span th:text="#{n2.date}">2026-02-20</span></div>
-                <h3 th:text="#{n2.title}">Inside the X9 digital motor</h3>
-                <p th:text="#{n2.summary}">…</p>
-                <span class="more" th:text="#{news.read}">Read →</span>
-            </a>
-            <a class="news-card" th:href="${localePrefix + '/news/xhope-motor-rd-center-opens'}" data-reveal>
-                <div class="meta"><span class="chip" th:text="#{n3.tag}">Company</span><span th:text="#{n3.date}">2026-01-08</span></div>
-                <h3 th:text="#{n3.title}">XHOPE opens new motor R&amp;D center</h3>
-                <p th:text="#{n3.summary}">…</p>
-                <span class="more" th:text="#{news.read}">Read →</span>
-            </a>
-            <a class="news-card" th:href="${localePrefix + '/news/s9-automap-wins-red-dot-2026'}" data-reveal>
-                <div class="meta"><span class="chip" th:text="#{n4.tag}">Awards</span><span th:text="#{n4.date}">2025-11-15</span></div>
-                <h3 th:text="#{n4.title}">S9 AutoMap wins Red Dot 2026</h3>
-                <p th:text="#{n4.summary}">…</p>
-                <span class="more" th:text="#{news.read}">Read →</span>
-            </a>
-        </div>
+<!--        <div class="news-grid">-->
+<!--            <a class="news-card" th:href="${localePrefix + '/news/xhope-v9-cyclone-launched'}" data-reveal>-->
+<!--                <div class="meta"><span class="chip" th:text="#{n1.tag}">Product Launch</span><span th:text="#{n1.date}">2026-03-12</span></div>-->
+<!--                <h3 th:text="#{n1.title}">Introducing the XHOPE V9 Cyclone</h3>-->
+<!--                <p th:text="#{n1.summary}">…</p>-->
+<!--                <span class="more" th:text="#{news.read}">Read →</span>-->
+<!--            </a>-->
+<!--            <a class="news-card" th:href="${localePrefix + '/news/inside-the-x9-digital-motor'}" data-reveal>-->
+<!--                <div class="meta"><span class="chip" th:text="#{n2.tag}">Engineering</span><span th:text="#{n2.date}">2026-02-20</span></div>-->
+<!--                <h3 th:text="#{n2.title}">Inside the X9 digital motor</h3>-->
+<!--                <p th:text="#{n2.summary}">…</p>-->
+<!--                <span class="more" th:text="#{news.read}">Read →</span>-->
+<!--            </a>-->
+<!--            <a class="news-card" th:href="${localePrefix + '/news/xhope-motor-rd-center-opens'}" data-reveal>-->
+<!--                <div class="meta"><span class="chip" th:text="#{n3.tag}">Company</span><span th:text="#{n3.date}">2026-01-08</span></div>-->
+<!--                <h3 th:text="#{n3.title}">XHOPE opens new motor R&amp;D center</h3>-->
+<!--                <p th:text="#{n3.summary}">…</p>-->
+<!--                <span class="more" th:text="#{news.read}">Read →</span>-->
+<!--            </a>-->
+<!--            <a class="news-card" th:href="${localePrefix + '/news/s9-automap-wins-red-dot-2026'}" data-reveal>-->
+<!--                <div class="meta"><span class="chip" th:text="#{n4.tag}">Awards</span><span th:text="#{n4.date}">2025-11-15</span></div>-->
+<!--                <h3 th:text="#{n4.title}">S9 AutoMap wins Red Dot 2026</h3>-->
+<!--                <p th:text="#{n4.summary}">…</p>-->
+<!--                <span class="more" th:text="#{news.read}">Read →</span>-->
+<!--            </a>-->
+<!--        </div>-->
 
         <!-- live/static pagination guard -->
         <nav class="pagination" th:if="${totalPages != null and totalPages > 1}">

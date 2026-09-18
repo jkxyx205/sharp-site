@@ -12,6 +12,11 @@
         "en-US": { "title": "Products — XHOPE", "description": "Explore XHOPE home cleaning products: cordless vacuums, fabric cleaners and robot sweepers. Engineering details, specs and performance.", "keywords": "XHOPE products, cordless vacuum, fabric cleaner, robot sweeper, specifications", "canonical": "", "robots": "index, follow", "ogTitle": "XHOPE Products", "ogDescription": "Cordless vacuums, fabric cleaners and robot sweepers engineered by XHOPE.", "ogImage": "" },
         "zh-CN": { "title": "产品中心 — XHOPE", "description": "探索 XHOPE 家清产品：无线吸尘器、布艺清洗机与扫地机。工程细节、参数与性能。", "keywords": "XHOPE 产品,无线吸尘器,布艺清洗机,扫地机,参数", "canonical": "", "robots": "index, follow", "ogTitle": "XHOPE 产品中心", "ogDescription": "XHOPE 研发的无线吸尘器、布艺清洗机与扫地机。", "ogImage": "" }
       } },
+    { "path": "/media", "template": "themes/xhope/media", "label": "媒体中心",
+      "seo_config": {
+        "en-US": { "title": "Media Center — XHOPE", "description": "XHOPE product gallery and video showcase — product imagery and cleaning technology in motion.", "keywords": "XHOPE media, product gallery, video, showcase, cleaning technology", "canonical": "", "robots": "index, follow", "ogTitle": "XHOPE Media Center", "ogDescription": "Product imagery and technology videos from XHOPE.", "ogImage": "" },
+        "zh-CN": { "title": "媒体中心 — XHOPE", "description": "XHOPE 产品图集与视频展示——产品影像与清洁技术动态呈现。", "keywords": "XHOPE 媒体,产品图集,视频,展示,清洁技术", "canonical": "", "robots": "index, follow", "ogTitle": "XHOPE 媒体中心", "ogDescription": "XHOPE 产品影像与技术视频。", "ogImage": "" }
+      } },
     { "path": "/news", "template": "themes/xhope/news", "label": "公司新闻",
       "seo_config": {
         "en-US": { "title": "News — XHOPE", "description": "XHOPE company news, product launches and technology updates from the home cleaning engineering team.", "keywords": "XHOPE news, product launch, cleaning technology, company updates", "canonical": "", "robots": "index, follow", "ogTitle": "XHOPE News", "ogDescription": "Company news, product launches and technology updates from XHOPE.", "ogImage": "" },
