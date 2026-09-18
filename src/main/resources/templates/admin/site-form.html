@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/fragments/head :: head(title='添加网站')}"></head>
+<body>
+<div class="shell">
+    <aside th:replace="~{admin/fragments/layout :: sidebar(active='sites')}"></aside>
+    <div class="main">
+        <header th:replace="~{admin/fragments/layout :: topbar()}"></header>
+        <main class="content">
+            <div class="card">
+                <h1>添加网站</h1>
+                <p class="error" th:if="${error}" th:text="${error}">错误</p>
+                <p class="hint">填写后将向 tenant、tenant_domain、admin_user 三张表插入数据,完成站点初始化。</p>
+
+                <form th:action="@{/admin/sites}" method="post">
+                    <fieldset>
+                        <legend>站点 (tenant)</legend>
+                        <label>站点编码 (code) <span class="hint">必填,唯一,创建后不可改</span>
+                            <input type="text" name="code" required /></label>
+                        <label>站点名称 <span class="hint">必填</span>
+                            <input type="text" name="name" required /></label>
+                        <label>主题
+                            <select name="themeId">
+                                <option th:each="t : ${themes}" th:value="${t}" th:text="${t}">theme</option>
+                            </select></label>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend>域名 (tenant_domain)</legend>
+                        <label>主域名 <span class="hint">必填,全局唯一,自动转小写</span>
+                            <input type="text" name="domain" required placeholder="example.com" /></label>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend>管理员 (admin_user)</legend>
+                        <label>用户名 <span class="hint">必填</span>
+                            <input type="text" name="username" required /></label>
+                        <label>密码 <span class="hint">必填</span>
+                            <input type="password" name="password" required /></label>
+                    </fieldset>
+
+                    <div class="actions">
+                        <button type="submit" class="btn btn-primary">创建站点</button>
+                        <a class="btn" th:href="@{/admin/sites}">取消</a>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/fragments/head :: head(title='网站管理')}"></head>
+<body>
+<div class="shell">
+    <aside th:replace="~{admin/fragments/layout :: sidebar(active='sites')}"></aside>
+    <div class="main">
+        <header th:replace="~{admin/fragments/layout :: topbar()}"></header>
+        <main class="content">
+            <h1>网站管理</h1>
+            <p class="error" th:if="${error}" th:text="${error}">错误</p>
+            <p class="hint" th:if="${msg}" th:text="${msg}">提示</p>
+
+            <div class="actions">
+                <a class="btn btn-primary" th:href="@{/admin/sites/new}">+ 添加网站</a>
+            </div>
+
+            <table>
+                <thead>
+                <tr><th>ID</th><th>编码</th><th>名称</th><th>主题</th><th>状态</th><th>操作</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="t : ${sites}">
+                    <td th:text="${t.id}">1</td>
+                    <td th:text="${t.code}">code</td>
+                    <td th:text="${t.name}">name</td>
+                    <td th:text="${t.themeId}">theme</td>
+                    <td><span class="tag" th:classappend="${t.status != null and t.status.intValue() == 1} ? 'tag-primary' : 'tag-secondary'"
+                              th:text="${t.status != null and t.status.intValue() == 1} ? '启用' : '停用'">—</span></td>
+                    <td>
+                        <form th:action="@{/admin/sites/{id}/delete(id=${t.id})}" method="post" style="display:inline"
+                              onsubmit="return confirm('删除该站点将清除其全部数据,且不可恢复。确认删除?');">
+                            <button type="submit" class="btn-link">删除</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <p class="empty" th:if="${sites == null or sites.isEmpty()}">暂无站点。</p>
+        </main>
+    </div>
+</div>
+</body>
+</html>
