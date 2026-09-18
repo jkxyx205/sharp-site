@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html th:lang="${currentLanguage}" th:dir="${currentLanguage == 'ar-SA' ? 'rtl' : 'ltr'}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{themes/xhope/fragments/head :: head(pageTitle=${pageTitle}, pageDescription=${pageDescription}, pageKeywords=${pageKeywords}, canonical=${canonical}, robots=${robots}, siteName=${siteName})}"></head>
+<body>
+<header th:replace="~{themes/xhope/fragments/header :: header(siteName=${siteName}, active='products')}"></header>
+
+<!-- ===================== PRODUCTS HERO ===================== -->
+<section class="section section--alt" style="padding-top:128px">
+    <div class="container section-head" data-reveal style="margin-bottom:0">
+        <p class="eyebrow" th:text="#{products.eyebrow}">PRODUCTS</p>
+        <h2 th:text="#{products.title}">Machines, not appliances.</h2>
+        <p th:text="#{products.lead}">Three product families. One engineering philosophy…</p>
+    </div>
+</section>
+
+<!-- ===================== V9 CYCLONE (vacuum) ===================== -->
+<section id="vacuum" class="section section--light">
+    <div class="container p-block">
+        <div class="p-media" data-reveal>
+            <div class="stage">
+                <div class="halo"></div>
+                <div class="ring"></div><div class="ring r2"></div>
+                <svg th:replace="~{themes/xhope/fragments/device :: vacuum}"></svg>
+            </div>
+        </div>
+        <div data-reveal>
+            <p class="p-eyebrow" th:text="#{p.vacuum.eyebrow}">CORDLESS VACUUM</p>
+            <h3 class="p-name" th:text="#{p.vacuum.name}">XHOPE V9 Cyclone</h3>
+            <span class="p-tag" th:text="#{p.vacuum.tag}">Flagship cordless</span>
+            <p class="p-lead" th:text="#{p.vacuum.lead}">…</p>
+            <div class="spec-table">
+                <div class="row"><span class="k" th:text="#{p.vacuum.f1}">Suction power</span><span class="v" th:text="#{p.vacuum.v1}">300 AW</span></div>
+                <div class="row"><span class="k" th:text="#{p.vacuum.f2}">Motor speed</span><span class="v" th:text="#{p.vacuum.v2}">125,000 RPM</span></div>
+                <div class="row"><span class="k" th:text="#{p.vacuum.f3}">Runtime</span><span class="v" th:text="#{p.vacuum.v3}">60 min</span></div>
+                <div class="row"><span class="k" th:text="#{p.vacuum.f4}">Weight</span><span class="v" th:text="#{p.vacuum.v4}">3.2 kg</span></div>
+                <div class="row"><span class="k" th:text="#{p.vacuum.f5}">Filtration</span><span class="v" th:text="#{p.vacuum.v5}">HEPA H13</span></div>
+                <div class="row"><span class="k" th:text="#{p.vacuum.f6}">Dust bin</span><span class="v" th:text="#{p.vacuum.v6}">1.5 L</span></div>
+            </div>
+            <div class="p-actions">
+                <a class="btn btn-accent" th:href="@{${localePrefix + '/contact'}}" th:text="#{products.inquire}">Request a quote</a>
+                <a class="btn btn-ghost" th:href="@{${localePrefix + '/contact'}}" th:text="#{products.buy}">Where to buy</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== MOTOR CORE (dark highlight) ===================== -->
+<section class="section section--alt">
+    <div class="container motor-grid">
+        <div class="motor-vis" data-reveal>
+            <div class="ring a"></div><div class="ring b"></div>
+            <div class="core"></div>
+        </div>
+        <div data-reveal>
+            <p class="eyebrow" th:text="#{home.motor.eyebrow}">THE CORE</p>
+            <h2 th:text="#{home.motor.title}">125,000 RPM. Nothing else comes close.</h2>
+            <p style="margin-top:18px;color:var(--x-muted)" th:text="#{home.motor.body}">…</p>
+            <div class="stat-row">
+                <div class="stat"><div class="num" th:text="#{home.motor.stat1}">125,000 RPM</div><div class="lbl" th:text="#{home.motor.stat1l}">Peak speed</div></div>
+                <div class="stat"><div class="num" th:text="#{home.motor.stat2}">3.2 kg</div><div class="lbl" th:text="#{home.motor.stat2l}">Weight</div></div>
+                <div class="stat"><div class="num" th:text="#{home.motor.stat3}">5-year</div><div class="lbl" th:text="#{home.motor.stat3l}">Warranty</div></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== F7 DEEPLIFT (fabric) ===================== -->
+<section id="fabric" class="section section--alt">
+    <div class="container p-block flip">
+        <div class="p-media" data-reveal>
+            <div class="stage">
+                <div class="halo"></div>
+                <div class="ring"></div><div class="ring r2"></div>
+                <svg th:replace="~{themes/xhope/fragments/device :: fabric}"></svg>
+            </div>
+        </div>
+        <div data-reveal>
+            <p class="p-eyebrow" th:text="#{p.fabric.eyebrow}">FABRIC CLEANER</p>
+            <h3 class="p-name" th:text="#{p.fabric.name}">XHOPE F7 DeepLift</h3>
+            <span class="p-tag" th:text="#{p.fabric.tag}">Stain &amp; upholstery</span>
+            <p class="p-lead" th:text="#{p.fabric.lead}">…</p>
+            <div class="spec-table">
+                <div class="row"><span class="k" th:text="#{p.fabric.f1}">Spray pressure</span><span class="v" th:text="#{p.fabric.v1}">1.2 MPa</span></div>
+                <div class="row"><span class="k" th:text="#{p.fabric.f2}">Suction lift</span><span class="v" th:text="#{p.fabric.v2}">18 kPa</span></div>
+                <div class="row"><span class="k" th:text="#{p.fabric.f3}">Clean tank</span><span class="v" th:text="#{p.fabric.v3}">1.8 L</span></div>
+                <div class="row"><span class="k" th:text="#{p.fabric.f4}">Dirty tank</span><span class="v" th:text="#{p.fabric.v4}">1.6 L</span></div>
+                <div class="row"><span class="k" th:text="#{p.fabric.f5}">Brush width</span><span class="v" th:text="#{p.fabric.v5}">240 mm</span></div>
+                <div class="row"><span class="k" th:text="#{p.fabric.f6}">Weight</span><span class="v" th:text="#{p.fabric.v6}">4.5 kg</span></div>
+            </div>
+            <div class="p-actions">
+                <a class="btn btn-accent" th:href="@{${localePrefix + '/contact'}}" th:text="#{products.inquire}">Request a quote</a>
+                <a class="btn btn-ghost" th:href="@{${localePrefix + '/contact'}}" th:text="#{products.buy}">Where to buy</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== S9 AUTOMAP (sweeper) ===================== -->
+<section id="sweeper" class="section section--light">
+    <div class="container p-block">
+        <div class="p-media" data-reveal>
+            <div class="stage">
+                <div class="halo"></div>
+                <div class="ring"></div><div class="ring r2"></div>
+                <svg th:replace="~{themes/xhope/fragments/device :: sweeper}"></svg>
+            </div>
+        </div>
+        <div data-reveal>
+            <p class="p-eyebrow" th:text="#{p.sweeper.eyebrow}">ROBOT SWEEPER</p>
+            <h3 class="p-name" th:text="#{p.sweeper.name}">XHOPE S9 AutoMap</h3>
+            <span class="p-tag" th:text="#{p.sweeper.tag}">Autonomous sweep</span>
+            <p class="p-lead" th:text="#{p.sweeper.lead}">…</p>
+            <div class="spec-table">
+                <div class="row"><span class="k" th:text="#{p.sweeper.f1}">Navigation</span><span class="v" th:text="#{p.sweeper.v1}">Solid-state LiDAR</span></div>
+                <div class="row"><span class="k" th:text="#{p.sweeper.f2}">Suction</span><span class="v" th:text="#{p.sweeper.v2}">8,000 Pa</span></div>
+                <div class="row"><span class="k" th:text="#{p.sweeper.f3}">Self-empty</span><span class="v" th:text="#{p.sweeper.v3}">60 days</span></div>
+                <div class="row"><span class="k" th:text="#{p.sweeper.f4}">Runtime</span><span class="v" th:text="#{p.sweeper.v4}">240 min</span></div>
+                <div class="row"><span class="k" th:text="#{p.sweeper.f5}">Obstacle clear</span><span class="v" th:text="#{p.sweeper.v5}">22 mm</span></div>
+                <div class="row"><span class="k" th:text="#{p.sweeper.f6}">Noise</span><span class="v" th:text="#{p.sweeper.v6}">55 dB(A)</span></div>
+            </div>
+            <div class="p-actions">
+                <a class="btn btn-accent" th:href="@{${localePrefix + '/contact'}}" th:text="#{products.inquire}">Request a quote</a>
+                <a class="btn btn-ghost" th:href="@{${localePrefix + '/contact'}}" th:text="#{products.buy}">Where to buy</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== CTA ===================== -->
+<section class="cta-band">
+    <div class="container">
+        <div data-reveal>
+            <h2 th:text="#{home.cta.title}">Ready to bring XHOPE home?</h2>
+            <p style="color:var(--x-muted);margin-top:10px" th:text="#{home.cta.body}">…</p>
+        </div>
+        <a class="btn btn-accent" th:href="@{${localePrefix + '/contact'}}" th:text="#{home.cta.btn}" data-reveal>Contact Us</a>
+    </div>
+</section>
+
+<footer th:replace="~{themes/xhope/fragments/footer :: footer(siteName=${siteName}, config=${config})}"></footer>
+</body>
+</html>

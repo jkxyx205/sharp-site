@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html th:lang="${currentLanguage}" th:dir="${currentLanguage == 'ar-SA' ? 'rtl' : 'ltr'}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{themes/xhope/fragments/head :: head(pageTitle=${product != null ? product.name : pageTitle}, pageDescription=${product != null and product.subtitle != null ? product.subtitle : pageDescription}, pageKeywords=${pageKeywords}, canonical=${canonical}, robots=${robots}, siteName=${siteName})}"></head>
+<body>
+<header th:replace="~{themes/xhope/fragments/header :: header(siteName=${siteName}, active='products')}"></header>
+
+<section class="section section--light" style="padding-top:120px" th:if="${product != null}">
+    <div class="container p-block">
+        <div class="p-media" data-reveal>
+            <div class="stage">
+                <div class="halo"></div>
+                <div class="ring"></div><div class="ring r2"></div>
+                <img th:if="${product.cover != null}" th:src="${product.cover}" th:alt="${product.name}"
+                     style="position:relative;z-index:1;width:62%;margin:auto;filter:drop-shadow(0 30px 50px rgba(0,0,0,.5))" />
+                <svg th:if="${product.cover == null}" th:replace="~{themes/xhope/fragments/device :: vacuum}"></svg>
+            </div>
+        </div>
+        <div data-reveal>
+            <p class="p-eyebrow" th:if="${product.categoryName != null}" th:text="${product.categoryName}">Category</p>
+            <h1 class="p-name" th:text="${product.name}">Product Name</h1>
+            <p class="p-lead" th:if="${product.subtitle != null}" th:text="${product.subtitle}"></p>
+            <div class="p-actions">
+                <a class="btn btn-accent" th:href="@{${localePrefix + '/contact'}}" th:text="#{products.inquire}">Request a quote</a>
+                <a class="btn btn-ghost" th:href="@{${localePrefix + '/contact'}}" th:text="#{products.buy}">Where to buy</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- rich content + spec -->
+<section class="section section--alt" th:if="${product != null and (product.content != null or product.specificationJson != null)}">
+    <div class="container" style="display:grid;grid-template-columns:1.4fr 1fr;gap:56px;align-items:start">
+        <div class="rich-text" data-reveal>
+            <h2 th:if="${product.content != null}" th:text="#{product.spec}" style="margin-bottom:18px">Overview</h2>
+            <div th:if="${product.content != null}" th:utext="${product.content} ?: ''">Product detail content.</div>
+        </div>
+        <div data-reveal th:if="${product.specificationJson != null and !product.specificationJson.isEmpty()}">
+            <h2 th:text="#{product.spec}" style="margin-bottom:18px">Specifications</h2>
+            <div class="spec-table" th:utext="${product.specificationJson}"></div>
+        </div>
+    </div>
+</section>
+
+<section class="section section--light" th:if="${product == null}">
+    <div class="container">
+        <h2 class="p-name" th:text="#{product.back}">← Back to products</h2>
+        <a class="btn btn-accent" style="margin-top:18px" th:href="@{${localePrefix + '/products'}}" th:text="#{product.back}">← Back to products</a>
+    </div>
+</section>
+
+<a class="back-link" style="display:inline-block;margin:0 var(--x-pad) 40px" th:href="@{${localePrefix + '/products'}}" th:text="#{product.back}">← Back to products</a>
+
+<footer th:replace="~{themes/xhope/fragments/footer :: footer(siteName=${siteName}, config=${config})}"></footer>
+</body>
+</html>

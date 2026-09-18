@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html th:lang="${currentLanguage}" th:dir="${currentLanguage == 'ar-SA' ? 'rtl' : 'ltr'}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{themes/xhope/fragments/head :: head(pageTitle=${pageTitle}, pageDescription=${pageDescription}, pageKeywords=${pageKeywords}, canonical=${canonical}, robots=${robots}, siteName=${siteName})}"></head>
+<body>
+<header th:replace="~{themes/xhope/fragments/header :: header(siteName=${siteName}, active='index')}"></header>
+
+<!-- ===================== HERO ===================== -->
+<section class="hero">
+    <div class="container">
+        <div>
+            <p class="eyebrow" th:text="#{home.hero.eyebrow}">XHOPE — PRECISION CLEANING</p>
+            <h1 th:utext="#{home.hero.title}">Suction, <span class="accent">Redefined.</span></h1>
+            <p class="hero-sub" th:text="#{home.hero.subtitle}">Cordless vacuums…</p>
+            <div class="hero-actions">
+                <a class="btn btn-accent" th:href="@{${localePrefix + '/products'}}" th:text="#{home.hero.cta}">Explore Products</a>
+                <a class="btn btn-ghost" th:href="@{${localePrefix + '/contact'}}" th:text="#{home.cta.btn}">Contact Us</a>
+            </div>
+            <div class="hero-specs">
+                <div><div class="num" th:text="#{home.hero.spec1}">125,000 RPM</div><div class="lbl" th:text="#{home.hero.spec1l}">Digital Motor</div></div>
+                <div><div class="num" th:text="#{home.hero.spec2}">300 AW</div><div class="lbl" th:text="#{home.hero.spec2l}">Suction Power</div></div>
+                <div><div class="num" th:text="#{home.hero.spec3}">60 min</div><div class="lbl" th:text="#{home.hero.spec3l}">Runtime</div></div>
+            </div>
+        </div>
+        <div class="stage" data-reveal>
+            <div class="halo"></div>
+            <div class="ring"></div><div class="ring r2"></div>
+            <svg th:replace="~{themes/xhope/fragments/device :: vacuum}"></svg>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== TECH INTRO ===================== -->
+<section class="section section--light">
+    <div class="container section-head" data-reveal>
+        <p class="eyebrow" th:text="#{brand.tagline}">Home Cleaning Engineering</p>
+        <h2 th:text="#{home.tech.title}">Engineered down to the last micron.</h2>
+        <p th:text="#{home.tech.lead}">Every XHOPE machine starts with the motor…</p>
+    </div>
+</section>
+
+<!-- ===================== CATEGORIES ===================== -->
+<section class="section section--alt">
+    <div class="container">
+        <div class="section-head" data-reveal>
+            <p class="eyebrow" th:text="#{home.cat.eyebrow}">PRODUCTS</p>
+            <h2 th:text="#{home.cat.title}">The lineup</h2>
+        </div>
+        <div class="cat-grid">
+            <a class="cat-card" th:href="${localePrefix + '/products#vacuum'}" data-reveal>
+                <div class="mini-stage"><img th:src="@{/themes-images/xhope/images/products/v1/tp.jpeg}" th:alt="#{home.cat.vacuum.name}" loading="lazy" /></div>
+                <span class="tag" th:text="#{cat.vacuum}">Cordless Vacuum</span>
+                <h3 th:text="#{home.cat.vacuum.name}">Cordless Vacuums</h3>
+                <p th:text="#{home.cat.vacuum.desc}">Whole-home deep clean, untethered.</p>
+                <span class="link" th:text="#{home.cat.view}">View range →</span>
+            </a>
+            <a class="cat-card" th:href="${localePrefix + '/products#fabric'}" data-reveal>
+<!--                <div class="mini-stage"><svg th:replace="~{themes/xhope/fragments/device :: fabric}"></svg></div>-->
+                <div class="mini-stage"><img th:src="@{/themes-images/xhope/images/products/v1/v4.png}" th:alt="#{home.cat.fabric.name}" loading="lazy" /></div>
+                <span class="tag" th:text="#{cat.fabric}">Fabric Cleaner</span>
+                <h3 th:text="#{home.cat.fabric.name}">Fabric Cleaners</h3>
+                <p th:text="#{home.cat.fabric.desc}">Lift stains from sofas, mattresses &amp; rugs.</p>
+                <span class="link" th:text="#{home.cat.view}">View range →</span>
+            </a>
+            <a class="cat-card" th:href="${localePrefix + '/products#sweeper'}" data-reveal>
+<!--                <div class="mini-stage"><svg th:replace="~{themes/xhope/fragments/device :: sweeper}"></svg></div>-->
+                <div class="mini-stage"><img th:src="@{http://site.xhope.top/media/xhope/1132320866030325760.jpg}" th:alt="#{home.cat.sweeper.name}" loading="lazy" /></div>
+                <span class="tag" th:text="#{cat.sweeper}">Robot Sweeper</span>
+                <h3 th:text="#{home.cat.sweeper.name}">Robot Sweepers</h3>
+                <p th:text="#{home.cat.sweeper.desc}">Self-emptying, lidar-mapped autonomy.</p>
+                <span class="link" th:text="#{home.cat.view}">View range →</span>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== MOTOR HIGHLIGHT ===================== -->
+<section class="section section--alt">
+    <div class="container motor-grid">
+        <div class="motor-vis" data-reveal>
+            <div class="ring a"></div><div class="ring b"></div>
+            <div class="core"></div>
+        </div>
+        <div data-reveal>
+            <p class="eyebrow" th:text="#{home.motor.eyebrow}">THE CORE</p>
+            <h2 th:text="#{home.motor.title}">125,000 RPM. Nothing else comes close.</h2>
+            <p style="margin-top:18px;color:var(--x-muted)" th:text="#{home.motor.body}">…</p>
+            <div class="stat-row">
+                <div class="stat"><div class="num" th:text="#{home.motor.stat1}">125,000 RPM</div><div class="lbl" th:text="#{home.motor.stat1l}">Peak speed</div></div>
+                <div class="stat"><div class="num" th:text="#{home.motor.stat2}">3.2 kg</div><div class="lbl" th:text="#{home.motor.stat2l}">Full-body weight</div></div>
+                <div class="stat"><div class="num" th:text="#{home.motor.stat3}">5-year</div><div class="lbl" th:text="#{home.motor.stat3l}">Motor warranty</div></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== NEWS TEASER ===================== -->
+<section class="section section--light">
+    <div class="container">
+        <div class="section-head" data-reveal>
+            <p class="eyebrow" th:text="#{home.news.eyebrow}">NEWS</p>
+            <h2 th:text="#{home.news.title}">From the lab</h2>
+        </div>
+        <div class="news-grid">
+            <a class="news-card" th:href="${localePrefix + '/news'}" data-reveal>
+                <div class="meta"><span class="chip" th:text="#{n1.tag}">Product Launch</span><span th:text="#{n1.date}">2026-03-12</span></div>
+                <h3 th:text="#{n1.title}">Introducing the XHOPE V9 Cyclone</h3>
+                <p th:text="#{n1.summary}">…</p>
+                <span class="more" th:text="#{news.read}">Read →</span>
+            </a>
+            <a class="news-card" th:href="${localePrefix + '/news'}" data-reveal>
+                <div class="meta"><span class="chip" th:text="#{n2.tag}">Engineering</span><span th:text="#{n2.date}">2026-02-20</span></div>
+                <h3 th:text="#{n2.title}">Inside the X9 digital motor</h3>
+                <p th:text="#{n2.summary}">…</p>
+                <span class="more" th:text="#{news.read}">Read →</span>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== CTA BAND ===================== -->
+<section class="cta-band">
+    <div class="container">
+        <div data-reveal>
+            <h2 th:text="#{home.cta.title}">Ready to bring XHOPE home?</h2>
+            <p style="color:var(--x-muted);margin-top:10px" th:text="#{home.cta.body}">…</p>
+        </div>
+        <a class="btn btn-accent" th:href="@{${localePrefix + '/contact'}}" th:text="#{home.cta.btn}" data-reveal>Contact Us</a>
+    </div>
+</section>
+
+<footer th:replace="~{themes/xhope/fragments/footer :: footer(siteName=${siteName}, config=${config})}"></footer>
+</body>
+</html>

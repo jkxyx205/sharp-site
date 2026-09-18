@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html th:lang="${currentLanguage}" th:dir="${currentLanguage == 'ar-SA' ? 'rtl' : 'ltr'}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{themes/xhope/fragments/head :: head(pageTitle=${pageTitle}, pageDescription=${pageDescription}, pageKeywords=${pageKeywords}, canonical=${canonical}, robots=${robots}, siteName=${siteName})}"></head>
+<body>
+<header th:replace="~{themes/xhope/fragments/header :: header(siteName=${siteName}, active='contact')}"></header>
+
+<section class="section section--alt" style="padding-top:128px">
+    <div class="container section-head" data-reveal style="margin-bottom:0">
+        <p class="eyebrow" th:text="#{contact.eyebrow}">CONTACT</p>
+        <h2 th:text="#{contact.title}">Let's talk.</h2>
+        <p th:text="#{contact.lead}">Sales, distribution partnerships, press…</p>
+    </div>
+</section>
+
+<section class="section section--light">
+    <div class="container contact-grid">
+        <!-- info (static fallback when config null) -->
+        <div data-reveal th:with="
+                phone=${(config != null and config.phone != null) ? config.phone : '+86 512 6800 0000'},
+                mobile=${(config != null and config.mobile != null) ? config.mobile : '+86 138 0000 0000'},
+                mail=${(config != null and config.email != null) ? config.email : 'hello@xhope.example'},
+                wa=${(config != null and config.whatsapp != null) ? config.whatsapp : '+86 138 0000 0000'}">
+            <h3 style="font-size:1.3rem;font-weight:600;letter-spacing:-.01em" th:text="#{contact.info.title}">Headquarters</h3>
+            <p style="margin-top:8px;color:var(--x-muted)" th:if="${config != null and config.address != null}" th:text="${config.address}">Address</p>
+            <p style="margin-top:8px;color:var(--x-muted)" th:if="${config == null or config.address == null}" th:text="#{contact.info.address}">Address</p>
+            <div class="info-list">
+                <div class="row"><span class="k" th:text="#{common.tel}">Tel</span><span class="v" th:text="${phone}"></span></div>
+                <div class="row"><span class="k" th:text="#{common.mobile}">Mobile</span><span class="v" th:text="${mobile}"></span></div>
+                <div class="row"><span class="k" th:text="#{common.email}">Email</span><span class="v"><a th:href="'mailto:' + ${mail}" th:text="${mail}"></a></span></div>
+                <div class="row"><span class="k" th:text="#{common.whatsapp}">WhatsApp</span><span class="v" th:text="${wa}"></span></div>
+            </div>
+        </div>
+
+        <!-- form -->
+        <form class="contact-form" data-reveal th:action="@{${localePrefix + '/contact'}}" method="post">
+            <h3 style="font-size:1.15rem;font-weight:600" th:text="#{contact.form.title}">Send a message</h3>
+            <div class="field">
+                <label th:text="#{contact.name}">Name</label>
+                <input type="text" name="name" required autocomplete="name" />
+            </div>
+            <div class="field">
+                <label th:text="#{contact.email}">Email</label>
+                <input type="email" name="email" required autocomplete="email" />
+            </div>
+            <div class="field">
+                <label th:text="#{contact.topic}">I'm interested in</label>
+                <select name="topic">
+                    <option th:text="#{contact.topic.vacuum}">Cordless vacuums</option>
+                    <option th:text="#{contact.topic.fabric}">Fabric cleaners</option>
+                    <option th:text="#{contact.topic.sweeper}">Robot sweepers</option>
+                    <option th:text="#{contact.topic.dealer}">Distribution</option>
+                    <option th:text="#{contact.topic.other}">Something else</option>
+                </select>
+            </div>
+            <div class="field">
+                <label th:text="#{contact.message}">Message</label>
+                <textarea name="message" rows="5" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-accent" th:text="#{contact.send}">Send message</button>
+        </form>
+    </div>
+</section>
+
+<footer th:replace="~{themes/xhope/fragments/footer :: footer(siteName=${siteName}, config=${config})}"></footer>
+</body>
+</html>

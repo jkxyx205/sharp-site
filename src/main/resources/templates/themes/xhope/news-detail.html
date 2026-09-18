@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html th:lang="${currentLanguage}" th:dir="${currentLanguage == 'ar-SA' ? 'rtl' : 'ltr'}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{themes/xhope/fragments/head :: head(pageTitle=${article != null ? article.title : pageTitle}, pageDescription=${article != null and article.summary != null ? article.summary : pageDescription}, pageKeywords=${pageKeywords}, canonical=${canonical}, robots=${robots}, siteName=${siteName})}"></head>
+<body>
+<header th:replace="~{themes/xhope/fragments/header :: header(siteName=${siteName}, active='news')}"></header>
+
+<article class="section section--light" style="padding-top:120px" th:if="${article != null}">
+    <div class="container" style="max-width:860px">
+        <p class="eyebrow" th:if="${article.categoryName != null}" th:text="${article.categoryName}">Category</p>
+        <h1 class="p-name" th:text="${article.title}" style="margin-top:14px">Article Title</h1>
+        <p style="color:var(--x-muted);margin-top:14px" th:if="${article.publishTime != null}">
+            <span th:text="${#temporals.format(article.publishTime, 'yyyy-MM-dd')}"></span><span th:if="${article.author != null}" th:text="'  ·  ' + ${article.author}"></span>
+        </p>
+        <img th:if="${article.cover != null}" th:src="${article.cover}" th:alt="${article.title}"
+             style="width:100%;border-radius:14px;margin:28px 0" />
+        <p class="p-lead" th:if="${article.summary != null}" th:text="${article.summary}"></p>
+        <div class="rich-text" style="margin-top:24px" th:utext="${article.content} ?: ''">Article content.</div>
+        <a class="btn btn-ghost back-link" style="margin-top:40px" th:href="@{${localePrefix + '/news'}}" th:text="#{news.back}">← Back to news</a>
+    </div>
+</article>
+
+<section class="section section--light" th:if="${article == null}">
+    <div class="container">
+        <h2 class="p-name" th:text="#{news.back}">← Back to news</h2>
+        <a class="btn btn-accent" style="margin-top:18px" th:href="@{${localePrefix + '/news'}}" th:text="#{news.back}">← Back to news</a>
+    </div>
+</section>
+
+<footer th:replace="~{themes/xhope/fragments/footer :: footer(siteName=${siteName}, config=${config})}"></footer>
+</body>
+</html>

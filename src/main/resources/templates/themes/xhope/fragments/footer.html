@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- xhope 页脚:静态兜底企业信息(config 缺失时用造数),滚动揭示脚本。 -->
+<th:block th:fragment="footer(siteName, config)" th:with="
+        addr=${(config != null and config.address != null) ? config.address : 'No. 88 Motor Road, Suzhou Industrial Park, Suzhou, China 215000'},
+        phone=${(config != null and config.phone != null) ? config.phone : '+86 512 6800 0000'},
+        mobile=${(config != null and config.mobile != null) ? config.mobile : '+86 138 0000 0000'},
+        mail=${(config != null and config.email != null) ? config.email : 'hello@xhope.example'},
+        wa=${(config != null and config.whatsapp != null) ? config.whatsapp : '+86 138 0000 0000'}">
+<footer class="site-footer">
+    <div class="container">
+        <div class="footer-top">
+            <div class="footer-brand">
+                <div class="brand"><span class="dot"></span><span th:text="${siteName}">XHOPE</span></div>
+                <p th:text="#{footer.tagline}">Home cleaning machines, engineered in Suzhou.</p>
+            </div>
+            <div>
+                <h4 th:text="#{footer.nav}">Navigate</h4>
+                <a th:href="@{${localePrefix + '/'}}" th:text="#{nav.home}">Home</a>
+                <a th:href="@{${localePrefix + '/products'}}" th:text="#{nav.products}">Products</a>
+                <a th:href="@{${localePrefix + '/news'}}" th:text="#{nav.news}">News</a>
+                <a th:href="@{${localePrefix + '/contact'}}" th:text="#{nav.contact}">Contact</a>
+            </div>
+            <div>
+                <h4 th:text="#{footer.contact}">Contact</h4>
+                <p th:text="${addr}" style="margin:0 0 6px">Address</p>
+                <p style="margin:0 0 6px"><span th:text="#{common.tel} + ': '"></span><span th:text="${phone}"></span></p>
+                <p style="margin:0 0 6px"><a th:href="'mailto:' + ${mail}" th:text="${mail}">email</a></p>
+                <p style="margin:0"><span th:text="#{common.whatsapp} + ': '"></span><span th:text="${wa}"></span></p>
+            </div>
+            <div>
+                <h4 th:text="#{footer.follow}">Follow</h4>
+                <a th:if="${config != null and config.facebook != null}" th:href="${config.facebook}" target="_blank" rel="noopener">Facebook</a>
+                <a th:if="${config != null and config.linkedin != null}" th:href="${config.linkedin}" target="_blank" rel="noopener">LinkedIn</a>
+                <a th:if="${config != null and config.youtube != null}" th:href="${config.youtube}" target="_blank" rel="noopener">YouTube</a>
+                <a th:if="${config == null or config.facebook == null}" href="#">Facebook</a>
+                <a th:if="${config == null or config.linkedin == null}" href="#">LinkedIn</a>
+                <a th:if="${config == null or config.youtube == null}" href="#">YouTube</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>© <span th:text="${#temporals.format(#temporals.createNow(), 'yyyy')}">2026</span> <span th:text="${siteName}"></span>. <span th:text="#{footer.rights}"></span></span>
+            <span th:if="${config != null and config.icp != null and !config.icp.isEmpty()}" th:text="${config.icp}"></span>
+            <span th:if="${(config == null or config.icp == null or config.icp.isEmpty()) and currentLanguage == 'zh-CN'}" th:text="#{footer.icp}"></span>
+            <span th:if="${config != null and config.copyright != null}" th:text="${config.copyright}"></span>
+        </div>
+    </div>
+</footer>
+<script>
+/* scroll reveal + sticky-header shading + mobile menu close-on-nav */
+(function () {
+    var prefersReduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var els = document.querySelectorAll('[data-reveal]');
+    if (prefersReduce || !('IntersectionObserver' in window)) {
+        els.forEach(function (e) { e.classList.add('is-visible'); });
+    } else {
+        var io = new IntersectionObserver(function (entries) {
+            entries.forEach(function (en) {
+                if (en.isIntersecting) { en.target.classList.add('is-visible'); io.unobserve(en.target); }
+            });
+        }, { threshold: 0.14, rootMargin: '0px 0px -8% 0px' });
+        els.forEach(function (e) { io.observe(e); });
+    }
+    /* close mobile menu when a link is clicked */
+    document.querySelectorAll('.site-nav a').forEach(function (a) {
+        a.addEventListener('click', function () {
+            var h = document.querySelector('.header-inner');
+            if (h) h.classList.remove('open');
+        });
+    });
+})();
+</script>
+</th:block>
+</html>

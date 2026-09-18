@@ -1,0 +1,26 @@
+{
+  "locales": ["en-US", "zh-CN"],
+  "defaultLocale": "en-US",
+  "pages": [
+    { "path": "/", "template": "themes/xhope/index", "label": "首页",
+      "seo_config": {
+        "en-US": { "title": "XHOPE — Suction, Redefined", "description": "XHOPE engineers premium home cleaning machines: cordless vacuums, fabric cleaners and robot sweepers. Extreme suction, black-tech motors, built to last.", "keywords": "cordless vacuum, fabric cleaner, robot sweeper, home cleaning, XHOPE, suction, motor", "canonical": "", "robots": "index, follow", "ogTitle": "XHOPE — Suction, Redefined", "ogDescription": "Premium home cleaning machines engineered for extreme suction and clean design.", "ogImage": "" },
+        "zh-CN": { "title": "XHOPE — 重新定义吸力", "description": "XHOPE 研发高端家清产品：无线吸尘器、布艺清洗机与扫地机。强劲吸力、黑科技马达、可靠耐用。", "keywords": "无线吸尘器,布艺清洗机,扫地机,家清产品,XHOPE,吸力,马达", "canonical": "", "robots": "index, follow", "ogTitle": "XHOPE — 重新定义吸力", "ogDescription": "为极致吸力与干净设计而生的家清产品。", "ogImage": "" }
+      } },
+    { "path": "/products", "template": "themes/xhope/products", "label": "产品中心",
+      "seo_config": {
+        "en-US": { "title": "Products — XHOPE", "description": "Explore XHOPE home cleaning products: cordless vacuums, fabric cleaners and robot sweepers. Engineering details, specs and performance.", "keywords": "XHOPE products, cordless vacuum, fabric cleaner, robot sweeper, specifications", "canonical": "", "robots": "index, follow", "ogTitle": "XHOPE Products", "ogDescription": "Cordless vacuums, fabric cleaners and robot sweepers engineered by XHOPE.", "ogImage": "" },
+        "zh-CN": { "title": "产品中心 — XHOPE", "description": "探索 XHOPE 家清产品：无线吸尘器、布艺清洗机与扫地机。工程细节、参数与性能。", "keywords": "XHOPE 产品,无线吸尘器,布艺清洗机,扫地机,参数", "canonical": "", "robots": "index, follow", "ogTitle": "XHOPE 产品中心", "ogDescription": "XHOPE 研发的无线吸尘器、布艺清洗机与扫地机。", "ogImage": "" }
+      } },
+    { "path": "/news", "template": "themes/xhope/news", "label": "公司新闻",
+      "seo_config": {
+        "en-US": { "title": "News — XHOPE", "description": "XHOPE company news, product launches and technology updates from the home cleaning engineering team.", "keywords": "XHOPE news, product launch, cleaning technology, company updates", "canonical": "", "robots": "index, follow", "ogTitle": "XHOPE News", "ogDescription": "Company news, product launches and technology updates from XHOPE.", "ogImage": "" },
+        "zh-CN": { "title": "公司新闻 — XHOPE", "description": "XHOPE 公司新闻、产品发布与家清技术动态。", "keywords": "XHOPE 新闻,产品发布,清洁技术,公司动态", "canonical": "", "robots": "index, follow", "ogTitle": "XHOPE 公司新闻", "ogDescription": "XHOPE 公司新闻、产品发布与技术动态。", "ogImage": "" }
+      } },
+    { "path": "/contact", "template": "themes/xhope/contact", "label": "联系我们",
+      "seo_config": {
+        "en-US": { "title": "Contact — XHOPE", "description": "Contact XHOPE for sales, distribution partnerships and product inquiries. Reach our home cleaning engineering team worldwide.", "keywords": "contact XHOPE, sales, distribution, partnership, inquiry", "canonical": "", "robots": "index, follow", "ogTitle": "Contact XHOPE", "ogDescription": "Sales, distribution partnerships and product inquiries with XHOPE.", "ogImage": "" },
+        "zh-CN": { "title": "联系我们 — XHOPE", "description": "联系 XHOPE 洽谈销售、经销合作与产品咨询，联系我们的家清工程团队。", "keywords": "联系 XHOPE,销售,经销合作,咨询", "canonical": "", "robots": "index, follow", "ogTitle": "联系 XHOPE", "ogDescription": "销售、经销合作与产品咨询。", "ogImage": "" }
+      } }
+  ]
+}
