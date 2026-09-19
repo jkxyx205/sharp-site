@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- LYHOTEC 顶部导航:白色玻璃态。active 渐变下划线高亮当前页。 -->
+<header th:fragment="header(active)" class="site-header">
+    <div class="container header-inner">
+        <a class="brand" th:href="@{${localePrefix + '/'}}">
+            <span class="accent-dot"></span>
+            <span>LYHOTEC</span>
+            <small>硬核清洁科技</small>
+        </a>
+        <button class="nav-toggle" aria-label="Toggle menu"
+                onclick="this.parentElement.classList.toggle('open')">&#9776;</button>
+        <nav class="site-nav">
+            <a th:href="@{${localePrefix + '/'}}" th:classappend="${active == 'index'} ? 'active' : ''">首页</a>
+            <a th:href="@{${localePrefix + '/products'}}" th:classappend="${active == 'products'} ? 'active' : ''">产品中心</a>
+            <a th:href="@{${localePrefix + '/tech'}}" th:classappend="${active == 'tech'} ? 'active' : ''">核心技术</a>
+            <a th:href="@{${localePrefix + '/accessories'}}" th:classappend="${active == 'accessories'} ? 'active' : ''">配件中心</a>
+            <a th:href="@{${localePrefix + '/support'}}" th:classappend="${active == 'support'} ? 'active' : ''">售后支持</a>
+            <a th:href="@{${localePrefix + '/blog'}}" th:classappend="${active == 'blog'} ? 'active' : ''">博客</a>
+            <a th:href="@{${localePrefix + '/about'}}" th:classappend="${active == 'about'} ? 'active' : ''">关于我们</a>
+            <a class="btn btn-accent nav-cta" th:href="@{${localePrefix + '/products'}}">立即选购</a>
+        </nav>
+    </div>
+    <script>
+    (function () {
+        document.querySelectorAll('.site-nav a').forEach(function (a) {
+            a.addEventListener('click', function () {
+                var h = document.querySelector('.header-inner');
+                if (h) h.classList.remove('open');
+            });
+        });
+    })();
+    </script>
+</header>
+</html>

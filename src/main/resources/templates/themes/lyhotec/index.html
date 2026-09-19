@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN" dir="ltr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{themes/__${themeId}__/fragments/head :: head(pageTitle='LYHOTEC | 硬核清洁科技 · 无线吸尘器与布艺清洗机', pageDescription='LYHOTEC 以自研数码马达打造高端无线吸尘器与布艺清洗机。300AW 大吸力、高温蒸汽、防缠绕刷头,为极致干净而生。', pageKeywords='无线吸尘器,布艺清洗机,大吸力,数码马达,LYHOTEC,清洁科技,高温蒸汽', canonical='/', robots='index, follow')}"></head>
+<body>
+<header th:replace="~{themes/__${themeId}__/fragments/header :: header(active='index')}"></header>
+
+<!-- ===================== HERO ===================== -->
+<section class="hero">
+    <div class="container">
+        <div>
+            <p class="eyebrow">LYHOTEC · 硬核清洁科技</p>
+            <h1>300AW 大吸力,<br/><span class="grad">重新定义干净。</span></h1>
+            <p class="hero-sub">自研 125,000 转数码马达、防缠绕刷头与高温蒸汽杀菌。从地毯到布艺沙发,一台机器解决全屋深度清洁。</p>
+            <div class="hero-actions">
+                <a class="btn btn-accent btn-lg" href="/products">探索全系产品</a>
+                <a class="btn btn-ghost btn-lg" href="/tech" style="color:#fff;border-color:rgba(255,255,255,.3)">核心技术</a>
+            </div>
+            <div class="hero-specs">
+                <div><div class="num">300<span class="grad">AW</span></div><div class="lbl">吸入功率</div></div>
+                <div><div class="num">125,000<span class="grad"> 转</span></div><div class="lbl">数码马达</div></div>
+                <div><div class="num">60<span class="grad"> 分钟</span></div><div class="lbl">超长续航</div></div>
+            </div>
+        </div>
+        <div class="hero-stage" data-reveal>
+            <div class="surface"></div>
+            <div class="scan"></div>
+            <svg class="device" viewBox="0 0 120 300" xmlns="http://www.w3.org/2000/svg" fill="none">
+                <rect x="52" y="6" width="16" height="150" rx="8" fill="#1f242c" stroke="#3a4049" stroke-width="2"/>
+                <rect x="44" y="150" width="32" height="70" rx="14" fill="url(#lg1)" stroke="#00c9d4" stroke-width="1.5"/>
+                <rect x="48" y="166" width="24" height="38" rx="6" fill="#0b0d10"/>
+                <circle cx="60" cy="185" r="6" fill="#00c9d4"/>
+                <path d="M40 220 L80 220 L74 250 L46 250 Z" fill="#1f242c" stroke="#3a4049" stroke-width="2"/>
+                <rect x="34" y="248" width="52" height="14" rx="7" fill="#0b0d10" stroke="#00c9d4" stroke-width="1.5"/>
+                <defs><linearGradient id="lg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#00c9d4"/><stop offset="1" stop-color="#1fb6ff"/></linearGradient></defs>
+            </svg>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== STAT BAND ===================== -->
+<section class="stat-band">
+    <div class="container">
+        <div class="grid">
+            <div data-reveal><div class="num"><span class="grad">300</span>AW</div><div class="lbl">峰值吸入功率</div></div>
+            <div data-reveal><div class="num"><span class="grad">99.9</span>%</div><div class="lbl">除螨杀菌率</div></div>
+            <div data-reveal><div class="num"><span class="grad">60</span>分钟</div><div class="lbl">持久续航</div></div>
+            <div data-reveal><div class="num"><span class="grad">42</span>dB</div><div class="lbl">静音运行</div></div>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== 畅销款推荐 ===================== -->
+<section class="section section--light">
+    <div class="container">
+        <div class="section-head" data-reveal>
+            <p class="eyebrow">畅销系列</p>
+            <h2>为每一个清洁场景而生</h2>
+            <p>从全屋无线吸尘到布艺深度清洗,LYHOTEC 用工程思维解决真实家居痛点。</p>
+        </div>
+        <div class="grid-3">
+            <a class="card" href="/product-detail" data-reveal>
+                <span class="pill">旗舰</span>
+                <div class="media"><svg viewBox="0 0 120 300" fill="none"><rect x="52" y="6" width="16" height="150" rx="8" fill="#3a4049"/><rect x="44" y="150" width="32" height="70" rx="14" fill="#0b0d10"/><circle cx="60" cy="185" r="6" fill="#00c9d4"/><path d="M40 220 L80 220 L74 250 L46 250 Z" fill="#3a4049"/><rect x="34" y="248" width="52" height="14" rx="7" fill="#0b0d10"/></svg></div>
+                <h3>V12 Pro 无线吸尘器</h3>
+                <p>300AW 大吸力,60 分钟续航,防缠绕刷头,整机密封过滤。</p>
+                <span class="link">¥3,299 起 →</span>
+            </a>
+            <a class="card" href="/product-detail" data-reveal>
+                <span class="pill">新品</span>
+                <div class="media"><svg viewBox="0 0 200 200" fill="none"><rect x="50" y="80" width="100" height="70" rx="12" fill="#3a4049"/><rect x="150" y="100" width="40" height="8" rx="4" fill="#0b0d10"/><rect x="60" y="95" width="80" height="40" rx="8" fill="#0b0d10"/><circle cx="100" cy="115" r="10" fill="#00c9d4"/><rect x="40" y="150" width="120" height="20" rx="6" fill="#3a4049"/></svg></div>
+                <h3>F8 布艺清洗机</h3>
+                <p>140℃ 高温蒸汽,强力抽吸,沙发地毯一机搞定。</p>
+                <span class="link">¥2,899 起 →</span>
+            </a>
+            <a class="card" href="/product-detail" data-reveal>
+                <span class="pill">热销</span>
+                <div class="media"><svg viewBox="0 0 200 200" fill="none"><circle cx="100" cy="110" r="55" fill="#3a4049"/><circle cx="100" cy="110" r="30" fill="#0b0d10"/><circle cx="100" cy="110" r="12" fill="#00c9d4"/><rect x="85" y="40" width="30" height="20" rx="4" fill="#3a4049"/><rect x="92" y="20" width="16" height="24" rx="8" fill="#0b0d10"/></svg></div>
+                <h3>G9 扫地机器人</h3>
+                <p>激光导航,自动集尘,拖扫一体,APP 远程控制。</p>
+                <span class="link">¥3,999 起 →</span>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== BEFORE / AFTER 演示 ===================== -->
+<section class="section section--dark">
+    <div class="container">
+        <div class="section-head center" data-reveal>
+            <p class="eyebrow">真实对比</p>
+            <h2>布艺清洗,眼见为实</h2>
+            <p class="l-muted">F8 布艺清洗机 140℃ 高温蒸汽配合强力抽吸,深度瓦解沙发与地毯中的陈年污渍。</p>
+        </div>
+        <div class="ba-wrap" data-reveal>
+            <div class="ba-card">
+                <span class="label before">清洁前</span>
+                <div class="dirty"></div>
+            </div>
+            <div class="ba-card">
+                <span class="label after">清洁后</span>
+                <div class="clean"></div>
+            </div>
+        </div>
+        <div style="text-align:center;margin-top:40px" data-reveal>
+            <a class="btn btn-accent btn-lg" href="/product-detail">了解 F8 布艺清洗机</a>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== 核心卖点 ===================== -->
+<section class="section section--alt">
+    <div class="container">
+        <div class="section-head" data-reveal>
+            <p class="eyebrow">核心科技</p>
+            <h2>每一项设计,都为更强清洁</h2>
+        </div>
+        <div class="grid-3">
+            <div class="card" data-reveal>
+                <div class="media"><svg viewBox="0 0 80 80" fill="none"><circle cx="40" cy="40" r="30" stroke="#00c9d4" stroke-width="3"/><circle cx="40" cy="40" r="14" fill="#0b0d10"/><path d="M40 18 L44 38 L60 30" stroke="#1fb6ff" stroke-width="3" fill="none"/></svg></div>
+                <h3>125,000 转数码马达</h3>
+                <p>自研高速数码马达,叶轮以 125,000 转/分钟旋转,产生 300AW 峰值吸力,瞬间吸走深层灰尘。</p>
+            </div>
+            <div class="card" data-reveal>
+                <div class="media"><svg viewBox="0 0 80 80" fill="none"><path d="M20 50 Q20 20 40 20 Q60 20 60 50" stroke="#00c9d4" stroke-width="3" fill="none"/><rect x="14" y="48" width="52" height="16" rx="8" fill="#0b0d10"/><path d="M30 56 L50 56" stroke="#1fb6ff" stroke-width="3"/></svg></div>
+                <h3>防缠绕刷头</h3>
+                <p>梳齿结构在吸尘同时梳理毛发,避免长发与宠物毛缠绕滚刷,持久保持吸力。</p>
+            </div>
+            <div class="card" data-reveal>
+                <div class="media"><svg viewBox="0 0 80 80" fill="none"><path d="M28 20 L52 20 L56 36 L24 36 Z" fill="#0b0d10" stroke="#00c9d4" stroke-width="2"/><path d="M30 36 Q30 60 40 60 Q50 60 50 36" stroke="#1fb6ff" stroke-width="3" fill="none"/></svg></div>
+                <h3>140℃ 高温蒸汽</h3>
+                <p>布艺清洗机内置即热锅炉,3 秒出蒸汽,140℃ 高温溶解油污并杀菌除螨。</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== 客户好评 ===================== -->
+<section class="section section--light">
+    <div class="container">
+        <div class="section-head" data-reveal>
+            <p class="eyebrow">用户口碑</p>
+            <h2>来自真实家庭的好评</h2>
+        </div>
+        <div class="grid-3">
+            <div class="review-card" data-reveal>
+                <div class="stars">★★★★★</div>
+                <h4>养宠家庭的救星</h4>
+                <p>三只猫加一只金毛,V12 Pro 的防缠绕刷头真的不缠毛,吸力比之前那台强太多,地毯里的毛全出来了。</p>
+                <div class="who">— 林女士 · 上海</div>
+            </div>
+            <div class="review-card" data-reveal>
+                <div class="stars">★★★★★</div>
+                <h4>布艺沙发焕然一新</h4>
+                <p>F8 把布沙发上的小孩污渍和奶渍全抽出来了,高温蒸汽还有股除菌的安心感,效果肉眼可见。</p>
+                <div class="who">— 王先生 · 杭州</div>
+            </div>
+            <div class="review-card" data-reveal>
+                <div class="stars">★★★★★</div>
+                <h4>续航足够清完整栋</h4>
+                <p>60 分钟续航把我 130㎡ 的房子全部吸完还剩电,静音模式晚上用也不吵,工程质感拉满。</p>
+                <div class="who">— 陈先生 · 深圳</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== 品牌故事 ===================== -->
+<section class="section section--alt">
+    <div class="container split">
+        <div data-reveal>
+            <p class="eyebrow">LYHOTEC 品牌</p>
+            <h2 class="sp-name">从一颗马达开始</h2>
+            <p class="sp-lead">LYHOTEC 创立于苏州高新区,由一群痴迷于流体力学与马达工程的工程师创办。我们坚信:真正的干净,来自对吸力、气流与温度的极致掌控。每一台机器,从马达叶轮到刷头梳齿,都由自有工厂与实验室反复打磨。</p>
+            <div style="margin-top:28px"><a class="btn btn-dark" href="/about">了解品牌故事</a></div>
+        </div>
+        <div class="sp-media dark" data-reveal>
+            <div class="stage">
+                <svg viewBox="0 0 200 200" fill="none">
+                    <circle cx="100" cy="100" r="70" stroke="#00c9d4" stroke-width="2" stroke-dasharray="6 8" opacity=".5"/>
+                    <circle cx="100" cy="100" r="46" fill="none" stroke="#1fb6ff" stroke-width="3"/>
+                    <circle cx="100" cy="100" r="24" fill="#0b0d10"/>
+                    <path d="M100 70 L110 100 L100 130 L90 100 Z" fill="#00c9d4"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== CTA ===================== -->
+<section class="cta-band">
+    <div class="container">
+        <div>
+            <h2>准备好重新定义干净?</h2>
+            <p>探索 LYHOTEC 全系产品,找到适合你家的清洁方案。</p>
+        </div>
+        <a class="btn btn-accent btn-lg" href="/products">立即选购</a>
+    </div>
+</section>
+
+<footer th:replace="~{themes/__${themeId}__/fragments/footer :: footer()}"></footer>
+</body>
+</html>

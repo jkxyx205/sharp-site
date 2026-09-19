@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-CN" dir="ltr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{themes/__${themeId}__/fragments/head :: head(pageTitle='核心技术', pageDescription='LYHOTEC 核心技术解析:自研数码马达、气旋分离、防缠绕刷头、140℃ 高温蒸汽杀菌与五重密封过滤。用工程思维重新定义清洁。', pageKeywords='LYHOTEC 技术,数码马达,气旋分离,防缠绕,高温蒸汽,HEPA过滤', canonical='/tech', robots='index, follow')}"></head>
+<body>
+<header th:replace="~{themes/__${themeId}__/fragments/header :: header(active='tech')}"></header>
+
+<!-- ===================== HERO ===================== -->
+<section class="hero">
+    <div class="container">
+        <div>
+            <p class="eyebrow">LYHOTEC 核心技术</p>
+            <h1>每一项专利,<br/><span class="grad">都为更干净。</span></h1>
+            <p class="hero-sub">从马达叶轮到刷头梳齿,LYHOTEC 把流体力学、热力学与机械工程,压缩进每一台手持设备。</p>
+            <div class="hero-actions">
+                <a class="btn btn-accent btn-lg" href="/products">查看应用产品</a>
+                <a class="btn btn-ghost btn-lg" href="/support" style="color:#fff;border-color:rgba(255,255,255,.3)">技术支持</a>
+            </div>
+        </div>
+        <div class="hero-stage" data-reveal>
+            <div class="surface"></div>
+            <div class="scan"></div>
+            <svg class="device" viewBox="0 0 200 200" fill="none">
+                <circle cx="100" cy="100" r="70" stroke="#00c9d4" stroke-width="2" stroke-dasharray="6 8" opacity=".5"/>
+                <circle cx="100" cy="100" r="46" fill="none" stroke="#1fb6ff" stroke-width="3"/>
+                <circle cx="100" cy="100" r="24" fill="#0b0d10"/>
+                <path d="M100 70 L110 100 L100 130 L90 100 Z" fill="#00c9d4"/>
+            </svg>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== 技术卡片 ===================== -->
+<section class="section section--light">
+    <div class="container">
+        <div class="section-head center" data-reveal>
+            <p class="eyebrow">五大核心技术</p>
+            <h2>硬核科技的具象表达</h2>
+            <p>每一项技术都来自自有实验室与工厂的反复打磨,可被参数验证、可被肉眼感知。</p>
+        </div>
+        <div class="grid-3">
+            <div class="tech-card" data-reveal>
+                <div class="num">01</div>
+                <h3>数码马达</h3>
+                <p>自研 125,000 转/分数码马达,陶瓷轴承与航空合金叶轮,在掌心释放 300AW 峰值吸力。</p>
+                <div class="vis"><svg viewBox="0 0 200 200" fill="none"><circle cx="100" cy="100" r="50" stroke="#00c9d4" stroke-width="2" stroke-dasharray="6 8"/><circle cx="100" cy="100" r="30" stroke="#1fb6ff" stroke-width="3"/><circle cx="100" cy="100" r="14" fill="#0b0d10"/><path d="M100 56 L108 100 L100 144 L92 100 Z" fill="#00c9d4"/></svg></div>
+            </div>
+            <div class="tech-card" data-reveal>
+                <div class="num">02</div>
+                <h3>气旋分离</h3>
+                <p>多锥气旋产生离心力,将灰尘与气流分离,避免滤网堵塞,吸力持久不衰减。</p>
+                <div class="vis"><svg viewBox="0 0 200 200" fill="none"><path d="M70 60 L130 60 L120 100 L80 100 Z" fill="#0b0d10"/><path d="M80 100 Q80 140 100 150 Q120 140 120 100" stroke="#1fb6ff" stroke-width="3" fill="none"/><circle cx="100" cy="70" r="6" fill="#00c9d4"/></svg></div>
+            </div>
+            <div class="tech-card" data-reveal>
+                <div class="num">03</div>
+                <h3>防缠绕刷头</h3>
+                <p>梳齿阵列在滚刷旋转时梳理毛发,将其导向吸口,95% 以上毛发无需手动清理。</p>
+                <div class="vis"><svg viewBox="0 0 200 200" fill="none"><rect x="40" y="80" width="120" height="40" rx="8" fill="#0b0d10"/><path d="M50 90 L150 90 M50 100 L150 100 M50 110 L150 110" stroke="#1fb6ff" stroke-width="2"/><circle cx="60" cy="100" r="4" fill="#00c9d4"/></svg></div>
+            </div>
+            <div class="tech-card" data-reveal>
+                <div class="num">04</div>
+                <h3>高温蒸汽杀菌</h3>
+                <p>即热式锅炉 3 秒出蒸汽,140℃ 高温溶解油污、杀灭尘螨与细菌,布艺清洁无需化学药剂。</p>
+                <div class="vis"><svg viewBox="0 0 200 200" fill="none"><path d="M80 50 L120 50 L130 80 L70 80 Z" fill="#0b0d10"/><path d="M85 80 Q85 130 100 140 Q115 130 115 80" stroke="#1fb6ff" stroke-width="3" fill="none"/><circle cx="100" cy="60" r="5" fill="#00c9d4"/></svg></div>
+            </div>
+            <div class="tech-card" data-reveal>
+                <div class="num">05</div>
+                <h3>五重密封过滤</h3>
+                <p>整机 HEPA 密封,五重过滤拦截 99.97% 0.3μm 颗粒,排出空气比吸入更干净。</p>
+                <div class="vis"><svg viewBox="0 0 200 200" fill="none"><rect x="50" y="60" width="100" height="80" rx="8" fill="#0b0d10"/><path d="M60 75 L140 75 M60 90 L140 90 M60 105 L140 105 M60 120 L140 120" stroke="#1fb6ff" stroke-width="2"/><circle cx="100" cy="100" r="6" fill="#00c9d4"/></svg></div>
+            </div>
+            <div class="tech-card" data-reveal>
+                <div class="num">06</div>
+                <h3>声学调校</h3>
+                <p>马达减震悬浮与气道消音设计,在保持吸力的同时将噪音压至 42dB,夜间清洁不扰家人。</p>
+                <div class="vis"><svg viewBox="0 0 200 200" fill="none"><path d="M60 100 Q70 70 80 100 Q90 130 100 100 Q110 70 120 100 Q130 130 140 100" stroke="#1fb6ff" stroke-width="3" fill="none"/><circle cx="60" cy="100" r="5" fill="#00c9d4"/><circle cx="140" cy="100" r="5" fill="#00c9d4"/></svg></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== 爆炸图 / 透视图 ===================== -->
+<section class="section section--dark">
+    <div class="container">
+        <div class="section-head center" data-reveal>
+            <p class="eyebrow">结构透视</p>
+            <h2>从一颗马达到一台机器</h2>
+            <p class="l-muted">V12 Pro 的内部结构剖视图:马达、气旋、尘筒、电池与刷头,层层堆叠的工程美学。</p>
+        </div>
+        <div class="sp-media dark" data-reveal style="max-width:760px;margin:0 auto">
+            <div class="stage" style="aspect-ratio:16/10">
+                <svg viewBox="0 0 400 250" fill="none">
+                    <rect x="40" y="40" width="80" height="40" rx="8" fill="none" stroke="#00c9d4" stroke-width="2"/>
+                    <text x="80" y="64" fill="#00c9d4" font-size="10" text-anchor="middle">电池组</text>
+                    <rect x="140" y="40" width="80" height="40" rx="8" fill="none" stroke="#1fb6ff" stroke-width="2"/>
+                    <text x="180" y="64" fill="#1fb6ff" font-size="10" text-anchor="middle">数码马达</text>
+                    <rect x="240" y="40" width="80" height="40" rx="8" fill="none" stroke="#00c9d4" stroke-width="2"/>
+                    <text x="280" y="64" fill="#00c9d4" font-size="10" text-anchor="middle">气旋锥</text>
+                    <rect x="90" y="110" width="100" height="50" rx="8" fill="none" stroke="#1fb6ff" stroke-width="2"/>
+                    <text x="140" y="140" fill="#1fb6ff" font-size="10" text-anchor="middle">尘筒 0.77L</text>
+                    <rect x="210" y="110" width="100" height="50" rx="8" fill="none" stroke="#00c9d4" stroke-width="2"/>
+                    <text x="260" y="140" fill="#00c9d4" font-size="10" text-anchor="middle">HEPA 过滤</text>
+                    <rect x="150" y="185" width="100" height="40" rx="8" fill="none" stroke="#1fb6ff" stroke-width="2"/>
+                    <text x="200" y="210" fill="#1fb6ff" font-size="10" text-anchor="middle">防缠绕刷头</text>
+                    <path d="M80 80 L80 110 M180 80 L180 110 M280 80 L260 110 M140 160 L140 185 M260 160 L200 185" stroke="#3a4049" stroke-width="1" stroke-dasharray="3 4"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== 实验室数据 ===================== -->
+<section class="section section--alt">
+    <div class="container">
+        <div class="section-head" data-reveal>
+            <p class="eyebrow">实验室验证</p>
+            <h2>参数经得起复测</h2>
+        </div>
+        <div class="fact-grid">
+            <div class="fact" data-reveal><div class="num">99.97%</div><div class="lbl">0.3μm 颗粒拦截率</div></div>
+            <div class="fact" data-reveal><div class="num">99.9%</div><div class="lbl">除螨杀菌率</div></div>
+            <div class="fact" data-reveal><div class="num">95%</div><div class="lbl">毛发防缠绕率</div></div>
+            <div class="fact" data-reveal><div class="num">3000+</div><div class="lbl">小时马达寿命测试</div></div>
+        </div>
+    </div>
+</section>
+
+<section class="cta-band">
+    <div class="container">
+        <div><h2>把硬核科技带回家</h2><p>体验 LYHOTEC 工程带来的极致清洁。</p></div>
+        <a class="btn btn-accent btn-lg" href="/products">选购产品</a>
+    </div>
+</section>
+
+<footer th:replace="~{themes/__${themeId}__/fragments/footer :: footer()}"></footer>
+</body>
+</html>

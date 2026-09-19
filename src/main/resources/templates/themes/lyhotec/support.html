@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN" dir="ltr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{themes/__${themeId}__/fragments/head :: head(pageTitle='售后支持', pageDescription='LYHOTEC 售后支持:说明书 PDF 下载、操作教学视频、保修注册、常见问题排查与联系方式。让设备使用无忧。', pageKeywords='LYHOTEC 支持,说明书下载,教学视频,保修注册,常见问题,Troubleshooting', canonical='/support', robots='index, follow')}"></head>
+<body>
+<header th:replace="~{themes/__${themeId}__/fragments/header :: header(active='support')}"></header>
+
+<section class="section section--light">
+    <div class="container">
+        <div class="section-head center" data-reveal>
+            <p class="eyebrow">售后支持</p>
+            <h2>我们陪你用满每一刻</h2>
+            <p>从开箱到日常维护,LYHOTEC 提供完整的售后资源。需要人工帮助?随时联系。</p>
+        </div>
+
+        <div class="support-grid">
+            <div class="sup-card" data-reveal>
+                <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg></div>
+                <h3>说明书下载</h3>
+                <p>各型号产品 PDF 说明书,图文详解安装、使用与保养。</p>
+                <a class="link" href="#downloads">查看下载列表 →</a>
+            </div>
+            <div class="sup-card" data-reveal>
+                <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M10 9l5 3-5 3z"/></svg></div>
+                <h3>教学视频</h3>
+                <p>开箱、组装、深度清洁、滤芯更换,视频一步步教你上手。</p>
+                <a class="link" href="#videos">观看视频 →</a>
+            </div>
+            <div class="sup-card" data-reveal>
+                <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></div>
+                <h3>保修注册</h3>
+                <p>在线注册设备序列号,激活 2 年主机保修与延保服务。</p>
+                <a class="link" href="#warranty">立即注册 →</a>
+            </div>
+        </div>
+
+        <!-- 说明书下载列表 -->
+        <div id="downloads" style="margin-top:88px">
+            <div class="section-head" data-reveal>
+                <p class="eyebrow">说明书下载</p>
+                <h2>PDF 资源</h2>
+            </div>
+            <div class="dl-list">
+                <div class="dl-row" data-reveal>
+                    <div><div class="nm">V12 Pro 无线吸尘器 使用说明书</div><div class="mt">PDF · 4.2 MB · 简体中文</div></div>
+                    <a class="btn btn-ghost" href="#">下载</a>
+                </div>
+                <div class="dl-row" data-reveal>
+                    <div><div class="nm">F8 布艺清洗机 使用说明书</div><div class="mt">PDF · 3.8 MB · 简体中文</div></div>
+                    <a class="btn btn-ghost" href="#">下载</a>
+                </div>
+                <div class="dl-row" data-reveal>
+                    <div><div class="nm">G9 扫地机器人 使用说明书</div><div class="mt">PDF · 5.1 MB · 简体中文</div></div>
+                    <a class="btn btn-ghost" href="#">下载</a>
+                </div>
+                <div class="dl-row" data-reveal>
+                    <div><div class="nm">配件通用适配指南</div><div class="mt">PDF · 1.6 MB · 简体中文</div></div>
+                    <a class="btn btn-ghost" href="#">下载</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 教学视频 -->
+        <div id="videos" style="margin-top:88px">
+            <div class="section-head" data-reveal>
+                <p class="eyebrow">教学视频</p>
+                <h2>从开箱到深度清洁</h2>
+            </div>
+            <div class="grid-3">
+                <div class="card" data-reveal>
+                    <div class="media" style="aspect-ratio:16/9;background:linear-gradient(160deg,#15181f,#0b0d10)"><svg viewBox="0 0 80 80" fill="none"><circle cx="40" cy="40" r="18" fill="none" stroke="#00c9d4" stroke-width="2"/><path d="M34 32 L48 40 L34 48 Z" fill="#00c9d4"/></svg></div>
+                    <h3>V12 Pro 开箱与组装</h3>
+                    <p>3 分钟完成组装与首次充电。</p>
+                </div>
+                <div class="card" data-reveal>
+                    <div class="media" style="aspect-ratio:16/9;background:linear-gradient(160deg,#15181f,#0b0d10)"><svg viewBox="0 0 80 80" fill="none"><circle cx="40" cy="40" r="18" fill="none" stroke="#00c9d4" stroke-width="2"/><path d="M34 32 L48 40 L34 48 Z" fill="#00c9d4"/></svg></div>
+                    <h3>刷头日常清理</h3>
+                    <p>滚刷与梳齿的拆卸清理方法。</p>
+                </div>
+                <div class="card" data-reveal>
+                    <div class="media" style="aspect-ratio:16/9;background:linear-gradient(160deg,#15181f,#0b0d10)"><svg viewBox="0 0 80 80" fill="none"><circle cx="40" cy="40" r="18" fill="none" stroke="#00c9d4" stroke-width="2"/><path d="M34 32 L48 40 L34 48 Z" fill="#00c9d4"/></svg></div>
+                    <h3>HEPA 滤芯更换</h3>
+                    <p>6 个月清洁、12 个月更换流程。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Troubleshooting -->
+        <div id="troubleshooting" style="margin-top:88px">
+            <div class="section-head" data-reveal>
+                <p class="eyebrow">常见问题排查</p>
+                <h2>Troubleshooting</h2>
+                <p>设备遇到问题?先按以下指引自查,多数情况可自行解决。</p>
+            </div>
+            <div class="faq" style="max-width:860px">
+                <details open><summary>吸力明显减弱?</summary><div class="ans">检查尘筒是否已满、滤芯是否堵塞。清洁或更换滤芯,并确认刷头吸口无异物阻塞。若仍异常,联系售后检测马达气密性。</div></details>
+                <details><summary>续航时间变短?</summary><div class="ans">电池为消耗品,长期使用后续航会自然衰减。避免电量完全耗尽再充电,建议 20% 时即充电。如明显衰减,可在配件中心更换原厂电池组。</div></details>
+                <details><summary>刷头不转或异响?</summary><div class="ans">关闭电源,清理滚刷缠绕的毛发与异物。梳齿结构如卡死,可拆下滚刷用剪刀沿梳齿方向清理。装回后仍异响,联系售后。</div></details>
+                <details><summary>蒸汽不出水?</summary><div class="ans">检查水箱是否缺水、喷嘴是否被水垢堵塞。使用配套清洁液与纯净水,定期用柠檬酸除垢。长期不用时清空水箱。</div></details>
+                <details><summary>充电指示灯不亮?</summary><div class="ans">确认壁挂座电源已接通、电池与座体接触点清洁。擦拭金属触点后重试。若指示灯仍不亮,可能为充电座或电池故障,联系售后。</div></details>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="cta-band">
+    <div class="container">
+        <div><h2>需要人工支持?</h2><p>工作日 9:00–21:00 在线客服,或致电 400-880-0000。</p></div>
+        <a class="btn btn-accent btn-lg" href="mailto:support@lyhotec.com">联系我们</a>
+    </div>
+</section>
+
+<footer th:replace="~{themes/__${themeId}__/fragments/footer :: footer()}"></footer>
+</body>
+</html>

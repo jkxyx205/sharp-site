@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN" dir="ltr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{themes/__${themeId}__/fragments/head :: head(pageTitle='博客', pageDescription='LYHOTEC 清洁知识博客:如何去除沙发宠物尿渍、硬质地板最佳吸尘方案、布艺沙发保养、车内清洁技巧等实用内容。', pageKeywords='清洁博客,宠物尿渍,沙发清洁,地板吸尘,布艺保养,车内清洁,LYHOTEC', canonical='/blog', robots='index, follow')}"></head>
+<body>
+<header th:replace="~{themes/__${themeId}__/fragments/header :: header(active='blog')}"></header>
+
+<section class="section section--light">
+    <div class="container">
+        <div class="section-head center" data-reveal>
+            <p class="eyebrow">LYHOTEC 博客</p>
+            <h2>清洁的科学与艺术</h2>
+            <p>来自工程师与真实家庭的清洁知识,帮你把家打理得更干净。</p>
+        </div>
+
+        <div class="blog-grid">
+            <a class="blog-card" href="#" data-reveal>
+                <div class="cover"><svg viewBox="0 0 80 80" fill="none"><circle cx="40" cy="40" r="26" fill="none" stroke="#00c9d4" stroke-width="3"/><path d="M28 40h24M40 28v24" stroke="#1fb6ff" stroke-width="3"/></svg></div>
+                <div class="body">
+                    <span class="tag">养宠家庭</span>
+                    <h3>如何彻底去除沙发上的宠物尿渍</h3>
+                    <p>宠物尿渍渗透深,普通擦拭难以根除。本文讲解酶解清洁与高温蒸汽组合方案,彻底除味除渍。</p>
+                    <div class="meta">2026-08-12 · 5 分钟阅读</div>
+                </div>
+            </a>
+            <a class="blog-card" href="#" data-reveal>
+                <div class="cover"><svg viewBox="0 0 80 80" fill="none"><rect x="16" y="36" width="48" height="8" rx="2" fill="none" stroke="#00c9d4" stroke-width="3"/><rect x="20" y="28" width="40" height="8" rx="2" fill="none" stroke="#1fb6ff" stroke-width="3"/></svg></div>
+                <div class="body">
+                    <span class="tag">地板清洁</span>
+                    <h3>2026 硬质地板最佳吸尘方案</h3>
+                    <p>木地板与瓷砖的吸尘需求不同。软绒滚刷与防缠绕刷头的场景对比,以及如何避免划伤地板。</p>
+                    <div class="meta">2026-08-04 · 7 分钟阅读</div>
+                </div>
+            </a>
+            <a class="blog-card" href="#" data-reveal>
+                <div class="cover"><svg viewBox="0 0 80 80" fill="none"><path d="M20 60 Q20 24 40 24 Q60 24 60 60" fill="none" stroke="#00c9d4" stroke-width="3"/><rect x="14" y="56" width="52" height="14" rx="6" fill="none" stroke="#1fb6ff" stroke-width="3"/></svg></div>
+                <div class="body">
+                    <span class="tag">布艺保养</span>
+                    <h3>布艺沙发多久深度清洁一次?</h3>
+                    <p>家庭使用频率、养宠与小孩因素决定清洁周期。一文读懂布艺沙发的日常与深度清洁节奏。</p>
+                    <div class="meta">2026-07-22 · 6 分钟阅读</div>
+                </div>
+            </a>
+            <a class="blog-card" href="#" data-reveal>
+                <div class="cover"><svg viewBox="0 0 80 80" fill="none"><rect x="16" y="36" width="48" height="20" rx="4" fill="none" stroke="#00c9d4" stroke-width="3"/><circle cx="26" cy="58" r="5" fill="none" stroke="#1fb6ff" stroke-width="3"/><circle cx="54" cy="58" r="5" fill="none" stroke="#1fb6ff" stroke-width="3"/></svg></div>
+                <div class="body">
+                    <span class="tag">车内清洁</span>
+                    <h3>车内深度清洁:从座椅到后备箱</h3>
+                    <p>缝隙吸头与布艺清洗机配合,清理座椅缝隙、脚垫与后备箱,让爱车焕然一新。</p>
+                    <div class="meta">2026-07-10 · 8 分钟阅读</div>
+                </div>
+            </a>
+            <a class="blog-card" href="#" data-reveal>
+                <div class="cover"><svg viewBox="0 0 80 80" fill="none"><circle cx="40" cy="40" r="22" fill="none" stroke="#00c9d4" stroke-width="3"/><path d="M40 18 L44 40 L60 40" stroke="#1fb6ff" stroke-width="3" fill="none"/></svg></div>
+                <div class="body">
+                    <span class="tag">技术科普</span>
+                    <h3>AW 与 PA:吸力参数怎么看?</h3>
+                    <p>吸入功率(AW)与气动功率(PA)有什么区别?如何读懂吸尘器参数表,避免营销陷阱。</p>
+                    <div class="meta">2026-06-28 · 6 分钟阅读</div>
+                </div>
+            </a>
+            <a class="blog-card" href="#" data-reveal>
+                <div class="cover"><svg viewBox="0 0 80 80" fill="none"><path d="M28 24 L52 24 L56 40 L24 40 Z" fill="none" stroke="#00c9d4" stroke-width="3"/><path d="M30 40 Q30 60 40 60 Q50 60 50 40" fill="none" stroke="#1fb6ff" stroke-width="3"/></svg></div>
+                <div class="body">
+                    <span class="tag">深度清洁</span>
+                    <h3>地毯深度清洁:蒸汽与抽吸的化学反应</h3>
+                    <p>高温蒸汽如何溶解油污,强力抽吸如何带出深层污渍。布艺清洗机的工作原理解析。</p>
+                    <div class="meta">2026-06-15 · 7 分钟阅读</div>
+                </div>
+            </a>
+        </div>
+
+        <div style="text-align:center;margin-top:48px" data-reveal>
+            <a class="btn btn-ghost" href="#">加载更多</a>
+        </div>
+    </div>
+</section>
+
+<footer th:replace="~{themes/__${themeId}__/fragments/footer :: footer()}"></footer>
+</body>
+</html>

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- SEO meta: title / description / keywords / canonical / robots / OG。siteName 硬编码为 LYHOTEC。 -->
+<th:block th:fragment="seo(title, description, keywords, canonical, robots)">
+    <title th:text="${title + ' | LYHOTEC'}">LYHOTEC</title>
+    <meta name="description" th:content="${description}" content="" />
+    <meta name="keywords" th:content="${keywords}" content="" />
+    <link rel="canonical" th:href="${canonical}" href="/" />
+    <meta name="robots" th:content="${robots}" content="index, follow" />
+    <meta name="theme-color" content="#0b0d10" />
+    <meta property="og:title" th:content="${title}" content="LYHOTEC" />
+    <meta property="og:description" th:content="${description}" content="" />
+    <meta property="og:site_name" content="LYHOTEC" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+</th:block>
+</html>

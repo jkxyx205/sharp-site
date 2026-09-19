@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN" dir="ltr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{themes/__${themeId}__/fragments/head :: head(pageTitle='配件中心', pageDescription='LYHOTEC 配件中心:全系刷头、滤网、水管、电池与专用清洁液,方便老客户复购,让设备持久如新。', pageKeywords='LYHOTEC 配件,刷头,滤网,电池,清洁液,水管,复购', canonical='/accessories', robots='index, follow')}"></head>
+<body>
+<header th:replace="~{themes/__${themeId}__/fragments/header :: header(active='accessories')}"></header>
+
+<section class="section section--light">
+    <div class="container">
+        <div class="section-head" data-reveal>
+            <p class="eyebrow">配件中心</p>
+            <h2>为你的设备持续赋能</h2>
+            <p>原厂配件,精准适配。从刷头到清洁液,让 LYHOTEC 设备持久保持巅峰状态。</p>
+        </div>
+
+        <div class="grid-3" style="grid-template-columns:repeat(4,1fr)">
+            <div class="acc-card" data-reveal>
+                <div class="media"><svg viewBox="0 0 200 200" fill="none"><rect x="40" y="80" width="120" height="50" rx="10" fill="#3a4049"/><rect x="50" y="90" width="100" height="30" rx="6" fill="#0b0d10"/><circle cx="100" cy="105" r="6" fill="#00c9d4"/></svg></div>
+                <h3>电动防缠绕刷头</h3>
+                <p class="l-muted" style="font-size:.84rem;margin-top:4px">适配 V9 / V12 系列</p>
+                <div class="price">¥399</div>
+            </div>
+            <div class="acc-card" data-reveal>
+                <div class="media"><svg viewBox="0 0 200 200" fill="none"><circle cx="100" cy="100" r="50" fill="#3a4049"/><circle cx="100" cy="100" r="24" fill="#0b0d10"/><circle cx="100" cy="100" r="8" fill="#00c9d4"/></svg></div>
+                <h3>缝隙吸头</h3>
+                <p class="l-muted" style="font-size:.84rem;margin-top:4px">通用接口</p>
+                <div class="price">¥89</div>
+            </div>
+            <div class="acc-card" data-reveal>
+                <div class="media"><svg viewBox="0 0 200 200" fill="none"><rect x="50" y="60" width="100" height="80" rx="10" fill="#3a4049"/><rect x="70" y="80" width="60" height="40" rx="6" fill="#0b0d10"/><circle cx="100" cy="100" r="10" fill="#00c9d4"/></svg></div>
+                <h3>软绒滚刷</h3>
+                <p class="l-muted" style="font-size:.84rem;margin-top:4px">硬质地板专用</p>
+                <div class="price">¥259</div>
+            </div>
+            <div class="acc-card" data-reveal>
+                <div class="media"><svg viewBox="0 0 200 200" fill="none"><rect x="60" y="60" width="80" height="80" rx="10" fill="#0b0d10"/><circle cx="100" cy="100" r="16" fill="#00c9d4"/><rect x="90" y="40" width="20" height="20" rx="4" fill="#3a4049"/></svg></div>
+                <h3>可换电池组</h3>
+                <p class="l-muted" style="font-size:.84rem;margin-top:4px">2500mAh · V12 系列</p>
+                <div class="price">¥599</div>
+            </div>
+            <div class="acc-card" data-reveal>
+                <div class="media"><svg viewBox="0 0 200 200" fill="none"><rect x="70" y="60" width="60" height="90" rx="8" fill="#3a4049"/><rect x="80" y="70" width="40" height="30" rx="4" fill="#0b0d10"/><circle cx="100" cy="130" r="6" fill="#00c9d4"/></svg></div>
+                <h3>HEPA 滤芯</h3>
+                <p class="l-muted" style="font-size:.84rem;margin-top:4px">五重过滤 · 可水洗</p>
+                <div class="price">¥149</div>
+            </div>
+            <div class="acc-card" data-reveal>
+                <div class="media"><svg viewBox="0 0 200 200" fill="none"><path d="M80 60 Q80 50 100 50 Q120 50 120 60 L120 140 Q120 150 100 150 Q80 150 80 140 Z" fill="#3a4049"/><rect x="92" y="70" width="16" height="60" rx="4" fill="#0b0d10"/><circle cx="100" cy="100" r="5" fill="#00c9d4"/></svg></div>
+                <h3>清洁液(1L)</h3>
+                <p class="l-muted" style="font-size:.84rem;margin-top:4px">布艺清洗机专用</p>
+                <div class="price">¥79</div>
+            </div>
+            <div class="acc-card" data-reveal>
+                <div class="media"><svg viewBox="0 0 200 200" fill="none"><rect x="40" y="70" width="120" height="14" rx="7" fill="#3a4049"/><circle cx="50" cy="77" r="8" fill="#0b0d10"/><circle cx="150" cy="77" r="8" fill="#0b0d10"/></svg></div>
+                <h3>加长软管</h3>
+                <p class="l-muted" style="font-size:.84rem;margin-top:4px">1.5m · 通用接口</p>
+                <div class="price">¥129</div>
+            </div>
+            <div class="acc-card" data-reveal>
+                <div class="media"><svg viewBox="0 0 200 200" fill="none"><rect x="60" y="50" width="80" height="100" rx="10" fill="#3a4049"/><rect x="75" y="65" width="50" height="70" rx="6" fill="#0b0d10"/><circle cx="100" cy="100" r="14" fill="#00c9d4"/></svg></div>
+                <h3>壁挂充电座</h3>
+                <p class="l-muted" style="font-size:.84rem;margin-top:4px">含电源适配器</p>
+                <div class="price">¥199</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="cta-band">
+    <div class="container">
+        <div><h2>找不到适配配件?</h2><p>联系客服,获取你的设备型号对应的完整配件清单。</p></div>
+        <a class="btn btn-accent btn-lg" href="/support">联系支持</a>
+    </div>
+</section>
+
+<footer th:replace="~{themes/__${themeId}__/fragments/footer :: footer()}"></footer>
+</body>
+</html>

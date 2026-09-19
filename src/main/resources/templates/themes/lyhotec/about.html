@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN" dir="ltr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{themes/__${themeId}__/fragments/head :: head(pageTitle='关于我们', pageDescription='LYHOTEC 品牌故事:苏州研发制造的硬核清洁科技公司。自有无尘车间与研发实验室,以流体力学与马达工程重新定义家居清洁。', pageKeywords='关于LYHOTEC,品牌故事,苏州研发,无尘车间,清洁科技,马达工程', canonical='/about', robots='index, follow')}"></head>
+<body>
+<header th:replace="~{themes/__${themeId}__/fragments/header :: header(active='about')}"></header>
+
+<!-- ===================== HERO ===================== -->
+<section class="hero">
+    <div class="container">
+        <div>
+            <p class="eyebrow">关于 LYHOTEC</p>
+            <h1>从一颗马达,<br/><span class="grad">到重新定义干净。</span></h1>
+            <p class="hero-sub">LYHOTEC 创立于苏州高新区,由一群痴迷于流体力学与马达工程的工程师创办。我们坚信:真正的干净,来自对吸力、气流与温度的极致掌控。</p>
+            <div class="hero-actions">
+                <a class="btn btn-accent btn-lg" href="/products">查看产品</a>
+                <a class="btn btn-ghost btn-lg" href="/tech" style="color:#fff;border-color:rgba(255,255,255,.3)">核心技术</a>
+            </div>
+        </div>
+        <div class="hero-stage" data-reveal>
+            <div class="surface"></div>
+            <div class="scan"></div>
+            <svg class="device" viewBox="0 0 200 200" fill="none">
+                <circle cx="100" cy="100" r="70" stroke="#00c9d4" stroke-width="2" stroke-dasharray="6 8" opacity=".5"/>
+                <circle cx="100" cy="100" r="46" fill="none" stroke="#1fb6ff" stroke-width="3"/>
+                <circle cx="100" cy="100" r="24" fill="#0b0d10"/>
+                <path d="M100 70 L110 100 L100 130 L90 100 Z" fill="#00c9d4"/>
+            </svg>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== 品牌故事 ===================== -->
+<section class="section section--light">
+    <div class="container story-split">
+        <div data-reveal>
+            <p class="eyebrow">品牌故事</p>
+            <h2 class="sp-name" style="margin-bottom:24px">工程,是我们的母语</h2>
+            <p class="story-lead">2018 年,几位曾在航空航天领域研究涡轮机械的工程师,因为一次糟糕的吸尘器体验走到了一起:为什么手持设备的吸力总是不够?为什么刷头总是缠毛?为什么清洁布艺要靠化学药剂?</p>
+            <p class="story-lead" style="margin-top:20px">他们从一颗高速数码马达开始,用三年时间走通从叶轮、气旋到刷头梳齿的全链路自研。LYHOTEC 的第一台原型机,诞生在苏州高新区一间不到 200㎡ 的实验室里。</p>
+            <p class="story-lead" style="margin-top:20px">今天,LYHOTEC 拥有自有无尘车间、马达产线与声学实验室。我们不做贴牌,每一台机器都从马达开始,由我们亲手打磨。</p>
+        </div>
+        <div class="sp-media dark" data-reveal>
+            <div class="stage" style="aspect-ratio:4/5">
+                <svg viewBox="0 0 200 250" fill="none">
+                    <rect x="20" y="20" width="160" height="210" rx="12" fill="none" stroke="#3a4049" stroke-width="2"/>
+                    <rect x="40" y="40" width="120" height="50" rx="6" fill="#0b0d10"/>
+                    <text x="100" y="70" fill="#00c9d4" font-size="9" text-anchor="middle">无尘车间</text>
+                    <rect x="40" y="100" width="120" height="50" rx="6" fill="#0b0d10"/>
+                    <text x="100" y="130" fill="#1fb6ff" font-size="9" text-anchor="middle">马达产线</text>
+                    <rect x="40" y="160" width="120" height="50" rx="6" fill="#0b0d10"/>
+                    <text x="100" y="190" fill="#00c9d4" font-size="9" text-anchor="middle">声学实验室</text>
+                </svg>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== 工厂实力 ===================== -->
+<section class="section section--dark">
+    <div class="container">
+        <div class="section-head center" data-reveal>
+            <p class="eyebrow">工贸一体</p>
+            <h2>自有工厂与研发实验室</h2>
+            <p class="l-muted">从研发到制造全链路自有,这是 LYHOTEC 对品质与技术的底气。</p>
+        </div>
+        <div class="fact-grid">
+            <div class="fact" data-reveal><div class="num">8,000㎡</div><div class="lbl">无尘车间</div></div>
+            <div class="fact" data-reveal><div class="num">120+</div><div class="lbl">研发工程师</div></div>
+            <div class="fact" data-reveal><div class="num">60+</div><div class="lbl">自有专利</div></div>
+            <div class="fact" data-reveal><div class="num">3</div><div class="lbl">独立实验室</div></div>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== 时间线 ===================== -->
+<section class="section section--alt">
+    <div class="container">
+        <div class="section-head" data-reveal>
+            <p class="eyebrow">发展历程</p>
+            <h2>从实验室到全屋清洁</h2>
+        </div>
+        <div class="timeline" style="max-width:760px">
+            <div class="tl-item" data-reveal>
+                <div class="yr">2018</div>
+                <h4>团队成立</h4>
+                <p>几位涡轮机械工程师在苏州高新区创立 LYHOTEC,聚焦手持清洁设备的马达自研。</p>
+            </div>
+            <div class="tl-item" data-reveal>
+                <div class="yr">2020</div>
+                <h4>第一台原型机</h4>
+                <p>自研 100,000 转数码马达下线,首台无线吸尘器原型机完成实验室验证。</p>
+            </div>
+            <div class="tl-item" data-reveal>
+                <div class="yr">2022</div>
+                <h4>布艺清洗线发布</h4>
+                <p>推出 140℃ 高温蒸汽布艺清洗机,进入沙发地毯深度清洁领域。</p>
+            </div>
+            <div class="tl-item" data-reveal>
+                <div class="yr">2024</div>
+                <h4>300AW 旗舰发布</h4>
+                <p>V12 Pro 量产,300AW 峰值吸力搭配防缠绕刷头,成为养宠家庭首选。</p>
+            </div>
+            <div class="tl-item" data-reveal>
+                <div class="yr">2026</div>
+                <h4>全球化</h4>
+                <p>自有无尘车间扩至 8,000㎡,产品进入欧美与东南亚市场,服务全球家庭。</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="cta-band">
+    <div class="container">
+        <div><h2>和 LYHOTEC 一起重新定义干净</h2><p>无论是选购产品还是经销合作,欢迎与我们对话。</p></div>
+        <a class="btn btn-accent btn-lg" href="/products">选购产品</a>
+    </div>
+</section>
+
+<footer th:replace="~{themes/__${themeId}__/fragments/footer :: footer()}"></footer>
+</body>
+</html>

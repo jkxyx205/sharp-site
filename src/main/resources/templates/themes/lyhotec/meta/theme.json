@@ -1,0 +1,144 @@
+{
+  "locales": [
+    "zh-CN"
+  ],
+  "defaultLocale": "zh-CN",
+  "pages": [
+    {
+      "path": "/",
+      "template": "index",
+      "label": "首页",
+      "seo_config": {
+        "zh-CN": {
+          "title": "LYHOTEC | 硬核清洁科技 · 无线吸尘器与布艺清洗机",
+          "description": "LYHOTEC 以自研数码马达打造高端无线吸尘器与布艺清洗机。300AW 大吸力、高温蒸汽、防缠绕刷头,为极致干净而生。",
+          "keywords": "无线吸尘器,布艺清洗机,大吸力,数码马达,LYHOTEC,清洁科技,高温蒸汽",
+          "canonical": "/",
+          "robots": "index, follow",
+          "ogTitle": "LYHOTEC — 硬核清洁科技",
+          "ogDescription": "300AW 大吸力,重新定义干净。",
+          "ogImage": ""
+        }
+      }
+    },
+    {
+      "path": "/products",
+      "template": "products",
+      "label": "产品中心",
+      "seo_config": {
+        "zh-CN": {
+          "title": "产品中心 — LYHOTEC",
+          "description": "探索 LYHOTEC 全系清洁产品:无线吸尘器、布艺清洗机、扫地机器人及配件。按场景与参数筛选适合你家的清洁方案。",
+          "keywords": "LYHOTEC 产品,无线吸尘器,布艺清洗机,扫地机,配件,选购",
+          "canonical": "/products",
+          "robots": "index, follow",
+          "ogTitle": "LYHOTEC 产品中心",
+          "ogDescription": "LYHOTEC 全系清洁产品,为每一种清洁需求而造。",
+          "ogImage": ""
+        }
+      }
+    },
+    {
+      "path": "/product-detail",
+      "template": "product-detail",
+      "label": "产品详情",
+      "seo_config": {
+        "zh-CN": {
+          "title": "V12 Pro 无线吸尘器 — LYHOTEC",
+          "description": "LYHOTEC V12 Pro 无线吸尘器:300AW 大吸力、125000 转数码马达、60 分钟续航、防缠绕刷头、整机密封过滤。参数、包装清单、FAQ 与真实评价。",
+          "keywords": "V12 Pro,无线吸尘器,300AW,数码马达,LYHOTEC,防缠绕刷头",
+          "canonical": "/product-detail",
+          "robots": "index, follow",
+          "ogTitle": "V12 Pro 无线吸尘器",
+          "ogDescription": "300AW 大吸力,重新定义干净。",
+          "ogImage": ""
+        }
+      }
+    },
+    {
+      "path": "/tech",
+      "template": "tech",
+      "label": "核心技术",
+      "seo_config": {
+        "zh-CN": {
+          "title": "核心技术 — LYHOTEC",
+          "description": "LYHOTEC 核心技术解析:自研数码马达、气旋分离、防缠绕刷头、140℃ 高温蒸汽杀菌与五重密封过滤。用工程思维重新定义清洁。",
+          "keywords": "LYHOTEC 技术,数码马达,气旋分离,防缠绕,高温蒸汽,HEPA过滤",
+          "canonical": "/tech",
+          "robots": "index, follow",
+          "ogTitle": "LYHOTEC 核心技术",
+          "ogDescription": "每一项专利,都为更干净。",
+          "ogImage": ""
+        }
+      }
+    },
+    {
+      "path": "/accessories",
+      "template": "accessories",
+      "label": "配件中心",
+      "seo_config": {
+        "zh-CN": {
+          "title": "配件中心 — LYHOTEC",
+          "description": "LYHOTEC 配件中心:全系刷头、滤网、水管、电池与专用清洁液,方便老客户复购,让设备持久如新。",
+          "keywords": "LYHOTEC 配件,刷头,滤网,电池,清洁液,水管,复购",
+          "canonical": "/accessories",
+          "robots": "index, follow",
+          "ogTitle": "LYHOTEC 配件中心",
+          "ogDescription": "原厂配件,精准适配,持久如新。",
+          "ogImage": ""
+        }
+      }
+    },
+    {
+      "path": "/support",
+      "template": "support",
+      "label": "售后支持",
+      "seo_config": {
+        "zh-CN": {
+          "title": "售后支持 — LYHOTEC",
+          "description": "LYHOTEC 售后支持:说明书 PDF 下载、操作教学视频、保修注册、常见问题排查与联系方式。让设备使用无忧。",
+          "keywords": "LYHOTEC 支持,说明书下载,教学视频,保修注册,常见问题,Troubleshooting",
+          "canonical": "/support",
+          "robots": "index, follow",
+          "ogTitle": "LYHOTEC 售后支持",
+          "ogDescription": "从开箱到日常维护,完整售后资源。",
+          "ogImage": ""
+        }
+      }
+    },
+    {
+      "path": "/about",
+      "template": "about",
+      "label": "关于我们",
+      "seo_config": {
+        "zh-CN": {
+          "title": "关于我们 — LYHOTEC",
+          "description": "LYHOTEC 品牌故事:苏州研发制造的硬核清洁科技公司。自有无尘车间与研发实验室,以流体力学与马达工程重新定义家居清洁。",
+          "keywords": "关于LYHOTEC,品牌故事,苏州研发,无尘车间,清洁科技,马达工程",
+          "canonical": "/about",
+          "robots": "index, follow",
+          "ogTitle": "关于 LYHOTEC",
+          "ogDescription": "从一颗马达,到重新定义干净。",
+          "ogImage": ""
+        }
+      }
+    },
+    {
+      "path": "/blog",
+      "template": "blog",
+      "label": "博客",
+      "seo_config": {
+        "zh-CN": {
+          "title": "博客 — LYHOTEC",
+          "description": "LYHOTEC 清洁知识博客:如何去除沙发宠物尿渍、硬质地板最佳吸尘方案、布艺沙发保养、车内清洁技巧等实用内容。",
+          "keywords": "清洁博客,宠物尿渍,沙发清洁,地板吸尘,布艺保养,车内清洁,LYHOTEC",
+          "canonical": "/blog",
+          "robots": "index, follow",
+          "ogTitle": "LYHOTEC 博客",
+          "ogDescription": "清洁的科学与艺术。",
+          "ogImage": ""
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN" dir="ltr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{themes/__${themeId}__/fragments/head :: head(pageTitle='产品中心', pageDescription='探索 LYHOTEC 全系清洁产品:无线吸尘器、布艺清洗机、扫地机器人及配件。按场景与参数筛选适合你家的清洁方案。', pageKeywords='LYHOTEC 产品,无线吸尘器,布艺清洗机,扫地机,配件,选购', canonical='/products', robots='index, follow')}"></head>
+<body>
+<header th:replace="~{themes/__${themeId}__/fragments/header :: header(active='products')}"></header>
+
+<section class="section section--light">
+    <div class="container">
+        <div class="section-head" data-reveal>
+            <p class="eyebrow">产品中心</p>
+            <h2>为每一种清洁需求而造</h2>
+            <p>按类型、场景或参数筛选,快速找到适合你家的 LYHOTEC 设备。</p>
+        </div>
+
+        <div class="shop">
+            <!-- 侧边筛选 -->
+            <aside class="filter">
+                <div class="group">
+                    <h4>类型</h4>
+                    <label><input type="checkbox" checked /> 无线吸尘器</label>
+                    <label><input type="checkbox" checked /> 布艺清洗机</label>
+                    <label><input type="checkbox" checked /> 扫地机器人</label>
+                    <label><input type="checkbox" /> 配件耗材</label>
+                </div>
+                <div class="group">
+                    <h4>场景</h4>
+                    <label><input type="checkbox" /> 养宠家庭</label>
+                    <label><input type="checkbox" /> 布艺沙发</label>
+                    <label><input type="checkbox" /> 车内清洁</label>
+                    <label><input type="checkbox" /> 硬质地板</label>
+                </div>
+                <div class="group">
+                    <h4>吸力</h4>
+                    <div class="chip-row">
+                        <span class="chip">150AW</span>
+                        <span class="chip on">300AW</span>
+                        <span class="chip">450AW</span>
+                    </div>
+                </div>
+                <div class="group">
+                    <h4>续航</h4>
+                    <div class="chip-row">
+                        <span class="chip">40 分钟</span>
+                        <span class="chip on">60 分钟</span>
+                        <span class="chip">90 分钟</span>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- 产品网格 -->
+            <div>
+                <div class="grid-3" style="grid-template-columns:repeat(2,1fr)">
+                    <a class="card" href="/product-detail" data-reveal>
+                        <span class="pill">旗舰</span>
+                        <div class="media"><svg viewBox="0 0 120 300" fill="none"><rect x="52" y="6" width="16" height="150" rx="8" fill="#3a4049"/><rect x="44" y="150" width="32" height="70" rx="14" fill="#0b0d10"/><circle cx="60" cy="185" r="6" fill="#00c9d4"/><path d="M40 220 L80 220 L74 250 L46 250 Z" fill="#3a4049"/><rect x="34" y="248" width="52" height="14" rx="7" fill="#0b0d10"/></svg></div>
+                        <h3>V12 Pro 无线吸尘器</h3>
+                        <p>300AW · 60 分钟续航 · 防缠绕刷头</p>
+                        <span class="link">¥3,299 起 →</span>
+                    </a>
+                    <a class="card" href="/product-detail" data-reveal>
+                        <span class="pill">新品</span>
+                        <div class="media"><svg viewBox="0 0 200 200" fill="none"><rect x="50" y="80" width="100" height="70" rx="12" fill="#3a4049"/><rect x="150" y="100" width="40" height="8" rx="4" fill="#0b0d10"/><rect x="60" y="95" width="80" height="40" rx="8" fill="#0b0d10"/><circle cx="100" cy="115" r="10" fill="#00c9d4"/><rect x="40" y="150" width="120" height="20" rx="6" fill="#3a4049"/></svg></div>
+                        <h3>F8 布艺清洗机</h3>
+                        <p>140℃ 蒸汽 · 强力抽吸 · 沙发地毯通用</p>
+                        <span class="link">¥2,899 起 →</span>
+                    </a>
+                    <a class="card" href="/product-detail" data-reveal>
+                        <span class="pill">热销</span>
+                        <div class="media"><svg viewBox="0 0 200 200" fill="none"><circle cx="100" cy="110" r="55" fill="#3a4049"/><circle cx="100" cy="110" r="30" fill="#0b0d10"/><circle cx="100" cy="110" r="12" fill="#00c9d4"/><rect x="85" y="40" width="30" height="20" rx="4" fill="#3a4049"/><rect x="92" y="20" width="16" height="24" rx="8" fill="#0b0d10"/></svg></div>
+                        <h3>G9 扫地机器人</h3>
+                        <p>激光导航 · 自动集尘 · 拖扫一体</p>
+                        <span class="link">¥3,999 起 →</span>
+                    </a>
+                    <a class="card" href="/product-detail" data-reveal>
+                        <div class="media"><svg viewBox="0 0 120 300" fill="none"><rect x="52" y="6" width="16" height="150" rx="8" fill="#3a4049"/><rect x="44" y="150" width="32" height="70" rx="14" fill="#0b0d10"/><circle cx="60" cy="185" r="6" fill="#00c9d4"/><path d="M40 220 L80 220 L74 250 L46 250 Z" fill="#3a4049"/><rect x="34" y="248" width="52" height="14" rx="7" fill="#0b0d10"/></svg></div>
+                        <h3>V9 轻量无线吸尘器</h3>
+                        <p>150AW · 40 分钟续航 · 1.2kg 机身</p>
+                        <span class="link">¥1,999 起 →</span>
+                    </a>
+                    <a class="card" href="/product-detail" data-reveal>
+                        <div class="media"><svg viewBox="0 0 200 200" fill="none"><rect x="50" y="80" width="100" height="70" rx="12" fill="#3a4049"/><rect x="150" y="100" width="40" height="8" rx="4" fill="#0b0d10"/><rect x="60" y="95" width="80" height="40" rx="8" fill="#0b0d10"/><circle cx="100" cy="115" r="10" fill="#00c9d4"/><rect x="40" y="150" width="120" height="20" rx="6" fill="#3a4049"/></svg></div>
+                        <h3>F5 便携布艺清洗机</h3>
+                        <p>120℃ 蒸汽 · 轻量手持 · 车内可用</p>
+                        <span class="link">¥1,599 起 →</span>
+                    </a>
+                    <a class="card" href="/accessories" data-reveal>
+                        <div class="media"><svg viewBox="0 0 120 200" fill="none"><circle cx="60" cy="60" r="24" fill="#0b0d10"/><rect x="54" y="84" width="12" height="80" rx="6" fill="#3a4049"/><rect x="40" y="164" width="40" height="14" rx="7" fill="#0b0d10"/></svg></div>
+                        <h3>全系配件耗材</h3>
+                        <p>刷头 · 滤网 · 水管 · 专用清洁液</p>
+                        <span class="link">浏览配件 →</span>
+                    </a>
+                </div>
+                <p class="l-muted" style="margin-top:32px;font-size:.9rem">显示 6 款产品 · 共 12 款</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer th:replace="~{themes/__${themeId}__/fragments/footer :: footer()}"></footer>
+</body>
+</html>
