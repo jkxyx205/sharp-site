@@ -1,0 +1,43 @@
+        # 放在 http {} 块内，server {} 块外面
+        map $host $site_root {
+            default       "/Users/rick/Space/tmp/site/www/default/current/";
+            "demo.xhope.top"  "/Users/rick/Space/tmp/site/www/1129466739902386176/current/";
+            "site.xhope.top"  "/Users/rick/Space/tmp/site/www/1129466739902386177/current/";
+            "test.xhope.top"  "/Users/rick/Space/tmp/site/www/1132420831012458496/current/";
+        }
+
+        server {
+            listen 80;
+            # 多个域名用空格隔开
+            server_name demo.xhope.top site.xhope.top test.xhope.top;
+
+            location ~ ^/(?:admin|preview|themes-images)/ {
+                proxy_pass http://localhost:8080;
+
+                # 建议这里也加上 header，否则后端拿不到真实域名
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+            }
+
+            # /contact 路径
+            location /contact {
+                # POST → 转发到后端
+                if ($request_method = POST) {
+                    proxy_pass http://localhost:8080;
+                }
+
+                # 非 POST → 返回静态文件
+                root $site_root;
+            }
+
+            location /upload/ {
+                alias /Users/rick/Space/tmp/site/upload/;
+            }
+
+            location / {
+                # 使用 map 动态映射的路径
+                root $site_root;
+            }
+        }
