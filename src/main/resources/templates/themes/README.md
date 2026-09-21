@@ -184,6 +184,8 @@ themes/{themeId}/
 | `news` | `List<ArticleView>` | 全部已发布文章 |
 | `categories` | `List<Category>` | 全部分类（原始实体，无 name） |
 
+> `/contact` 是唯一带表单提交的静态页：表单 AJAX `POST /contact`（多语言无关）由 `SiteContactController` 返回 JSON，契约见 §12。
+
 ## 8. 变量类型（字段速查）
 
 ```java
@@ -297,7 +299,72 @@ record ThemePage(String path, String template, String label)     // 当前页信
 </nav>
 ```
 
-## 12. 生成新主题的检查清单
+## 12. 联系表单（`contact.html` 专属）
+
+联系页是唯一带表单提交的静态页。表单经 `SiteContactController` 以 **AJAX + JSON** 提交，**不走 PRG/flash**——静态发布站的 `GET /contact` 由 Nginx 静态服务，Spring 读不到 flash，只有客户端 JS 能给出"发送成功"反馈。
+
+### 后端契约（`SiteContactController.submit`）
+
+- 路由：`POST /contact` 与 `POST /{locale:[a-z]{2}-[a-z]{2}}/contact`，均返回 JSON。
+- 请求体（`ContactForm` DTO，`@Valid` 校验）：`name`（必填）、`email`（必填，合法邮箱）、`message`（必填）、`topic`（可选）。
+- 响应：`Content-Type: application/json`，`{"success": true}` 或 `{"success": false}`（校验失败 400、发信失败 200，体均 `success:false`）。**不返回视图、不重定向、不发 flash**。
+- 发信：经 sharp-mail `MailHandler` 发往当前租户 `tenant_config.email`；发件人取 `spring.mail.username`（ISP 要求 from=认证账号）。
+- CSRF：`POST /contact` 在 `SecurityConfig` 中用 `RegexRequestMatcher` 豁免（静态站无 session，无法注入 token；公开表单靠服务端校验，后续加限频/Honeypot，见 `docs/TODO.md §1/§10`）。
+
+### 模板契约（`contact.html` 必须遵守）
+
+```html
+<!-- 1) 表单：action 固定 "/contact"（多语言无关——即页 /zh-cn/contact 也 POST /contact）。
+        禁用 th:action（见下“要点”），用普通 action="/contact"。 -->
+<form class="contact-form" method="post" action="/contact">
+  <input type="text" name="name" required />
+  <input type="email" name="email" required />
+  <textarea name="message" rows="5" required></textarea>
+  <!-- 可选：<select name="topic">…</select> -->
+
+  <!-- 2) 成功/失败横幅：常驻 hidden，文案走 i18n 键 contact.sent_success / contact.sent_failed -->
+  <div id="contactSuccess" hidden th:text="#{contact.sent_success}">发送成功</div>
+  <div id="contactError" hidden th:text="#{contact.sent_failed}">发送失败</div>
+  <button type="submit" th:text="#{contact.send}">Send</button>
+</form>
+
+<!-- 3) 提交脚本（页脚后、</body> 前）：拦截 submit → fetch POST → 据 success 显示横幅；
+        成功清空表单、禁用按钮防重复、异常降级显示失败横幅 -->
+<script>
+(function () {
+    var form = document.querySelector('.contact-form');
+    if (!form) return;
+    var ok = document.getElementById('contactSuccess');
+    var no = document.getElementById('contactError');
+    function show(el) { if (el) el.hidden = false; }
+    function hide(el) { if (el) el.hidden = true; }
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        hide(ok); hide(no);
+        var btn = form.querySelector('button[type=submit]');
+        if (btn) btn.disabled = true;
+        fetch(form.action, { method: 'POST', body: new FormData(form), headers: { 'Accept': 'application/json' } })
+            .then(function (r) { return r.json(); })
+            .then(function (d) { if (d && d.success) { show(ok); form.reset(); } else { show(no); } })
+            .catch(function () { show(no); })
+            .finally(function () { if (btn) btn.disabled = false; });
+    });
+})();
+</script>
+```
+
+**要点**
+
+- `action="/contact"` 硬编码、**多语言无关**：访客在 `/zh-cn/contact` 页面也 POST `/contact`；Controller 同时映射 `/contact` 与 `/{locale}/contact`，响应是 JSON，locale 在 POST 上丢失无影响（横幅文案已随页面 locale 渲染进 DOM）。
+- **禁用 `th:action`**：它触发 Spring Security 的 CSRF 隐藏域注入，需 `request.getSession()`；联系页较大，渲染到 `<form>` 时响应已 commit（缓冲区已 flush），`getSession()` 抛 `Cannot create a session after the response has been committed`，页面在表单处截断、页脚与脚本全丢。改用普通 `action="/contact"`（应用 context-path 为 `/`，与静态站路径一致）即可规避。
+- 三路渲染一致：live、预览、静态发布产物中此表单与脚本同源（`StaticSiteGenerator` 把 `contact.html` 原样写出，脚本随之发布）。
+- 文案键：新增 `contact.sent_success` / `contact.sent_failed`，复用既有 `contact.*` 系列。单语言主题（如 `xhope-cn`）可用内联文案（`th:text="'发送成功…'"`）代替 `#{}`。
+
+### 静态发布站部署提醒
+
+静态站须由 Nginx 把 `POST /contact`（及 `POST /{locale}/contact`）代理到后端 Spring Boot；`GET /contact` 仍静态服务（`location /` + `root $site_root`）。否则 POST 命中 Nginx 的目录跳转（301 `/contact`→`/contact/`），表单数据丢失。Nginx 只代理 `/admin`、`/preview`、`/themes-images` 时需为 `/contact` 补一条 POST 代理规则。
+
+## 13. 生成新主题的检查清单
 
 1. 新建 `themes/{themeId}/`（如复制 `themes/xhope-cn/` → `themes/xhope-cn-v2/`），按目标站点改 `meta/theme.json` 的 `locales`/`defaultLocale`/`pages`/文案与 `meta/messages.json`。
 2. `theme.json` 的 `pages[].template` 写逻辑名（`index`/`products`/`about`…）；片段引用写 `~{themes/__${themeId}__/fragments/...}`——**两者都不含主题名，复制目录后无需改动任何内部引用**。租户 `themeId` 指向新目录是唯一的"身份"改动。
@@ -310,3 +377,4 @@ record ThemePage(String path, String template, String label)     // 当前页信
 9. 文案一律走 `messages.json` 键（`#{...}`），不硬编码企业名/地址等可变内容。
 10. 至少为 `defaultLocale` 提供所有用到的文案键；`seo_config` 至少为 `defaultLocale` 填首页与关键页。
 11. 验证：启动站点，默认语种与 `/zh-cn/` 前缀分别访问首页/列表/详情/静态页；后台 `/admin` 改一条 SEO 看前台是否覆盖生效；执行 `./gradlew test`。
+12. 联系页 `contact.html` 按 §12 契约实现：表单 `class="contact-form"` + `action="/contact"`（**不用 `th:action`**）、字段 `name`/`email`/`message`（可选 `topic`）、常驻 `hidden` 的 `#contactSuccess`/`#contactError` 横幅、页脚后内联提交脚本；补 `contact.sent_success`/`contact.sent_failed` 文案键。提交后应内联弹出成功横幅并发信到 `tenant_config.email`。
