@@ -47,30 +47,30 @@ public class PublishService {
      * 执行一次发布,返回最终状态的发布记录(SUCCESS 或抛出失败异常)。
      */
     public PublishRecord publish() throws IOException {
-        Long tenantId = TenantContext.requireTenantId();
+        String tenantCode = TenantContext.requireTenantCode();
         String version = recordService.nextVersion();
         PublishRecord record = recordService.start(version);
         try {
             Path releaseDir = generator.generate(version);
-            atomicSwitch(tenantId, version, releaseDir);
+            atomicSwitch(tenantCode, version, releaseDir);
             recordService.succeed(record.getId());
             return recordService.findByVersion(version).orElse(record);
         } catch (Exception e) {
             // §20:错误信息可记录,但不含敏感凭据;发布失败必须记录(§20)。
-            log.error("发布失败 tenant={} version={}: {}", tenantId, version, e.getMessage(), e);
+            log.error("发布失败 tenant={} version={}: {}", tenantCode, version, e.getMessage(), e);
             recordService.fail(record.getId(), e.getMessage());
             throw new BizException("发布失败: " + e.getMessage());
         }
     }
 
     /** {@code current} 符号链接目标(供校验/测试读取)。 */
-    public Path currentPath(Long tenantId) {
-        return Paths.get(wwwRoot).resolve(tenantId.toString()).resolve("current");
+    public Path currentPath(String tenantCode) {
+        return Paths.get(wwwRoot).resolve(tenantCode).resolve("current");
     }
 
     /** 原子切换 current → 新 release。 */
-    private void atomicSwitch(Long tenantId, String version, Path releaseDir) throws IOException {
-        Path tenantRoot = Paths.get(wwwRoot).resolve(tenantId.toString());
+    private void atomicSwitch(String tenantCode, String version, Path releaseDir) throws IOException {
+        Path tenantRoot = Paths.get(wwwRoot).resolve(tenantCode);
         Files.createDirectories(tenantRoot);
         Path current = tenantRoot.resolve("current");
         Path tmp = tenantRoot.resolve(".current-" + version + ".tmp");

@@ -39,6 +39,10 @@ public final class TenantContext {
         return require().getId();
     }
 
+    public static String requireTenantCode() {
+        return require().getCode();
+    }
+
     public static void clear() {
         HOLDER.remove();
     }

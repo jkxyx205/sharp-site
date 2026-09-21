@@ -135,7 +135,7 @@ public class StaticSiteGenerator {
      */
     public Path generate(String version) throws IOException {
         Tenant tenant = TenantContext.require();
-        Path releaseDir = releaseDir(tenant.getId(), version);
+        Path releaseDir = releaseDir(tenant.getCode(), version);
         Files.createDirectories(releaseDir);
         ThemeManifest manifest = manifestResolver.resolve(tenant);
         String defaultLocale = manifest.defaultLocale();
@@ -396,8 +396,8 @@ public class StaticSiteGenerator {
         ctx.setVariable("nextLink", page < totalPages ? localePrefix + basePath + (page + 1) + "/" : null);
     }
 
-    private Path releaseDir(Long tenantId, String version) {
-        return Paths.get(wwwRoot).resolve(tenantId.toString()).resolve("releases").resolve(version);
+    private Path releaseDir(String tenantCode, String version) {
+        return Paths.get(wwwRoot).resolve(tenantCode.toString()).resolve("releases").resolve(version);
     }
 
     /**

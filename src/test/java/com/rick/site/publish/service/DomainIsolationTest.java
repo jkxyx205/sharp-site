@@ -98,8 +98,8 @@ class DomainIsolationTest {
         PublishRecord recB = publishService.publish();
         assertEquals("v001", recB.getVersion());
 
-        Path currentA = publishService.currentPath(tenantA.getId());
-        Path currentB = publishService.currentPath(tenantB.getId());
+        Path currentA = publishService.currentPath(tenantA.getCode());
+        Path currentB = publishService.currentPath(tenantB.getCode());
 
         assertTrue(Files.isSymbolicLink(currentA), "A 的 current 应为符号链接");
         assertTrue(Files.isSymbolicLink(currentB), "B 的 current 应为符号链接");

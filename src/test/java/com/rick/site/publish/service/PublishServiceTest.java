@@ -86,7 +86,7 @@ class PublishServiceTest {
         assertEquals("v001", rec.getVersion());
         assertEquals(PublishRecordService.STATUS_SUCCESS, rec.getStatus());
 
-        Path current = publishService.currentPath(tenant.getId());
+        Path current = publishService.currentPath(tenant.getCode());
         assertTrue(Files.isSymbolicLink(current), "current 应为符号链接");
         Path target = Files.readSymbolicLink(current);
         assertTrue(target.toString().contains("v001"), "current → v001");
@@ -103,7 +103,7 @@ class PublishServiceTest {
     void publishFailureLeavesCurrentUnchanged() throws Exception {
         // 首次发布成功:current → v001
         publishService.publish();
-        Path current = publishService.currentPath(tenant.getId());
+        Path current = publishService.currentPath(tenant.getCode());
         Path targetBefore = Files.readSymbolicLink(current);
         assertTrue(targetBefore.toString().contains("v001"));
 
