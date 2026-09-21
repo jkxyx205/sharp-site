@@ -1,9 +1,9 @@
         # 放在 http {} 块内，server {} 块外面
         map $host $site_root {
             default       "/Users/rick/Space/tmp/site/www/default/current/";
-            "demo.xhope.top"  "/Users/rick/Space/tmp/site/www/1129466739902386176/current/";
-            "site.xhope.top"  "/Users/rick/Space/tmp/site/www/1129466739902386177/current/";
-            "test.xhope.top"  "/Users/rick/Space/tmp/site/www/1132420831012458496/current/";
+            "demo.xhope.top"  "/Users/rick/Space/tmp/site/www/demo/current/";
+            "site.xhope.top"  "/Users/rick/Space/tmp/site/www/site/current/";
+            "test.xhope.top"  "/Users/rick/Space/tmp/site/www/test/current/";
         }
 
         server {
