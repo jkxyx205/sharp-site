@@ -41,6 +41,7 @@ dependencies {
     implementation 'com.rick.db:sharp-database:0.0.1-SNAPSHOT'
     implementation 'com.rick.meta:sharp-meta:0.0.1-SNAPSHOT'
     implementation 'com.rick.fileupload:sharp-fileupload:0.0.1-SNAPSHOT'
+    implementation 'com.rick.mail:sharp-mail:0.0.1-SNAPSHOT'
 
     runtimeOnly 'org.postgresql:postgresql'
 

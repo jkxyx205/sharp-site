@@ -6,6 +6,8 @@
 
 <section class="container section contact">
     <h1 th:text="#{contact.title}">Contact</h1>
+    <div id="contactSuccess" class="contact-banner success" hidden style="padding:12px 16px;margin-bottom:16px;border-radius:6px;background:#e7f4e4;color:#1f6f3b" th:text="#{contact.sent_success}">发送成功</div>
+    <div id="contactError" class="contact-banner error" hidden style="padding:12px 16px;margin-bottom:16px;border-radius:6px;background:#fdecea;color:#a83227" th:text="#{contact.sent_failed}">发送失败</div>
     <div class="contact-grid">
         <div th:if="${config != null}">
             <p th:if="${config.address != null}" th:text="${config.address}">Address</p>
@@ -16,7 +18,7 @@
             </p>
             <p th:if="${config.whatsapp != null}" th:text="|#{common.whatsapp}: ${config.whatsapp}|">WhatsApp</p>
         </div>
-        <form class="contact-form" th:action="@{${localePrefix + '/contact'}}" method="post">
+        <form class="contact-form" method="post" action="/contact">
             <label><span th:text="#{contact.name}">Name</span> <input type="text" name="name" required /></label>
             <label><span th:text="#{contact.email}">Email</span> <input type="email" name="email" required /></label>
             <label><span th:text="#{contact.message}">Message</span> <textarea name="message" rows="5" required></textarea></label>
@@ -26,5 +28,26 @@
 </section>
 
 <footer th:replace="~{themes/__${themeId}__/fragments/footer :: footer(siteName=${siteName}, config=${config})}"></footer>
+<script>
+(function () {
+    var form = document.querySelector('.contact-form');
+    if (!form) return;
+    var ok = document.getElementById('contactSuccess');
+    var no = document.getElementById('contactError');
+    function show(el) { if (el) el.hidden = false; }
+    function hide(el) { if (el) el.hidden = true; }
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        hide(ok); hide(no);
+        var btn = form.querySelector('button[type=submit]');
+        if (btn) btn.disabled = true;
+        fetch(form.action, { method: 'POST', body: new FormData(form), headers: { 'Accept': 'application/json' } })
+            .then(function (r) { return r.json(); })
+            .then(function (d) { if (d && d.success) { show(ok); form.reset(); } else { show(no); } })
+            .catch(function () { show(no); })
+            .finally(function () { if (btn) btn.disabled = false; });
+    });
+})();
+</script>
 </body>
 </html>

@@ -42,6 +42,8 @@
   "contact.email":   { "zh-CN": "邮箱",      "en-US": "Email",     "ar-SA": "البريد الإلكتروني", "fr-FR": "E-mail", "ru-RU": "Эл. почта", "es-ES": "Correo electrónico" },
   "contact.message": { "zh-CN": "留言",      "en-US": "Message",   "ar-SA": "الرسالة",    "fr-FR": "Message",     "ru-RU": "Сообщение",   "es-ES": "Mensaje" },
   "contact.send":    { "zh-CN": "发送",      "en-US": "Send",      "ar-SA": "إرسال",      "fr-FR": "Envoyer",      "ru-RU": "Отправить",   "es-ES": "Enviar" },
+  "contact.sent_success": { "zh-CN": "发送成功，感谢您的留言！", "en-US": "Your message has been sent. Thank you!", "ar-SA": "تم إرسال رسالتك. شكراً!", "fr-FR": "Votre message a été envoyé. Merci !", "ru-RU": "Ваше сообщение отправлено. Спасибо!", "es-ES": "¡Tu mensaje ha sido enviado. Gracias!" },
+  "contact.sent_failed":  { "zh-CN": "发送失败，请稍后重试或直接联系我们。", "en-US": "Sorry, something went wrong. Please try again later or contact us directly.", "ar-SA": "عذراً، حدث خطأ. حاول مرة أخرى لاحقاً أو تواصل معنا مباشرة.", "fr-FR": "Désolé, une erreur est survenue. Réessayez plus tard ou contactez-nous directement.", "ru-RU": "Извините, произошла ошибка. Попробуйте позже или свяжитесь с нами напрямую.", "es-ES": "Lo sentimos, algo salió mal. Inténtalo más tarde o contáctanos directamente." },
 
   "common.tel":      { "zh-CN": "电话",      "en-US": "Tel",       "ar-SA": "هاتف",       "fr-FR": "Tél",         "ru-RU": "Тел",         "es-ES": "Tel" },
   "common.mobile":   { "zh-CN": "手机",      "en-US": "Mobile",    "ar-SA": "جوال",       "fr-FR": "Mobile",      "ru-RU": "Мобильный",    "es-ES": "Móvil" },

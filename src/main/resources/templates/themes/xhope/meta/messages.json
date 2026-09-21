@@ -140,6 +140,8 @@
   "contact.topic.other":  { "en-US": "Something else", "zh-CN": "其他" },
   "contact.message": { "en-US": "Message", "zh-CN": "留言" },
   "contact.send":    { "en-US": "Send message", "zh-CN": "发送" },
+  "contact.sent_success": { "en-US": "Your message has been sent. Thank you!", "zh-CN": "发送成功，感谢您的留言！" },
+  "contact.sent_failed":  { "en-US": "Sorry, something went wrong. Please try again later or contact us directly.", "zh-CN": "发送失败，请稍后重试或直接联系我们。" },
 
   "common.tel":      { "en-US": "Tel", "zh-CN": "电话" },
   "common.mobile":   { "en-US": "Mobile", "zh-CN": "手机" },

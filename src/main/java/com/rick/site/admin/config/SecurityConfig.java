@@ -10,6 +10,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 
 /**
  * Spring Security 配置(TASK-0902)。
@@ -50,7 +51,12 @@ public class SecurityConfig {
                 .logoutUrl("/admin/logout")
                 .logoutSuccessUrl("/admin/login?logout")
                 .permitAll())
-            .addFilterBefore(new AdminContextFilter(tenantService), UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(new AdminContextFilter(tenantService), UsernamePasswordAuthenticationFilter.class)
+            // 联系表单 POST(/contact 与 /{locale}/contact)豁免 CSRF:
+            // 正式站为静态 HTML(Nginx),无 session → Thymeleaf 无法注入 CSRF token;
+            // 该端点为公开未认证表单,改由服务端校验 + 限频/Honeypot 防刷(TODO §1/§10)。
+            .csrf(csrf -> csrf.ignoringRequestMatchers(
+                    new RegexRequestMatcher("^/(?:[a-z]{2}-[a-z]{2}/)?contact$", "POST")));
         return http.build();
     }
 }
