@@ -2,7 +2,10 @@ package com.rick.site.admin.web;
 
 import com.rick.common.http.exception.BizException;
 import com.rick.site.catalog.service.CategoryService;
+import com.rick.site.common.async.AsyncRunner;
 import com.rick.site.i18n.service.DefaultLocaleResolver;
+import com.rick.site.tenant.context.TenantContext;
+import com.rick.site.tenant.entity.Tenant;
 import com.rick.site.video.entity.Video;
 import com.rick.site.video.entity.VideoI18n;
 import com.rick.site.video.service.VideoService;
@@ -29,12 +32,14 @@ public class AdminVideoController {
     private final VideoService videoService;
     private final CategoryService categoryService;
     private final DefaultLocaleResolver localeResolver;
+    private final AsyncRunner asyncRunner;
 
     public AdminVideoController(VideoService videoService, CategoryService categoryService,
-                                DefaultLocaleResolver localeResolver) {
+                                DefaultLocaleResolver localeResolver, AsyncRunner asyncRunner) {
         this.videoService = videoService;
         this.categoryService = categoryService;
         this.localeResolver = localeResolver;
+        this.asyncRunner = asyncRunner;
     }
 
     @GetMapping
@@ -75,7 +80,7 @@ public class AdminVideoController {
             Video saved = videoService.saveVideo(video);
             String name = req.getParameter("name");
             if (name != null && !name.isBlank()) {
-                videoService.saveI18n(saved.getId(), VideoI18n.builder()
+                VideoI18n source = VideoI18n.builder()
                         .language(language)
                         .name(name)
                         .subtitle(req.getParameter("subtitle"))
@@ -83,7 +88,22 @@ public class AdminVideoController {
                         .content(req.getParameter("content"))
                         .seoTitle(req.getParameter("seoTitle"))
                         .seoDescription(req.getParameter("seoDescription"))
-                        .build());
+                        .build();
+                videoService.saveI18n(saved.getId(), source);
+                if ("true".equals(req.getParameter("syncToOtherLanguages"))) {
+                    // 翻译同步逐语种调 LLM,耗时较长,提交到异步线程池;请求线程立即返回。
+                    // 租户上下文不隐式继承:在此捕获,异步任务体里 set/clear。
+                    Tenant tenant = TenantContext.require();
+                    java.util.List<String> targets = targetLanguages(language);
+                    asyncRunner.run(() -> {
+                        TenantContext.set(tenant);
+                        try {
+                            videoService.syncToLanguages(saved.getId(), source, targets);
+                        } finally {
+                            TenantContext.clear();
+                        }
+                    });
+                }
             }
             return "redirect:/admin/videos/" + saved.getId() + "/edit?lang=" + language;
         } catch (BizException e) {
@@ -105,5 +125,12 @@ public class AdminVideoController {
     private void addLanguages(Model model) {
         model.addAttribute("languages", localeResolver.supportedLanguages());
         model.addAttribute("defaultLanguage", localeResolver.defaultLanguage());
+    }
+
+    /** 同步目标语种:租户启用语种去掉当前编辑语种。 */
+    private java.util.List<String> targetLanguages(String currentLang) {
+        return localeResolver.supportedLanguages().stream()
+                .filter(l -> !l.equals(currentLang))
+                .toList();
     }
 }

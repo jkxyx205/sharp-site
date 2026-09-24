@@ -47,3 +47,11 @@ logging:
   level:
     root: INFO
     com.rick.site: DEBUG
+
+# 多语言内容同步翻译(OpenAI 兼容 Chat Completions;密钥入 .env.postgres.properties)
+app:
+  translation:
+    enabled: ${TRANSLATION.ENABLED:false}
+    base-url: ${TRANSLATION.BASE_URL:https://api.openai.com/v1}
+    api-key: ${TRANSLATION.API_KEY:}
+    model: ${TRANSLATION.MODEL:gpt-4o-mini}

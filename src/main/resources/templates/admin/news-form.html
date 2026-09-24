@@ -51,6 +51,9 @@
                     <fieldset th:classappend="${currentLang == defaultLanguage ? 'default-lang' : ''}">
                         <legend><span th:text="${currentLang}">语言</span>
                             <span class="lang-tag" th:if="${currentLang == defaultLanguage}">· 默认语言</span></legend>
+                        <label class="sync-lang" th:if="${languages != null and languages.size() > 1}">
+                            <input type="checkbox" name="syncToOtherLanguages" value="true" checked />
+                            同步到其他语言 <span class="hint">翻译当前语种并覆盖其它启用语种</span></label>
                         <label>Title <span class="hint">必填,空则不保存该语种</span>
                             <input type="text" name="title"
                                    th:value="${i18nMap['__${currentLang}__'] != null ? i18nMap['__${currentLang}__'].title : ''}" /></label>

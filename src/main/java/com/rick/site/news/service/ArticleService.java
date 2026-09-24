@@ -10,6 +10,7 @@ import com.rick.site.news.entity.Article;
 import com.rick.site.news.entity.ArticleI18n;
 import com.rick.site.page.service.HtmlSanitizer;
 import com.rick.site.tenant.context.TenantContext;
+import com.rick.site.translate.TranslationService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -33,15 +34,17 @@ public class ArticleService extends BaseServiceImpl<ArticleDAO, Article, Long> {
     private final HtmlSanitizer sanitizer;
     private final I18nService i18nService;
     private final CategoryService categoryService;
+    private final TranslationService translationService;
 
     public ArticleService(ArticleDAO baseDAO, ArticleI18nDAO i18nDAO,
                           HtmlSanitizer sanitizer, I18nService i18nService,
-                          CategoryService categoryService) {
+                          CategoryService categoryService, TranslationService translationService) {
         super(baseDAO);
         this.i18nDAO = i18nDAO;
         this.sanitizer = sanitizer;
         this.i18nService = i18nService;
         this.categoryService = categoryService;
+        this.translationService = translationService;
     }
 
     public List<Article> listByTenant() {
@@ -77,6 +80,38 @@ public class ArticleService extends BaseServiceImpl<ArticleDAO, Article, Long> {
         i18n.setContent(sanitizer.clean(i18n.getContent()));
         findByLanguage(articleId, i18n.getLanguage()).ifPresent(existing -> i18n.setId(existing.getId()));
         return i18nDAO.insertOrUpdate(i18n);
+    }
+
+    /**
+     * 把 {@code source} 语种文案翻译并覆盖写入 {@code targetLangs} 各语种的 i18n 行(覆盖式同步)。
+     *
+     * <p>逐语种调用 {@link TranslationService#translate},再用 {@link #saveI18n} 写入(复用幂等 upsert
+     * 与 HtmlSanitizer 清洗)。某目标语种翻译失败即抛出,源语种行不受影响(独立事务)。
+     *
+     * @param articleId   已保存的文章主键
+     * @param source      刚保存的源语种 i18n(取 language 与文案字段)
+     * @param targetLangs 需同步的目标语种列表(不含源语种)
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void syncToLanguages(Long articleId, ArticleI18n source, List<String> targetLangs) {
+        String sourceLang = source.getLanguage();
+        Map<String, String> sourceFields = new LinkedHashMap<>();
+        sourceFields.put("title", source.getTitle());
+        sourceFields.put("summary", source.getSummary());
+        sourceFields.put("content", source.getContent());
+        sourceFields.put("seoTitle", source.getSeoTitle());
+        sourceFields.put("seoDescription", source.getSeoDescription());
+        for (String lang : targetLangs) {
+            Map<String, String> t = translationService.translate(sourceFields, sourceLang, lang);
+            saveI18n(articleId, ArticleI18n.builder()
+                    .language(lang)
+                    .title(t.get("title"))
+                    .summary(t.get("summary"))
+                    .content(t.get("content"))
+                    .seoTitle(t.get("seoTitle"))
+                    .seoDescription(t.get("seoDescription"))
+                    .build());
+        }
     }
 
     /** 逻辑删除:校验归属(跨租户查不到)后置 is_deleted。 */

@@ -2,10 +2,12 @@ package com.rick.site.admin.web;
 
 import com.rick.common.http.exception.BizException;
 import com.rick.site.catalog.service.CategoryService;
+import com.rick.site.common.async.AsyncRunner;
 import com.rick.site.i18n.service.DefaultLocaleResolver;
 import com.rick.site.news.entity.Article;
 import com.rick.site.news.entity.ArticleI18n;
 import com.rick.site.news.service.ArticleService;
+import com.rick.site.tenant.context.TenantContext;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,12 +32,14 @@ public class AdminArticleController {
     private final ArticleService articleService;
     private final CategoryService categoryService;
     private final DefaultLocaleResolver localeResolver;
+    private final AsyncRunner asyncRunner;
 
     public AdminArticleController(ArticleService articleService, CategoryService categoryService,
-                                  DefaultLocaleResolver localeResolver) {
+                                  DefaultLocaleResolver localeResolver, AsyncRunner asyncRunner) {
         this.articleService = articleService;
         this.categoryService = categoryService;
         this.localeResolver = localeResolver;
+        this.asyncRunner = asyncRunner;
     }
 
     @GetMapping
@@ -77,14 +81,29 @@ public class AdminArticleController {
             Article saved = articleService.saveArticle(article);
             String title = req.getParameter("title");
             if (title != null && !title.isBlank()) {
-                articleService.saveI18n(saved.getId(), ArticleI18n.builder()
+                ArticleI18n source = ArticleI18n.builder()
                         .language(language)
                         .title(title)
                         .summary(req.getParameter("summary"))
                         .content(req.getParameter("content"))
                         .seoTitle(req.getParameter("seoTitle"))
                         .seoDescription(req.getParameter("seoDescription"))
-                        .build());
+                        .build();
+                articleService.saveI18n(saved.getId(), source);
+                if ("true".equals(req.getParameter("syncToOtherLanguages"))) {
+                    // 翻译同步逐语种调 LLM,耗时较长,提交到异步线程池;请求线程立即返回。
+                    // 租户上下文不隐式继承:在此捕获,异步任务体里 set/clear。
+                    com.rick.site.tenant.entity.Tenant tenant = TenantContext.require();
+                    java.util.List<String> targets = targetLanguages(language);
+                    asyncRunner.run(() -> {
+                        TenantContext.set(tenant);
+                        try {
+                            articleService.syncToLanguages(saved.getId(), source, targets);
+                        } finally {
+                            TenantContext.clear();
+                        }
+                    });
+                }
             }
             return "redirect:/admin/news/" + saved.getId() + "/edit?lang=" + language;
         } catch (BizException e) {
@@ -106,5 +125,12 @@ public class AdminArticleController {
     private void addLanguages(Model model) {
         model.addAttribute("languages", localeResolver.supportedLanguages());
         model.addAttribute("defaultLanguage", localeResolver.defaultLanguage());
+    }
+
+    /** 同步目标语种:租户启用语种去掉当前编辑语种。 */
+    private java.util.List<String> targetLanguages(String currentLang) {
+        return localeResolver.supportedLanguages().stream()
+                .filter(l -> !l.equals(currentLang))
+                .toList();
     }
 }

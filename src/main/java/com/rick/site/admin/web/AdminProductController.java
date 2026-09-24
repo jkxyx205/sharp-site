@@ -2,10 +2,13 @@ package com.rick.site.admin.web;
 
 import com.rick.common.http.exception.BizException;
 import com.rick.site.catalog.service.CategoryService;
+import com.rick.site.common.async.AsyncRunner;
 import com.rick.site.i18n.service.DefaultLocaleResolver;
 import com.rick.site.product.entity.Product;
 import com.rick.site.product.entity.ProductI18n;
 import com.rick.site.product.service.ProductService;
+import com.rick.site.tenant.context.TenantContext;
+import com.rick.site.tenant.entity.Tenant;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,12 +33,14 @@ public class AdminProductController {
     private final ProductService productService;
     private final CategoryService categoryService;
     private final DefaultLocaleResolver localeResolver;
+    private final AsyncRunner asyncRunner;
 
     public AdminProductController(ProductService productService, CategoryService categoryService,
-                                  DefaultLocaleResolver localeResolver) {
+                                  DefaultLocaleResolver localeResolver, AsyncRunner asyncRunner) {
         this.productService = productService;
         this.categoryService = categoryService;
         this.localeResolver = localeResolver;
+        this.asyncRunner = asyncRunner;
     }
 
     @GetMapping
@@ -76,7 +81,7 @@ public class AdminProductController {
             Product saved = productService.saveProduct(product);
             String name = req.getParameter("name");
             if (name != null && !name.isBlank()) {
-                productService.saveI18n(saved.getId(), ProductI18n.builder()
+                ProductI18n source = ProductI18n.builder()
                         .language(language)
                         .name(name)
                         .subtitle(req.getParameter("subtitle"))
@@ -85,7 +90,22 @@ public class AdminProductController {
                         .specificationJson(req.getParameter("specificationJson"))
                         .seoTitle(req.getParameter("seoTitle"))
                         .seoDescription(req.getParameter("seoDescription"))
-                        .build());
+                        .build();
+                productService.saveI18n(saved.getId(), source);
+                if ("true".equals(req.getParameter("syncToOtherLanguages"))) {
+                    // 翻译同步逐语种调 LLM,耗时较长,提交到异步线程池;请求线程立即返回。
+                    // 租户上下文不隐式继承:在此捕获,异步任务体里 set/clear。
+                    Tenant tenant = TenantContext.require();
+                    java.util.List<String> targets = targetLanguages(language);
+                    asyncRunner.run(() -> {
+                        TenantContext.set(tenant);
+                        try {
+                            productService.syncToLanguages(saved.getId(), source, targets);
+                        } finally {
+                            TenantContext.clear();
+                        }
+                    });
+                }
             }
             return "redirect:/admin/products/" + saved.getId() + "/edit?lang=" + language;
         } catch (BizException e) {
@@ -107,5 +127,12 @@ public class AdminProductController {
     private void addLanguages(Model model) {
         model.addAttribute("languages", localeResolver.supportedLanguages());
         model.addAttribute("defaultLanguage", localeResolver.defaultLanguage());
+    }
+
+    /** 同步目标语种:租户启用语种去掉当前编辑语种。 */
+    private java.util.List<String> targetLanguages(String currentLang) {
+        return localeResolver.supportedLanguages().stream()
+                .filter(l -> !l.equals(currentLang))
+                .toList();
     }
 }

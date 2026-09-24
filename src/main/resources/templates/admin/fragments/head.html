@@ -74,7 +74,7 @@
         th { background: transparent; color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .03em; }
 
         form { font-size: 14px; }
-        label { display: block; margin: 12px 0 4px; font-weight: 600; font-size: 13px; }
+        label { display: block; margin: 12px 0 4px; font-weight: 600; font-size: 13px; word-break: keep-all }
         input[type=password], input[type=text], input[type=url], input[type=number], input[type=email], input[type=datetime-local], select, textarea {
             width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px;
             font: inherit; background: var(--card); color: var(--fg); box-sizing: border-box; }
@@ -87,7 +87,7 @@
         .default-lang { background: var(--muted-bg); }
 
         .btn { display: inline-flex; align-items: center; padding: 8px 14px; border-radius: 6px; border: 1px solid var(--border);
-                background: var(--card); color: var(--fg); font-size: 13px; cursor: pointer; text-decoration: none; line-height: 1; }
+                background: var(--card); color: var(--fg); font-size: 13px; cursor: pointer; text-decoration: none; line-height: 1; word-break: keep-all}
         .btn:hover { background: var(--muted-bg); }
         .btn-primary { background: var(--primary); color: var(--primary-fg); border-color: var(--primary); }
         .btn-primary:hover { background: var(--primary); opacity: .9; }

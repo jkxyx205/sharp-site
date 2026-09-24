@@ -10,6 +10,7 @@ import com.rick.site.product.dao.ProductI18nDAO;
 import com.rick.site.product.entity.Product;
 import com.rick.site.product.entity.ProductI18n;
 import com.rick.site.tenant.context.TenantContext;
+import com.rick.site.translate.TranslationService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -32,15 +33,17 @@ public class ProductService extends BaseServiceImpl<ProductDAO, Product, Long> {
     private final HtmlSanitizer sanitizer;
     private final I18nService i18nService;
     private final CategoryService categoryService;
+    private final TranslationService translationService;
 
     public ProductService(ProductDAO baseDAO, ProductI18nDAO i18nDAO,
                           HtmlSanitizer sanitizer, I18nService i18nService,
-                          CategoryService categoryService) {
+                          CategoryService categoryService, TranslationService translationService) {
         super(baseDAO);
         this.i18nDAO = i18nDAO;
         this.sanitizer = sanitizer;
         this.i18nService = i18nService;
         this.categoryService = categoryService;
+        this.translationService = translationService;
     }
 
     public List<Product> listByTenant() {
@@ -79,6 +82,42 @@ public class ProductService extends BaseServiceImpl<ProductDAO, Product, Long> {
         i18n.setSpecificationJson((spec == null || spec.isBlank()) ? "{}" : spec);
         findByLanguage(productId, i18n.getLanguage()).ifPresent(existing -> i18n.setId(existing.getId()));
         return i18nDAO.insertOrUpdate(i18n);
+    }
+
+    /**
+     * 把 {@code source} 语种文案翻译并覆盖写入 {@code targetLangs} 各语种的 i18n 行(覆盖式同步)。
+     *
+     * <p>逐语种调用 {@link TranslationService#translate},再用 {@link #saveI18n} 写入(复用幂等 upsert
+     * 与 HtmlSanitizer 清洗;specificationJson 译文由 saveI18n 兜底为合法 JSON)。
+     *
+     * @param productId   已保存的产品主键
+     * @param source      刚保存的源语种 i18n(取 language 与文案字段)
+     * @param targetLangs 需同步的目标语种列表(不含源语种)
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void syncToLanguages(Long productId, ProductI18n source, List<String> targetLangs) {
+        String sourceLang = source.getLanguage();
+        Map<String, String> sourceFields = new LinkedHashMap<>();
+        sourceFields.put("name", source.getName());
+        sourceFields.put("subtitle", source.getSubtitle());
+        sourceFields.put("description", source.getDescription());
+        sourceFields.put("content", source.getContent());
+        sourceFields.put("specificationJson", source.getSpecificationJson());
+        sourceFields.put("seoTitle", source.getSeoTitle());
+        sourceFields.put("seoDescription", source.getSeoDescription());
+        for (String lang : targetLangs) {
+            Map<String, String> t = translationService.translate(sourceFields, sourceLang, lang);
+            saveI18n(productId, ProductI18n.builder()
+                    .language(lang)
+                    .name(t.get("name"))
+                    .subtitle(t.get("subtitle"))
+                    .description(t.get("description"))
+                    .content(t.get("content"))
+                    .specificationJson(t.get("specificationJson"))
+                    .seoTitle(t.get("seoTitle"))
+                    .seoDescription(t.get("seoDescription"))
+                    .build());
+        }
     }
 
     /** 逻辑删除:校验归属(跨租户查不到)后置 is_deleted。 */
