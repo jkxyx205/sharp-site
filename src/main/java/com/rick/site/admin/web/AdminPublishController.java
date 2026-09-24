@@ -1,16 +1,24 @@
 package com.rick.site.admin.web;
 
+import com.rick.common.http.exception.BizException;
 import com.rick.site.publish.entity.PublishRecord;
 import com.rick.site.publish.service.PublishRecordService;
 import com.rick.site.publish.service.PublishService;
+import com.rick.site.tenant.context.TenantContext;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -55,5 +63,25 @@ public class AdminPublishController {
             log.warn("发布失败(已记录): {}", e.getMessage());
         }
         return "redirect:/admin/publish";
+    }
+
+    /**
+     * 下载指定成功版本的部署文件 zip(整站静态产物)。
+     *
+     * <p>版本归属经 {@code recordService.findByVersion} 租户隔离查询校验;
+     * 仅 SUCCESS 版本可下载(PENDING/FAILED 不产出可用部署包)。
+     */
+    @GetMapping("/{version}/download")
+    public void download(@PathVariable String version, HttpServletResponse response) throws IOException {
+        PublishRecord record = recordService.findByVersion(version)
+                .orElseThrow(() -> new BizException("发布版本不存在: " + version));
+        if (!PublishRecordService.STATUS_SUCCESS.equals(record.getStatus())) {
+            throw new BizException("版本 " + version + " 未成功发布,无法下载");
+        }
+        String tenantCode = TenantContext.requireTenantCode();
+        String filename = URLEncoder.encode(tenantCode + "-" + version + ".zip", StandardCharsets.UTF_8);
+        response.setContentType("application/zip");
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"");
+        publishService.writeReleaseZip(version, response.getOutputStream());
     }
 }

@@ -8,8 +8,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.UncheckedIOException;
 import java.nio.file.*;
+import java.util.stream.Stream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  * 发布服务(TASK-1302 / 1303 / 1304,ARCHITECTURE §10,REQUIREMENTS §18)。
@@ -66,6 +72,42 @@ public class PublishService {
     /** {@code current} 符号链接目标(供校验/测试读取)。 */
     public Path currentPath(String tenantCode) {
         return Paths.get(wwwRoot).resolve(tenantCode).resolve("current");
+    }
+
+    /**
+     * 把指定版本的发布产物目录打包成 zip 写入 {@code out}(供后台下载部署文件)。
+     *
+     * <p>版本归属已由调用方(AdminPublishController 经 {@code recordService.findByVersion}
+     * 租户隔离查询)校验;此处仅按当前租户上下文定位 {@code releases/{version}} 目录,
+     * 目录不存在或不可读时抛 {@link BizException}。zip 内条目用相对路径,避免 ZipSlip。
+     *
+     * @param version 租户内已存在的发布版本号(如 v001)
+     * @param out     下载响应输出流(调用方负责在 finally 关闭)
+     */
+    public void writeReleaseZip(String version, OutputStream out) throws IOException {
+        String tenantCode = TenantContext.requireTenantCode();
+        Path releaseDir = Paths.get(wwwRoot).resolve(tenantCode).resolve("releases").resolve(version);
+        if (!Files.isDirectory(releaseDir)) {
+            throw new BizException("发布产物目录不存在: " + version);
+        }
+        Path root = releaseDir.toAbsolutePath().normalize();
+        try (ZipOutputStream zos = new ZipOutputStream(out);
+             Stream<Path> walk = Files.walk(root)) {
+            walk.filter(p -> !p.equals(root) && Files.isRegularFile(p))
+                    .forEach(p -> {
+                        String entryName = root.relativize(p).toString()
+                                .replace(File.separatorChar, '/');
+                        try {
+                            zos.putNextEntry(new ZipEntry(entryName));
+                            Files.copy(p, zos);
+                            zos.closeEntry();
+                        } catch (IOException e) {
+                            throw new UncheckedIOException(e);
+                        }
+                    });
+        } catch (UncheckedIOException e) {
+            throw e.getCause();
+        }
     }
 
     /** 原子切换 current → 新 release。 */

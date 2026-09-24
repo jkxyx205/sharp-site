@@ -24,7 +24,7 @@
             <div class="card">
                 <table>
                     <thead>
-                    <tr><th>版本</th><th>状态</th><th>开始时间</th><th>完成时间</th><th>错误信息</th></tr>
+                    <tr><th>版本</th><th>状态</th><th>开始时间</th><th>完成时间</th><th>错误信息</th><th>下载</th></tr>
                     </thead>
                     <tbody>
                     <tr th:each="r : ${records}">
@@ -33,6 +33,7 @@
                         <td><span th:if="${r.startedAt != null}" th:text="${#temporals.format(r.startedAt, 'yyyy-MM-dd HH:mm:ss')}">—</span></td>
                         <td><span th:if="${r.finishedAt != null}" th:text="${#temporals.format(r.finishedAt, 'yyyy-MM-dd HH:mm:ss')}">—</span></td>
                         <td class="error" th:text="${r.errorMessage ?: ''}">—</td>
+                        <td><a th:if="${r.status == 'SUCCESS'}" th:href="@{/admin/publish/{v}/download(v=${r.version})}">下载</a></td>
                     </tr>
                     </tbody>
                 </table>
