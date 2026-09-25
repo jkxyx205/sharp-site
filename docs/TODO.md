@@ -36,7 +36,8 @@ Phase 2 MVP 已实现并可用：多租户 + 域名解析、Theme 解耦（moder
 当前仅有本地开发说明，缺少生产部署文档与自动化。
 
 - [ ] 生产 `application.yml` profile（`prod`）：数据库连接、`sharp.site.www-root`、上传根目录、日志路径。
-- [ ] Nginx 配置范例：静态站 `root /data/www/{tenant}/current;` + `/admin/*`、`/preview/*`、`POST /contact`（询盘）反代到 Spring Boot；域名 → tenant 目录映射；**域名不可访问其它 tenant 目录**（task §TASK-1403）。
+- [ ] Nginx 配置范例：静态站 `root /data/www/{tenantCode
+- }/current;` + `/admin/*`、`/preview/*`、`POST /contact`（询盘）反代到 Spring Boot；域名 → tenant 目录映射；**域名不可访问其它 tenant 目录**（task §TASK-1403）。
 - [ ] SSL：Phase 2 明确不做自动 SSL，但商用需明确方案（certbot / Caddy / 反代层托管），写入部署文档。
 - [ ] 应用作为 systemd / 容器运行说明；健康检查端点（`/actuator/health`，是否引入 actuator 需评估依赖）。
 - [ ] 发布目录清理策略：保留最近 N 个 release，旧版本可回滚。

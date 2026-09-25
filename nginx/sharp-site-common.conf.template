@@ -28,7 +28,7 @@ server {
     server_name {domain};
 
     # 静态根:该租户的当前发布版本(release 符号链接)
-    root /data/www/{tenant_id}/current;
+    root /data/www/{tenant_code}/current;
     index index.html;
 
     # 路径首页:优先 index.html

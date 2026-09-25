@@ -124,7 +124,7 @@ psql -h <host> -U <user> -d sharp_site -f sql/schema.sql
 ## Nginx 配置
 
 静态站点由 Nginx 直接托管,按 Host → 租户目录映射。模板见
-[`nginx/sharp-site.conf.template`](nginx/sharp-site.conf.template):
+[`nginx/sharp-site.conf.template`](nginx/sharp-site.manual-domain.conf.template):
 
 ```
 domain ──► /data/www/{tenantId}/current

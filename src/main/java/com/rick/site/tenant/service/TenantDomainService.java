@@ -41,8 +41,11 @@ public class TenantDomainService extends BaseServiceImpl<TenantDomainDAO, Tenant
 
     private static final int DOMAIN_MAX_LENGTH = 255;
 
-    public TenantDomainService(TenantDomainDAO baseDAO) {
+    private final DomainRoutingService routingService;
+
+    public TenantDomainService(TenantDomainDAO baseDAO, DomainRoutingService routingService) {
         super(baseDAO);
+        this.routingService = routingService;
     }
 
     /** 当前上下文租户的域名(tenant_id 由 DatabaseConfig 统一追加)。 */
@@ -81,7 +84,10 @@ public class TenantDomainService extends BaseServiceImpl<TenantDomainDAO, Tenant
                 .isPrimary(primary ? (short) 1 : (short) 0)
                 .status((short) 1)
                 .build();
-        return baseDAO.insert(entity);
+        TenantDomain inserted = baseDAO.insert(entity);
+        // 绑定域名:建 by-host 软链,nginx 即按 $host 自动路由到该租户 current
+        routingService.enable(normalized, TenantContext.requireTenantCode());
+        return inserted;
     }
 
     /**
@@ -99,13 +105,22 @@ public class TenantDomainService extends BaseServiceImpl<TenantDomainDAO, Tenant
     public TenantDomain updateStatus(Long domainId, short status) {
         TenantDomain owned = requireOwned(domainId);
         owned.setStatus(status);
-        return baseDAO.update(owned);
+        TenantDomain updated = baseDAO.update(owned);
+        // 停用 → 移除软链;启用 → 重建软链
+        if (status == 1) {
+            routingService.enable(owned.getDomain(), TenantContext.requireTenantCode());
+        } else {
+            routingService.disable(owned.getDomain());
+        }
+        return updated;
     }
 
     @Transactional(rollbackFor = Exception.class)
     public void delete(Long domainId) {
-        requireOwned(domainId);
+        TenantDomain owned = requireOwned(domainId);
         baseDAO.deleteById(domainId);
+        // 删除域名:移除软链,该域名不再路由
+        routingService.disable(owned.getDomain());
     }
 
     /** 域名规范化:trim + 小写 + 格式校验 */

@@ -1,0 +1,40 @@
+# 放在 http {} 块内
+#
+# 域名 → 站点目录的映射由应用维护,nginx 不再逐域名配置:
+# {wwwRoot}/by-host/{域名} 是指向 {wwwRoot}/{tenantCode}/current 的软链,
+# 由 sharp-site 在「绑定/停用/删除域名」时自动创建/移除(见 DomainRoutingService)。
+# 新增域名无需改 nginx,应用建好软链即自动生效;未知域名无软链 → 默认 404。
+
+server {
+    listen 80 default_server;
+    # 捕获所有域名:不再逐一列举 server_name,新增域名无需改 nginx
+    server_name _;
+    index index.html;
+
+    location ~ ^/(?:admin|preview|themes-images)/ {
+        proxy_pass http://localhost:8080;
+
+        # 后端按 Host 解析租户(TenantResolver 查 tenant_domain),必须透传真实域名
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # /contact:POST 转发后端(表单提交),其余返回静态页
+    location /contact {
+        if ($request_method = POST) {
+            proxy_pass http://localhost:8080;
+        }
+        root /Users/rick/Space/tmp/site/www/by-host/$host;
+    }
+
+    location /upload/ {
+        alias /Users/rick/Space/tmp/site/upload/;
+    }
+
+    location / {
+        # 按 $host 取 by-host/{域名} 软链 → 租户 current 发布目录
+        root /Users/rick/Space/tmp/site/www/by-host/$host;
+    }
+}
