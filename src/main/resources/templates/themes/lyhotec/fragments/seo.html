@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<!-- SEO meta: title / description / keywords / canonical / robots / OG。siteName 硬编码为 LYHOTEC。 -->
-<th:block th:fragment="seo(title, description, keywords, canonical, robots)">
-    <title th:text="${title + ' | LYHOTEC'}">LYHOTEC</title>
+<!-- SEO meta 片段 (README §9):title/description/keywords/canonical/robots/OG,
+     全部来自 SeoConfigService 写入的模型变量,不硬编码企业内容。 -->
+<th:block th:fragment="seo(title, description, keywords, canonical, robots, siteName)">
+    <title th:text="${title + ' | ' + siteName}">Page Title | Site Name</title>
     <meta name="description" th:content="${description}" content="" />
     <meta name="keywords" th:content="${keywords}" content="" />
     <link rel="canonical" th:href="${canonical}" href="/" />
     <meta name="robots" th:content="${robots}" content="index, follow" />
-    <meta name="theme-color" content="#0b0d10" />
-    <meta property="og:title" th:content="${title}" content="LYHOTEC" />
-    <meta property="og:description" th:content="${description}" content="" />
-    <meta property="og:site_name" content="LYHOTEC" />
+    <meta property="og:title" th:content="${ogTitle != null ? ogTitle : title}" content="" />
+    <meta property="og:description" th:content="${ogDescription != null ? ogDescription : description}" content="" />
+    <meta property="og:image" th:if="${ogImage != null and !ogImage.isEmpty()}" th:content="${ogImage}" />
+    <meta property="og:site_name" th:content="${siteName}" content="" />
     <meta property="og:type" content="website" />
-    <meta name="twitter:card" content="summary_large_image" />
 </th:block>
 </html>

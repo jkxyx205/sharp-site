@@ -1,67 +1,41 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<!-- LYHOTEC 页脚:静态造数企业信息。滚动揭示脚本在此收口。 -->
-<footer th:fragment="footer()" class="site-footer">
-    <div class="container">
-        <div class="footer-top">
-            <div class="footer-brand">
-                <div class="brand"><span class="accent-dot"></span> LYHOTEC</div>
-                <p>硬核清洁科技 · 苏州研发制造。以数码马达与气旋工程,重新定义家居清洁的吸力与效率。</p>
+<!-- 页脚 (README §10):企业信息来自 TenantConfig,判空访问,不硬编码。 -->
+<footer th:fragment="footer(siteName, config)" class="site-footer">
+    <div class="container footer-grid">
+        <div class="footer-brand">
+            <div class="brand">
+                <img class="brand-logo" th:src="@{/themes-images/{tid}/images/lyhotec-logo.png(tid=${themeId})}" src="/themes-images/lyhotec/images/lyhotec-logo.png" th:alt="${siteName}" alt="LYHOTEC" width="36" height="36" />
+<!--                <span class="brand-mark" th:text="${siteName}">LYHOTEC</span>-->
             </div>
-            <div>
-                <h4>产品</h4>
-                <a href="/products">无线吸尘器</a>
-                <a href="/products">布艺清洗机</a>
-                <a href="/accessories">配件中心</a>
-                <a href="/tech">核心技术</a>
-            </div>
-            <div>
-                <h4>支持</h4>
-                <a href="/support">说明书下载</a>
-                <a href="/support">教学视频</a>
-                <a href="/support">保修注册</a>
-                <a href="/support">常见问题</a>
-            </div>
-            <div>
-                <h4>公司</h4>
-                <a href="/about">关于我们</a>
-                <a href="/blog">博客</a>
-                <a href="mailto:support@lyhotec.com">support@lyhotec.com</a>
-                <a href="tel:+8651268000000">+86 512 6800 0000</a>
-            </div>
+            <p class="footer-tagline" th:text="#{footer.tagline}">Tagline</p>
         </div>
-        <div class="footer-bottom">
-            <span>© <span th:text="${#temporals.format(#temporals.createNow(), 'yyyy')}">2026</span> LYHOTEC. 保留所有权利。</span>
-            <span>苏ICP备2026000000号 · 苏州市高新区科技城马达路 88 号</span>
+        <div class="footer-col">
+            <h5 th:text="#{footer.nav.title}">Navigate</h5>
+            <ul>
+                <li><a th:href="@{${localePrefix + '/'}}" th:text="#{nav.home}">Home</a></li>
+                <li><a th:href="@{${localePrefix + '/products'}}" th:text="#{nav.products}">Products</a></li>
+                <li><a th:href="@{${localePrefix + '/news'}}" th:text="#{nav.news}">News</a></li>
+                <li><a th:href="@{${localePrefix + '/about'}}" th:text="#{nav.about}">About</a></li>
+                <li><a th:href="@{${localePrefix + '/contact'}}" th:text="#{nav.contact}">Contact</a></li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h5 th:text="#{footer.contact.title}">Contact</h5>
+            <ul>
+                <li th:if="${config != null and config.address != null}" th:text="${config.address}">Address</li>
+                <li th:if="${config != null and config.phone != null}" th:text="|#{common.tel}: ${config.phone}|">Tel</li>
+                <li th:if="${config != null and config.email != null}">
+                    <a th:href="'mailto:' + ${config.email}" th:text="${config.email}">email</a>
+                </li>
+                <li th:if="${config != null and config.whatsapp != null}" th:text="|#{common.whatsapp}: ${config.whatsapp}|">WhatsApp</li>
+            </ul>
         </div>
     </div>
-    <script>
-    (function () {
-        var prefersReduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        var els = document.querySelectorAll('[data-reveal]');
-        if (prefersReduce || !('IntersectionObserver' in window)) {
-            els.forEach(function (e) { e.classList.add('is-visible'); });
-        } else {
-            var io = new IntersectionObserver(function (entries) {
-                entries.forEach(function (en) {
-                    if (en.isIntersecting) { en.target.classList.add('is-visible'); io.unobserve(en.target); }
-                });
-            }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
-            els.forEach(function (e) { io.observe(e); });
-        }
-        /* product detail tabs */
-        document.querySelectorAll('.pd-tabs [data-tab]').forEach(function (btn) {
-            btn.addEventListener('click', function () {
-                var head = btn.closest('.tab-head');
-                var wrap = head.parentElement;
-                head.querySelectorAll('button').forEach(function (b) { b.classList.remove('active'); });
-                btn.classList.add('active');
-                wrap.querySelectorAll('.tab-pane').forEach(function (p) { p.classList.remove('active'); });
-                var target = wrap.querySelector('[data-pane="' + btn.getAttribute('data-tab') + '"]');
-                if (target) target.classList.add('active');
-            });
-        });
-    })();
-    </script>
+    <div class="container footer-bottom">
+        <p th:if="${config != null and config.copyright != null}" th:text="${config.copyright}">© Year Site</p>
+        <p th:if="${config == null or config.copyright == null}" th:text="#{footer.copyright}">© 2026 LYHOTEC</p>
+        <p th:if="${config != null and config.icp != null}" th:text="${config.icp}" class="icp">ICP</p>
+    </div>
 </footer>
 </html>

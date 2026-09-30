@@ -1,35 +1,24 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<!-- LYHOTEC 顶部导航:白色玻璃态。active 渐变下划线高亮当前页。 -->
-<header th:fragment="header(active)" class="site-header">
+<!-- 顶部导航 (README §10)。active 标记当前页。站内链接拼 localePrefix。 -->
+<header th:fragment="header(siteName, active)" class="site-header" id="top">
     <div class="container header-inner">
         <a class="brand" th:href="@{${localePrefix + '/'}}">
-            <span class="accent-dot"></span>
-            <span>LYHOTEC</span>
-            <small>硬核清洁科技</small>
+            <img class="brand-logo" th:src="@{/themes-images/{tid}/images/lyhotec-logo.png(tid=${themeId})}" src="/themes-images/lyhotec/images/lyhotec-logo.png" th:alt="${siteName}" alt="LYHOTEC" width="36" height="36" />
+            <span class="brand-text">
+<!--                <span class="brand-mark" th:text="${siteName}">LYHOTEC</span>-->
+                <span class="brand-tag" th:text="#{brand.tagline}">Home Cleaning Technology</span>
+            </span>
         </a>
-        <button class="nav-toggle" aria-label="Toggle menu"
-                onclick="this.parentElement.classList.toggle('open')">&#9776;</button>
-        <nav class="site-nav">
-            <a th:href="@{${localePrefix + '/'}}" th:classappend="${active == 'index'} ? 'active' : ''">首页</a>
-            <a th:href="@{${localePrefix + '/products'}}" th:classappend="${active == 'products'} ? 'active' : ''">产品中心</a>
-            <a th:href="@{${localePrefix + '/tech'}}" th:classappend="${active == 'tech'} ? 'active' : ''">核心技术</a>
-            <a th:href="@{${localePrefix + '/accessories'}}" th:classappend="${active == 'accessories'} ? 'active' : ''">配件中心</a>
-            <a th:href="@{${localePrefix + '/support'}}" th:classappend="${active == 'support'} ? 'active' : ''">售后支持</a>
-            <a th:href="@{${localePrefix + '/blog'}}" th:classappend="${active == 'blog'} ? 'active' : ''">博客</a>
-            <a th:href="@{${localePrefix + '/about'}}" th:classappend="${active == 'about'} ? 'active' : ''">关于我们</a>
-            <a class="btn btn-accent nav-cta" th:href="@{${localePrefix + '/products'}}">立即选购</a>
+        <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false" onclick="this.parentElement.classList.toggle('open');this.setAttribute('aria-expanded',this.parentElement.classList.contains('open'))">&#9776;</button>
+        <nav class="site-nav" aria-label="Primary">
+            <a th:href="@{${localePrefix + '/'}}" th:text="#{nav.home}" th:classappend="${active == 'index'} ? 'active' : ''">Home</a>
+            <a th:href="@{${localePrefix + '/products'}}" th:text="#{nav.products}" th:classappend="${active == 'products'} ? 'active' : ''">Products</a>
+            <a th:href="@{${localePrefix + '/news'}}" th:text="#{nav.news}" th:classappend="${active == 'news'} ? 'active' : ''">News</a>
+            <a th:href="@{${localePrefix + '/about'}}" th:text="#{nav.about}" th:classappend="${active == 'about'} ? 'active' : ''">About</a>
+            <a th:href="@{${localePrefix + '/contact'}}" th:text="#{nav.contact}" th:classappend="${active == 'contact'} ? 'active' : ''">Contact</a>
+            <th:block th:replace="~{themes/__${themeId}__/fragments/language :: language(current=${currentLanguage}, languages=${languages})}"></th:block>
         </nav>
     </div>
-    <script>
-    (function () {
-        document.querySelectorAll('.site-nav a').forEach(function (a) {
-            a.addEventListener('click', function () {
-                var h = document.querySelector('.header-inner');
-                if (h) h.classList.remove('open');
-            });
-        });
-    })();
-    </script>
 </header>
 </html>

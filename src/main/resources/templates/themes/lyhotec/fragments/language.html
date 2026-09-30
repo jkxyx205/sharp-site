@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- 语言切换 (README §8):languages 为空时整体不渲染。单 span 内 each,分隔符在内层可见。 -->
+<span th:fragment="language(current, languages)" class="lang-switch"
+      th:if="${languages != null and !languages.isEmpty()}">
+    <span th:each="l : ${languages}">
+        <a th:href="@{${l.path}}" th:text="${l.label}"
+           th:classappend="${l.code == current} ? 'active' : ''">EN</a><th:block th:if="${!lStat.last}"> / </th:block>
+    </span>
+</span>
+</html>

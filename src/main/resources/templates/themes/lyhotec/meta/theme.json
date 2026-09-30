@@ -1,22 +1,30 @@
 {
-  "locales": [
-    "zh-CN"
-  ],
-  "defaultLocale": "zh-CN",
+  "locales": ["en-US", "zh-CN"],
+  "defaultLocale": "en-US",
   "pages": [
     {
       "path": "/",
       "template": "index",
-      "label": "首页",
+      "label": "Home",
       "seo_config": {
-        "zh-CN": {
-          "title": "LYHOTEC | 硬核清洁科技 · 无线吸尘器与布艺清洗机",
-          "description": "LYHOTEC 以自研数码马达打造高端无线吸尘器与布艺清洗机。300AW 大吸力、高温蒸汽、防缠绕刷头,为极致干净而生。",
-          "keywords": "无线吸尘器,布艺清洗机,大吸力,数码马达,LYHOTEC,清洁科技,高温蒸汽",
-          "canonical": "/",
+        "en-US": {
+          "title": "LYHOTEC — Home Cleaning Technology",
+          "description": "LYHOTEC engineers vacuum cleaners, fabric cleaning machines and leaf blowers. Core motor R&D, precision manufacturing, minimal design.",
+          "keywords": "vacuum cleaner, fabric cleaning machine, leaf blower, home cleaning appliances, cleaning technology, LYHOTEC",
+          "canonical": "",
           "robots": "index, follow",
-          "ogTitle": "LYHOTEC — 硬核清洁科技",
-          "ogDescription": "300AW 大吸力,重新定义干净。",
+          "ogTitle": "LYHOTEC — Home Cleaning Technology",
+          "ogDescription": "Vacuum cleaners, fabric cleaning machines and leaf blowers engineered around our own high-speed motor platform.",
+          "ogImage": ""
+        },
+        "zh-CN": {
+          "title": "LYHOTEC — 家清科技",
+          "description": "LYHOTEC 自研吸尘器、布艺清洗机与吹叶机,核心电机自研,精密制造,极简设计。",
+          "keywords": "吸尘器,布艺清洗机,吹叶机,家清产品,清洁科技,LYHOTEC",
+          "canonical": "",
+          "robots": "index, follow",
+          "ogTitle": "LYHOTEC — 家清科技",
+          "ogDescription": "围绕自研高速电机平台打造的吸尘器、布艺清洗机与吹叶机。",
           "ogImage": ""
         }
       }
@@ -24,84 +32,53 @@
     {
       "path": "/products",
       "template": "products",
-      "label": "产品中心",
+      "label": "Products",
       "seo_config": {
+        "en-US": {
+          "title": "Products — Vacuum Cleaners, Fabric Cleaners, Leaf Blowers",
+          "description": "Browse LYHOTEC product lines: cordless vacuum cleaners, fabric cleaning machines and leaf blowers built on our high-speed motor platform.",
+          "keywords": "vacuum cleaner, fabric cleaning machine, leaf blower, cordless vacuum, product catalog, LYHOTEC",
+          "canonical": "",
+          "robots": "index, follow",
+          "ogTitle": "LYHOTEC Products",
+          "ogDescription": "Cordless vacuums, fabric cleaners and leaf blowers engineered around a single high-speed motor platform.",
+          "ogImage": ""
+        },
         "zh-CN": {
-          "title": "产品中心 — LYHOTEC",
-          "description": "探索 LYHOTEC 全系清洁产品:无线吸尘器、布艺清洗机、扫地机器人及配件。按场景与参数筛选适合你家的清洁方案。",
-          "keywords": "LYHOTEC 产品,无线吸尘器,布艺清洗机,扫地机,配件,选购",
-          "canonical": "/products",
+          "title": "产品中心 — 吸尘器、布艺清洗机、吹叶机",
+          "description": "浏览 LYHOTEC 产品线:无线吸尘器、布艺清洗机与吹叶机,基于自研高速电机平台。",
+          "keywords": "吸尘器,布艺清洗机,吹叶机,无线吸尘器,产品中心,LYHOTEC",
+          "canonical": "",
           "robots": "index, follow",
           "ogTitle": "LYHOTEC 产品中心",
-          "ogDescription": "LYHOTEC 全系清洁产品,为每一种清洁需求而造。",
+          "ogDescription": "围绕单一高速电机平台打造的无线吸尘器、布艺清洗机与吹叶机。",
           "ogImage": ""
         }
       }
     },
     {
-      "path": "/product-detail",
-      "template": "product-detail",
-      "label": "产品详情",
+      "path": "/news",
+      "template": "news",
+      "label": "News",
       "seo_config": {
-        "zh-CN": {
-          "title": "V12 Pro 无线吸尘器 — LYHOTEC",
-          "description": "LYHOTEC V12 Pro 无线吸尘器:300AW 大吸力、125000 转数码马达、60 分钟续航、防缠绕刷头、整机密封过滤。参数、包装清单、FAQ 与真实评价。",
-          "keywords": "V12 Pro,无线吸尘器,300AW,数码马达,LYHOTEC,防缠绕刷头",
-          "canonical": "/product-detail",
+        "en-US": {
+          "title": "Company News — LYHOTEC",
+          "description": "Latest company news from LYHOTEC: product launches, manufacturing updates, R&D milestones and partnerships.",
+          "keywords": "LYHOTEC news, company news, product launch, manufacturing, R&D",
+          "canonical": "",
           "robots": "index, follow",
-          "ogTitle": "V12 Pro 无线吸尘器",
-          "ogDescription": "300AW 大吸力,重新定义干净。",
+          "ogTitle": "Company News — LYHOTEC",
+          "ogDescription": "Product launches, manufacturing updates, R&D milestones and partnerships from LYHOTEC.",
           "ogImage": ""
-        }
-      }
-    },
-    {
-      "path": "/tech",
-      "template": "tech",
-      "label": "核心技术",
-      "seo_config": {
+        },
         "zh-CN": {
-          "title": "核心技术 — LYHOTEC",
-          "description": "LYHOTEC 核心技术解析:自研数码马达、气旋分离、防缠绕刷头、140℃ 高温蒸汽杀菌与五重密封过滤。用工程思维重新定义清洁。",
-          "keywords": "LYHOTEC 技术,数码马达,气旋分离,防缠绕,高温蒸汽,HEPA过滤",
-          "canonical": "/tech",
+          "title": "公司新闻 — LYHOTEC",
+          "description": "LYHOTEC 最新动态:新品发布、制造进展、研发里程碑与合作。",
+          "keywords": "LYHOTEC 新闻,公司新闻,新品发布,制造,研发",
+          "canonical": "",
           "robots": "index, follow",
-          "ogTitle": "LYHOTEC 核心技术",
-          "ogDescription": "每一项专利,都为更干净。",
-          "ogImage": ""
-        }
-      }
-    },
-    {
-      "path": "/accessories",
-      "template": "accessories",
-      "label": "配件中心",
-      "seo_config": {
-        "zh-CN": {
-          "title": "配件中心 — LYHOTEC",
-          "description": "LYHOTEC 配件中心:全系刷头、滤网、水管、电池与专用清洁液,方便老客户复购,让设备持久如新。",
-          "keywords": "LYHOTEC 配件,刷头,滤网,电池,清洁液,水管,复购",
-          "canonical": "/accessories",
-          "robots": "index, follow",
-          "ogTitle": "LYHOTEC 配件中心",
-          "ogDescription": "原厂配件,精准适配,持久如新。",
-          "ogImage": ""
-        }
-      }
-    },
-    {
-      "path": "/support",
-      "template": "support",
-      "label": "售后支持",
-      "seo_config": {
-        "zh-CN": {
-          "title": "售后支持 — LYHOTEC",
-          "description": "LYHOTEC 售后支持:说明书 PDF 下载、操作教学视频、保修注册、常见问题排查与联系方式。让设备使用无忧。",
-          "keywords": "LYHOTEC 支持,说明书下载,教学视频,保修注册,常见问题,Troubleshooting",
-          "canonical": "/support",
-          "robots": "index, follow",
-          "ogTitle": "LYHOTEC 售后支持",
-          "ogDescription": "从开箱到日常维护,完整售后资源。",
+          "ogTitle": "公司新闻 — LYHOTEC",
+          "ogDescription": "LYHOTEC 的产品发布、制造进展、研发里程碑与合作动态。",
           "ogImage": ""
         }
       }
@@ -109,33 +86,53 @@
     {
       "path": "/about",
       "template": "about",
-      "label": "关于我们",
+      "label": "About",
       "seo_config": {
+        "en-US": {
+          "title": "About Us — LYHOTEC",
+          "description": "LYHOTEC is a home cleaning technology company focused on high-speed motor R&D and precision manufacturing. Meet our factory and team.",
+          "keywords": "about LYHOTEC, cleaning technology company, motor R&D, factory, manufacturing",
+          "canonical": "",
+          "robots": "index, follow",
+          "ogTitle": "About Us — LYHOTEC",
+          "ogDescription": "A home cleaning technology company built on high-speed motor R&D and precision manufacturing.",
+          "ogImage": ""
+        },
         "zh-CN": {
           "title": "关于我们 — LYHOTEC",
-          "description": "LYHOTEC 品牌故事:苏州研发制造的硬核清洁科技公司。自有无尘车间与研发实验室,以流体力学与马达工程重新定义家居清洁。",
-          "keywords": "关于LYHOTEC,品牌故事,苏州研发,无尘车间,清洁科技,马达工程",
-          "canonical": "/about",
+          "description": "LYHOTEC 是一家专注高速电机自研与精密制造的家清科技公司,了解我们的工厂与团队。",
+          "keywords": "关于 LYHOTEC,清洁科技公司,电机研发,工厂,制造",
+          "canonical": "",
           "robots": "index, follow",
-          "ogTitle": "关于 LYHOTEC",
-          "ogDescription": "从一颗马达,到重新定义干净。",
+          "ogTitle": "关于我们 — LYHOTEC",
+          "ogDescription": "以高速电机自研与精密制造为根基的家清科技公司。",
           "ogImage": ""
         }
       }
     },
     {
-      "path": "/blog",
-      "template": "blog",
-      "label": "博客",
+      "path": "/contact",
+      "template": "contact",
+      "label": "Contact",
       "seo_config": {
-        "zh-CN": {
-          "title": "博客 — LYHOTEC",
-          "description": "LYHOTEC 清洁知识博客:如何去除沙发宠物尿渍、硬质地板最佳吸尘方案、布艺沙发保养、车内清洁技巧等实用内容。",
-          "keywords": "清洁博客,宠物尿渍,沙发清洁,地板吸尘,布艺保养,车内清洁,LYHOTEC",
-          "canonical": "/blog",
+        "en-US": {
+          "title": "Contact — LYHOTEC",
+          "description": "Contact LYHOTEC for product inquiries, distribution partnerships and OEM/ODM cooperation.",
+          "keywords": "contact LYHOTEC, product inquiry, distribution, OEM, ODM, partnership",
+          "canonical": "",
           "robots": "index, follow",
-          "ogTitle": "LYHOTEC 博客",
-          "ogDescription": "清洁的科学与艺术。",
+          "ogTitle": "Contact — LYHOTEC",
+          "ogDescription": "Get in touch with LYHOTEC for product inquiries, distribution and OEM/ODM cooperation.",
+          "ogImage": ""
+        },
+        "zh-CN": {
+          "title": "联系我们 — LYHOTEC",
+          "description": "联系 LYHOTEC 洽谈产品咨询、经销合作与 OEM/ODM 合作。",
+          "keywords": "联系 LYHOTEC,产品咨询,经销,OEM,ODM,合作",
+          "canonical": "",
+          "robots": "index, follow",
+          "ogTitle": "联系我们 — LYHOTEC",
+          "ogDescription": "联系 LYHOTEC 洽谈产品咨询、经销与 OEM/ODM 合作。",
           "ogImage": ""
         }
       }

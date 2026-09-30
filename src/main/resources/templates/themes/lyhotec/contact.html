@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html th:lang="${currentLanguage}" th:dir="${currentLanguage == 'ar-SA' ? 'rtl' : 'ltr'}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{themes/__${themeId}__/fragments/head :: head(pageTitle=${pageTitle}, pageDescription=${pageDescription}, pageKeywords=${pageKeywords}, canonical=${canonical}, robots=${robots}, siteName=${siteName})}"></head>
+<body>
+<header th:replace="~{themes/__${themeId}__/fragments/header :: header(siteName=${siteName}, active='contact')}"></header>
+
+<section class="section">
+    <div class="container">
+        <span class="eyebrow" th:text="#{contact.label}">Contact</span>
+        <h1 class="h-display" th:text="#{contact.title}">Talk to our team</h1>
+        <p class="lead" th:text="#{contact.subtitle}">Product inquiry, distribution, or OEM/ODM cooperation.</p>
+    </div>
+</section>
+
+<section class="section" style="padding-top:0">
+    <div class="container contact-grid">
+        <div class="contact-info">
+            <h2 class="h-section" style="font-size:1.3rem" th:text="#{contact.info.title}">Direct contact</h2>
+            <ul>
+                <li th:if="${config != null and config.address != null}">
+                    <span class="k" th:text="#{contact.info.address}">Address</span>
+                    <span th:text="${config.address}">Address</span>
+                </li>
+                <li th:if="${config != null and config.phone != null}">
+                    <span class="k" th:text="#{contact.info.phone}">Phone</span>
+                    <span th:text="${config.phone}">+86 ...</span>
+                </li>
+                <li th:if="${config != null and config.mobile != null}">
+                    <span class="k" th:text="#{common.mobile}">Mobile</span>
+                    <span th:text="${config.mobile}">+86 ...</span>
+                </li>
+                <li th:if="${config != null and config.email != null}">
+                    <span class="k" th:text="#{contact.info.email}">Email</span>
+                    <span><a th:href="'mailto:' + ${config.email}" th:text="${config.email}">email</a></span>
+                </li>
+                <li th:if="${config != null and config.whatsapp != null}">
+                    <span class="k" th:text="#{common.whatsapp}">WhatsApp</span>
+                    <span th:text="${config.whatsapp}">WhatsApp</span>
+                </li>
+                <li>
+                    <span class="k" th:text="#{contact.info.hours}">Hours</span>
+                    <span th:text="#{contact.info.hours_val}">Mon–Fri, 9:00–18:00 (CST)</span>
+                </li>
+            </ul>
+        </div>
+
+        <div>
+            <div id="contactSuccess" class="contact-banner success" hidden th:text="#{contact.sent_success}">发送成功</div>
+            <div id="contactError" class="contact-banner error" hidden th:text="#{contact.sent_failed}">发送失败</div>
+            <form class="contact-form" method="post" action="/contact">
+                <div class="field">
+                    <label for="cf-name"><span th:text="#{contact.name}">Name</span></label>
+                    <input id="cf-name" type="text" name="name" required autocomplete="name" />
+                </div>
+                <div class="field">
+                    <label for="cf-email"><span th:text="#{contact.email}">Email</span></label>
+                    <input id="cf-email" type="email" name="email" required autocomplete="email" />
+                </div>
+                <div class="field">
+                    <label for="cf-message"><span th:text="#{contact.message}">Message</span></label>
+                    <textarea id="cf-message" name="message" rows="5" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-solid" th:text="#{contact.send}">Send message</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<footer th:replace="~{themes/__${themeId}__/fragments/footer :: footer(siteName=${siteName}, config=${config})}"></footer>
+<script>
+(function () {
+    var form = document.querySelector('.contact-form');
+    if (!form) return;
+    var ok = document.getElementById('contactSuccess');
+    var no = document.getElementById('contactError');
+    function show(el) { if (el) el.hidden = false; }
+    function hide(el) { if (el) el.hidden = true; }
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        hide(ok); hide(no);
+        var btn = form.querySelector('button[type=submit]');
+        if (btn) btn.disabled = true;
+        fetch(form.action, { method: 'POST', body: new FormData(form), headers: { 'Accept': 'application/json' } })
+            .then(function (r) { return r.json(); })
+            .then(function (d) { if (d && d.success) { show(ok); form.reset(); } else { show(no); } })
+            .catch(function () { show(no); })
+            .finally(function () { if (btn) btn.disabled = false; });
+    });
+})();
+</script>
+</body>
+</html>

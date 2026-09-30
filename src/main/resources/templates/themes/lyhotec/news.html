@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html th:lang="${currentLanguage}" th:dir="${currentLanguage == 'ar-SA' ? 'rtl' : 'ltr'}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{themes/__${themeId}__/fragments/head :: head(pageTitle=${pageTitle}, pageDescription=${pageDescription}, pageKeywords=${pageKeywords}, canonical=${canonical}, robots=${robots}, siteName=${siteName})}"></head>
+<body>
+<header th:replace="~{themes/__${themeId}__/fragments/header :: header(siteName=${siteName}, active='news')}"></header>
+
+<section class="section" style="padding-bottom:48px">
+    <div class="container">
+        <span class="eyebrow" th:text="#{news.label}">Newsroom</span>
+        <h1 class="h-display" th:text="#{news.title}">Company news</h1>
+        <p class="lead" th:text="#{news.subtitle}">Product launches, manufacturing, R&D and partnerships.</p>
+    </div>
+</section>
+
+<section class="section" style="padding-top:0">
+    <div class="container">
+        <div class="news-list">
+            <div class="news-item">
+                <a th:href="@{${localePrefix + '/news/ifa-2026-cyclone-platform'}}">
+                    <span class="date">2026 · 09 · 12</span>
+                    <span class="meta">
+                        <h3 th:text="#{news.n1.title}">Cyclone platform at IFA 2026</h3>
+                        <p th:text="#{news.n1.summary}">Doubles separation efficiency, cuts motor noise 12%.</p>
+                    </span>
+                    <span class="arr" th:text="#{news.readmore}">Read more</span>
+                </a>
+            </div>
+            <div class="news-item">
+                <a th:href="@{${localePrefix + '/news/factory-phase-two-full-production'}}">
+                    <span class="date">2026 · 08 · 28</span>
+                    <span class="meta">
+                        <h3 th:text="#{news.n2.title}">Smart manufacturing base reaches full production</h3>
+                        <p th:text="#{news.n2.summary}">Phase II adds 80,000 m² and an automated motor line.</p>
+                    </span>
+                    <span class="arr" th:text="#{news.readmore}">Read more</span>
+                </a>
+            </div>
+            <div class="news-item">
+                <a th:href="@{${localePrefix + '/news/motor-lab-200-patents'}}">
+                    <span class="date">2026 · 07 · 15</span>
+                    <span class="meta">
+                        <h3 th:text="#{news.n3.title}">R&D center surpasses 200 patents</h3>
+                        <p th:text="#{news.n3.summary}">200+ granted patents on high-speed digital motors.</p>
+                    </span>
+                    <span class="arr" th:text="#{news.readmore}">Read more</span>
+                </a>
+            </div>
+            <div class="news-item">
+                <a th:href="@{${localePrefix + '/news/sustainability-30-percent-energy'}}">
+                    <span class="date">2026 · 06 · 02</span>
+                    <span class="meta">
+                        <h3 th:text="#{news.n4.title}">Annual sustainability report: 30% energy-use reduction</h3>
+                        <p th:text="#{news.n4.summary}">New variable-frequency control cuts energy 30%.</p>
+                    </span>
+                    <span class="arr" th:text="#{news.readmore}">Read more</span>
+                </a>
+            </div>
+            <div class="news-item">
+                <a th:href="@{${localePrefix + '/news/european-retail-partnership'}}">
+                    <span class="date">2026 · 05 · 20</span>
+                    <span class="meta">
+                        <h3 th:text="#{news.n5.title}">Strategic partnership with European retail chain</h3>
+                        <p th:text="#{news.n5.summary}">1,200 stores across 14 countries from Q1 2027.</p>
+                    </span>
+                    <span class="arr" th:text="#{news.readmore}">Read more</span>
+                </a>
+            </div>
+        </div>
+        <nav class="pagination" th:if="${totalPages != null and totalPages > 1}">
+            <a th:if="${prevLink != null}" th:href="${prevLink}" th:text="#{page.prev}">‹ Previous</a>
+            <span th:text="${page + ' / ' + totalPages}">1 / 1</span>
+            <a th:if="${nextLink != null}" th:href="${nextLink}" th:text="#{page.next}">Next ›</a>
+        </nav>
+    </div>
+</section>
+
+<footer th:replace="~{themes/__${themeId}__/fragments/footer :: footer(siteName=${siteName}, config=${config})}"></footer>
+</body>
+</html>

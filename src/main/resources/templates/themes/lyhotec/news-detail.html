@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html th:lang="${currentLanguage}" th:dir="${currentLanguage == 'ar-SA' ? 'rtl' : 'ltr'}" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{themes/__${themeId}__/fragments/head :: head(pageTitle=${pageTitle}, pageDescription=${pageDescription}, pageKeywords=${pageKeywords}, canonical=${canonical}, robots=${robots}, siteName=${siteName})}"></head>
+<body>
+<header th:replace="~{themes/__${themeId}__/fragments/header :: header(siteName=${siteName}, active='news')}"></header>
+
+<!-- 静态数据新闻详情:有 ${article} 时用后端字段,否则回退到静态演示文章。 -->
+<article class="section" style="padding-top:96px">
+    <div class="container" style="max-width:860px">
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a th:href="@{${localePrefix + '/'}}" th:text="#{nav.home}">Home</a> / <a th:href="@{${localePrefix + '/news'}}" th:text="#{nav.news}">News</a>
+        </nav>
+
+        <span class="eyebrow" th:text="#{news.label}">Newsroom</span>
+        <h1 class="h-display" th:text="${article != null and article.title != null} ? ${article.title} : #{news.n1.title}">LYHOTEC unveils next-gen Cyclone platform at IFA 2026</h1>
+        <p class="article-meta" th:text="${article != null and article.publishTime != null ? #temporals.format(article.publishTime, 'yyyy · MM · dd') : '2026 · 09 · 12'}">2026 · 09 · 12</p>
+
+        <div class="article-body" th:utext="${article != null and article.content != null ? article.content : '<p>Berlin, 12 September 2026 — LYHOTEC today unveiled its next-generation Cyclone platform at IFA 2026, headlined by the flagship Cyclone Pro V18 cordless stick vacuum.</p><p>The new platform re-engineers the separation array into 15 counter-rotating cones, doubling separation efficiency so that suction holds steady as the bin fills. A redesigned acoustic baffle around the 125,000-rpm digital motor trims motor noise by 12 percent compared with the previous generation — a measurable drop in the sound a user actually hears while cleaning.</p><p>“Every product we make starts from the same motor,” the company said. “This generation is quieter not because we tuned the housing, but because we improved the motor itself.”</p><p>The Cyclone Pro V18 ships with a removable 25.2 V battery that swaps across the V-series line, and a HEPA-sealed exhaust capturing 99.97% of particles down to 0.3 µm.</p>'}">Article content.</div>
+
+        <p class="back-link"><a th:href="@{${localePrefix + '/news'}}" th:text="#{news.back}">← Back to news</a></p>
+    </div>
+</article>
+
+<footer th:replace="~{themes/__${themeId}__/fragments/footer :: footer(siteName=${siteName}, config=${config})}"></footer>
+</body>
+</html>
